@@ -24,4 +24,4 @@ To address all of these, this library uses a well-known JSON parser: Jackson.
 However, there are some cons to doing it this way:
 
 * It's not possible to have a different schema in the DynamoDB and JSON versions of an object.
-* Speed mayb be an issue (verify).
+* Speed may be an issue (verify).
