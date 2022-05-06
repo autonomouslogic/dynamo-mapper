@@ -8,6 +8,10 @@
 
 A simple mapper for converting to and from DynamoDB AttributeValues and POJOs using Jackson.
 
+## Usage
+* ObjectMapper constructions, JSR timestamps, big decimals
+* `@JsonInclude(JsonInclude.Include.NON_NULL)`
+
 ## Comparison with DynamoDBMapper and DynamoDB Enhanced
 The DynamoDBMapper in the v1 AWS SDK and the DynamoDB Enhanced Client in the v2 AWS SDK both provide similar mapping
 functionality.
@@ -19,9 +23,13 @@ of the implementations by AWS:
 * The annotation must be added to methods and not properties. This makes libraries such as Lombok useless.
 * The AWS mappers don't work well with builder classes, which again makes Lombok's `@Value`s useless.
 * Java 17 records?
+* Custom serializers.
 
 To address all of these, this library uses a well-known JSON parser: Jackson.
 However, there are some cons to doing it this way:
 
 * It's not possible to have a different schema in the DynamoDB and JSON versions of an object.
 * Speed may be an issue (verify).
+
+## Resources
+* https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html
