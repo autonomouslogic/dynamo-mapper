@@ -3,6 +3,7 @@ package com.autonomouslogic.dynamomapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -105,9 +106,22 @@ public class DynamoMapperTest {
 				).build()
 			).build())
 		),
-		LONG(
+		INTEGER(
 			new TestObject().setNumber(100),
 			Map.of("number", AttributeValue.builder().n("100").build())
+		),
+		INTEGER_LIST(
+			new TestObject().setNumberList(List.of(1, 2, 3)),
+			Map.of("numberList", AttributeValue.builder().ns("1", "2", "3").build())
+		),
+		INTEGER_SET(
+			new TestObject().setNumberSet(Set.of(1, 2, 3)),
+			Map.of("numberSet", AttributeValue.builder().ns("1", "2", "3").build())
+		),
+		NULL(
+			new TestObject(),
+			Map.of("nul", AttributeValue.builder().nul(true).build()),
+			EncodeDecode.DECODE_ONLY
 		),
 		STRING(
 			new TestObject().setString("str-val"),
@@ -125,6 +139,7 @@ public class DynamoMapperTest {
 
 	@ParameterizedTest
 	@EnumSource(Tests.class)
+	@SneakyThrows
 	public void shouldEncode(Tests test) {
 		if (test.getEncodeDecode() == EncodeDecode.DECODE_ONLY) {
 			return;
@@ -135,11 +150,12 @@ public class DynamoMapperTest {
 
 	@ParameterizedTest
 	@EnumSource(Tests.class)
+	@SneakyThrows
 	public void shouldDecode(Tests test) {
 		if (test.getEncodeDecode() == EncodeDecode.ENCODE_ONLY) {
 			return;
 		}
-		var pojo = mapper.decode(test.getDdb());
+		var pojo = mapper.decode(test.getDdb(), TestObject.class);
 		assertEquals(test.getPojo(), pojo);
 	}
 }

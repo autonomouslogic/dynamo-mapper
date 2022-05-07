@@ -27,5 +27,11 @@ public class TestObject {
 	@JsonProperty
 	protected Number number; // @todo Long, BigInteger, BigDecimal
 	@JsonProperty
+	protected List<Number> numberList;
+	@JsonProperty
+	protected Set<Number> numberSet;
+	@JsonProperty
+	protected String nul;
+	@JsonProperty
 	protected String string;
 }
