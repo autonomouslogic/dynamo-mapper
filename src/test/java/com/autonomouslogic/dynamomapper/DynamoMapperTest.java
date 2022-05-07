@@ -12,7 +12,9 @@ import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -32,7 +34,7 @@ public class DynamoMapperTest {
 			.setBinary(bytes)
 			.setString("str-val");
 
-		expectedDdb = new HashMap<String, AttributeValue>();
+		expectedDdb = new HashMap<>();
 		expectedDdb.put("binary", AttributeValue.builder().b(SdkBytes.fromByteArray(Base64.encodeBase64(bytes))).build());
 //		expectedDdb.put("bool", AttributeValue.builder().bool(true).build()); @todo
 //		expectedDdb.put("binarySet", AttributeValue.builder().bs().build()); @todo
@@ -57,6 +59,55 @@ public class DynamoMapperTest {
 			Map.of("string", AttributeValue.builder()
 				.b(SdkBytes.fromByteArray(Base64.encodeBase64(new byte[] {1, 2, 3, 4}))).build()),
 			EncodeDecode.DECODE_ONLY
+		),
+		BOOL(
+			new TestObject().setBool(true),
+			Map.of("bool", AttributeValue.builder().bool(true).build())
+		),
+		BINARY_SET(
+			new TestObject().setBinarySet(Set.of(
+				new byte[] {1, 2, 3, 4},
+				new byte[] {5, 6, 7, 8}
+			)),
+			Map.of("binarySet", AttributeValue.builder().bs(
+				SdkBytes.fromByteArray(Base64.encodeBase64(new byte[] {1, 2, 3, 4})),
+				SdkBytes.fromByteArray(Base64.encodeBase64(new byte[] {5, 6, 7, 8}))
+			).build())
+		),
+		BINARY_LIST(
+			new TestObject().setBinaryList(List.of(
+				new byte[] {1, 2, 3, 4},
+				new byte[] {5, 6, 7, 8}
+			)),
+			Map.of("binaryList", AttributeValue.builder().bs(
+				SdkBytes.fromByteArray(Base64.encodeBase64(new byte[] {1, 2, 3, 4})),
+				SdkBytes.fromByteArray(Base64.encodeBase64(new byte[] {5, 6, 7, 8}))
+			).build())
+		),
+		LIST_STRING(
+			new TestObject().setListString(List.of("str1", "str2")),
+			Map.of("listString", AttributeValue.builder().l(
+				AttributeValue.builder().s("str1").build(),
+				AttributeValue.builder().s("str2").build()
+			).build())
+		),
+		LIST_OBJECT(
+			new TestObject().setListObject(List.of(
+				new TestObject().setString("str1"),
+				new TestObject().setString("str2")
+			)),
+			Map.of("listObject", AttributeValue.builder().l(
+				AttributeValue.builder().m(
+					Map.of("string", AttributeValue.builder().s("str1").build())
+				).build(),
+				AttributeValue.builder().m(
+					Map.of("string", AttributeValue.builder().s("str2").build())
+				).build()
+			).build())
+		),
+		LONG(
+			new TestObject().setNumber(100),
+			Map.of("number", AttributeValue.builder().n("100").build())
 		),
 		STRING(
 			new TestObject().setString("str-val"),
