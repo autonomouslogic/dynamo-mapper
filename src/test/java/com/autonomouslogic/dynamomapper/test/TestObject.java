@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -25,6 +26,10 @@ public class TestObject {
 	@JsonProperty
 	protected List<TestObject> listObject;
 	@JsonProperty
+	protected TestObject object;
+	@JsonProperty
+	protected Map<String, String> map;
+	@JsonProperty
 	protected Number number; // @todo Long, BigInteger, BigDecimal
 	@JsonProperty
 	protected List<Number> numberList;
@@ -34,4 +39,8 @@ public class TestObject {
 	protected String nul;
 	@JsonProperty
 	protected String string;
+	@JsonProperty
+	protected List<String> stringList;
+	@JsonProperty
+	protected Set<String> stringSet;
 }

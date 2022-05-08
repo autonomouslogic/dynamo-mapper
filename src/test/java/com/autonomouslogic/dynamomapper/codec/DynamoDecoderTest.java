@@ -3,6 +3,7 @@ package com.autonomouslogic.dynamomapper.codec;
 import com.autonomouslogic.dynamomapper.DynamoMapper;
 import com.autonomouslogic.dynamomapper.test.CodecTests;
 import com.autonomouslogic.dynamomapper.test.EncodeDecode;
+import com.autonomouslogic.dynamomapper.test.StdObjectMapper;
 import com.autonomouslogic.dynamomapper.test.TestObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -22,20 +23,17 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DynamoDecoderTest {
-	DynamoMapper mapper;
-
-	@BeforeEach
-	public void beforeEach() {
-		var objectMapper = new ObjectMapper();
-		mapper = new DynamoMapper(objectMapper);
-	}
+	ObjectMapper objectMapper = StdObjectMapper.objectMapper();
+	DynamoMapper mapper = new DynamoMapper(objectMapper);
 
 	@ParameterizedTest
 	@MethodSource("loadTests")
 	@SneakyThrows
 	public void shouldDecode(CodecTests test) {
 		var pojo = mapper.decode(test.getDdb(), TestObject.class);
-		assertEquals(test.getPojo(), pojo);
+		var json = objectMapper.writeValueAsString(pojo);
+		var expectedJson = objectMapper.writeValueAsString(test.getPojo());
+		assertEquals(expectedJson, json);
 	}
 
 	public static List<CodecTests> loadTests() {

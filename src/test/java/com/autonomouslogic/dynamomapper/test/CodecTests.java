@@ -10,14 +10,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.autonomouslogic.dynamomapper.test.Util.BYTE_STRING_1;
+import static com.autonomouslogic.dynamomapper.test.Util.BYTE_STRING_2;
+
+/**
+ * @link https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html
+ */
 @AllArgsConstructor
 @Getter
 public enum CodecTests {
+
 	BINARY(
-		new TestObject().setBinary(new byte[]{1, 2, 3, 4}),
-		Map.of("string", AttributeValue.builder()
-			.b(SdkBytes.fromByteArray(Base64.encodeBase64(new byte[]{1, 2, 3, 4}))).build()),
-		EncodeDecode.DECODE_ONLY
+		new TestObject().setBinary(BYTE_STRING_1),
+		Map.of("binary", AttributeValue.builder()
+			.b(SdkBytes.fromByteArray(BYTE_STRING_1)).build())
 	),
 	BOOL(
 		new TestObject().setBool(true),
@@ -25,22 +31,22 @@ public enum CodecTests {
 	),
 	BINARY_SET(
 		new TestObject().setBinarySet(Set.of(
-			new byte[]{1, 2, 3, 4},
-			new byte[]{5, 6, 7, 8}
+			BYTE_STRING_1,
+			BYTE_STRING_2
 		)),
 		Map.of("binarySet", AttributeValue.builder().bs(
-			SdkBytes.fromByteArray(Base64.encodeBase64(new byte[]{1, 2, 3, 4})),
-			SdkBytes.fromByteArray(Base64.encodeBase64(new byte[]{5, 6, 7, 8}))
+			SdkBytes.fromByteArray(BYTE_STRING_1),
+			SdkBytes.fromByteArray(BYTE_STRING_2)
 		).build())
 	),
 	BINARY_LIST(
 		new TestObject().setBinaryList(List.of(
-			new byte[]{1, 2, 3, 4},
-			new byte[]{5, 6, 7, 8}
+			BYTE_STRING_1,
+			BYTE_STRING_2
 		)),
 		Map.of("binaryList", AttributeValue.builder().bs(
-			SdkBytes.fromByteArray(Base64.encodeBase64(new byte[]{1, 2, 3, 4})),
-			SdkBytes.fromByteArray(Base64.encodeBase64(new byte[]{5, 6, 7, 8}))
+			SdkBytes.fromByteArray(BYTE_STRING_1),
+			SdkBytes.fromByteArray(BYTE_STRING_2)
 		).build())
 	),
 	LIST_STRING(
@@ -64,6 +70,25 @@ public enum CodecTests {
 			).build()
 		).build())
 	),
+	MAP_OBJECT(
+		new TestObject().setObject(
+			new TestObject().setString("str1")
+		),
+		Map.of("object", AttributeValue.builder().m(
+			Map.of("string", AttributeValue.builder().s("str1").build())
+		).build())
+	),
+	MAP_MAP(
+		new TestObject().setMap(
+			Map.of("k1", "v1", "k2", "v2")
+		),
+		Map.of("map", AttributeValue.builder().m(
+			Map.of(
+				"k1", AttributeValue.builder().s("v1").build(),
+				"k2", AttributeValue.builder().s("v2").build()
+			)
+		).build())
+	),
 	INTEGER(
 		new TestObject().setNumber(100),
 		Map.of("number", AttributeValue.builder().n("100").build())
@@ -84,6 +109,14 @@ public enum CodecTests {
 	STRING(
 		new TestObject().setString("str-val"),
 		Map.of("string", AttributeValue.builder().s("str-val").build())
+	),
+	STRING_LIST(
+		new TestObject().setStringList(List.of("str1", "str2")),
+		Map.of("stringList", AttributeValue.builder().ss("str1", "str2").build())
+	),
+	STRING_SET(
+		new TestObject().setStringSet(Set.of("str1", "str2")),
+		Map.of("stringSet", AttributeValue.builder().ss("str1", "str2").build())
 	);
 
 	TestObject pojo;

@@ -8,6 +8,9 @@
 
 A simple mapper for converting to and from DynamoDB AttributeValues and POJOs using Jackson.
 
+## In Development
+Dynamo Mapper is still in development. Breaking changes may be introduced without warning.
+
 ## Usage
 * ObjectMapper constructions, JSR timestamps, big decimals
 * `@JsonInclude(JsonInclude.Include.NON_NULL)`
@@ -31,5 +34,9 @@ However, there are some cons to doing it this way:
 * It's not possible to have a different schema in the DynamoDB and JSON versions of an object.
 * Speed may be an issue (verify).
 
+## Versioning
+Dynamo Mapper follows [semantic versioning](https://semver.org/).
+
 ## Resources
 * https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html
+* https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html

@@ -6,8 +6,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -29,17 +31,74 @@ public class DynamoDecoder {
 	private JsonNode decodeValue(AttributeValue val) {
 		var nodeFactory = objectMapper.getNodeFactory();
 		if (val.b() != null) {
-			return nodeFactory.binaryNode(val.b().asByteArray());
+			return decodeBinary(val.b());
 		}
 		if (val.bool() != null) {
 			return nodeFactory.booleanNode(val.bool());
 		}
+		if (val.hasBs() && val.bs() != null) {
+			return decodeBinarySet(val);
+		}
+		if (val.hasL() && val.l() != null) {
+			return decodeList(val);
+		}
+		if (val.hasM() && val.m() != null) {
+			return decodeMap(val);
+		}
+		if (val.n() != null) {
+			return decodeNumber(val.n());
+		}
+		if (val.hasNs() && val.ns() != null) {
+			return decodeNumberSet(val);
+		}
 		if (val.nul() != null) {
 			return nodeFactory.nullNode();
 		}
-		if (val.n() != null) {
-			return nodeFactory.textNode(val.n());
+		if (val.s() != null) {
+			return nodeFactory.textNode(val.s());
 		}
-		throw new IllegalArgumentException();
+		// @todo ss
+		throw new IllegalArgumentException(val.toString());
+	}
+
+	private JsonNode decodeBinary(SdkBytes bytes) {
+		return objectMapper.getNodeFactory().binaryNode(bytes.asByteArray());
+	}
+
+	private JsonNode decodeNumber(String num) {
+		return objectMapper.getNodeFactory().textNode(num);
+	}
+
+	private JsonNode decodeMap(AttributeValue val) {
+		var obj = objectMapper.getNodeFactory().objectNode();
+		for (var entry : val.m().entrySet()) {
+			obj.set(entry.getKey(), decodeValue(entry.getValue()));
+		}
+		return obj;
+	}
+
+	private JsonNode decodeList(AttributeValue val) {
+		var arr = objectMapper.getNodeFactory().arrayNode();
+		for (var entry : val.l()) {
+			arr.add(decodeValue(entry));
+		}
+		return arr;
+	}
+
+	private JsonNode decodeBinarySet(AttributeValue val) {
+		var arr = objectMapper.getNodeFactory().arrayNode();
+		for (var entry : val.bs()) {
+			arr.add(decodeBinary(entry));
+		}
+		return arr;
+	}
+
+	private JsonNode decodeNumberSet(AttributeValue val) {
+
+		var arr = objectMapper.getNodeFactory().arrayNode();
+		for (var entry : val.ns()) {
+			arr.add(decodeNumber(entry));
+		}
+		return arr;
 	}
 }
