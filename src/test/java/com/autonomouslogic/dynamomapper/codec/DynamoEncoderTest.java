@@ -23,14 +23,15 @@ public class DynamoEncoderTest {
 	@ParameterizedTest
 	@MethodSource("loadTests")
 	@SneakyThrows
-	public void shouldDecode(CodecTests test) {
-		var pojo = mapper.decode(test.getDdb(), TestObject.class);
-		assertEquals(test.getPojo(), pojo);
+	public void shouldEncode(CodecTests test) {
+		var ddb = mapper.encode(test.getPojo());
+		assertEquals(test.getDdb(), ddb);
 	}
 
 	public static List<CodecTests> loadTests() {
 		return Stream.of(CodecTests.values())
 			.filter(CodecTests::encodeTest)
+//			.filter(e -> e.name().equals("LIST_OBJECT"))
 			.collect(Collectors.toList());
 	}
 }

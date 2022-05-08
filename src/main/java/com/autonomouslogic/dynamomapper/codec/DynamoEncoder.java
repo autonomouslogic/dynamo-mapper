@@ -8,6 +8,7 @@ import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class DynamoEncoder {
 			return AttributeValue.builder().nul(true).build();
 		}
 		if (node.isBinary()) {
-			return AttributeValue.builder().b(SdkBytes.fromByteArray(node.binaryValue())).build();
+			return AttributeValue.builder().b(SdkBytes.fromByteArrayUnsafe(node.binaryValue())).build();
 		}
 		if (node.isBoolean()) {
 			return AttributeValue.builder().bool(node.booleanValue()).build();
@@ -65,8 +66,13 @@ public class DynamoEncoder {
 		throw new IllegalArgumentException(String.format("Unsupported node type: %s", node.getNodeType()));
 	}
 
-	private AttributeValue encodeList(@NonNull JsonNode list) {
-		throw new UnsupportedOperationException();
+	private AttributeValue encodeList(@NonNull JsonNode list) throws IOException {
+		var nodeFactory = objectMapper.getNodeFactory();
+		var values = new ArrayList<AttributeValue>();
+		for (var entry : list) {
+			values.add(encodeValue(entry));
+		}
+		return AttributeValue.builder().l(values).build();
 	}
 
 	private AttributeValue encodePrimitive(JsonNode node) {

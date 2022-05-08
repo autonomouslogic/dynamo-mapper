@@ -19,7 +19,6 @@ import static com.autonomouslogic.dynamomapper.test.Util.BYTE_STRING_2;
 @AllArgsConstructor
 @Getter
 public enum CodecTests {
-
 	BINARY(
 		new TestObject().setBinary(BYTE_STRING_1),
 		Map.of("binary", AttributeValue.builder()
@@ -37,7 +36,8 @@ public enum CodecTests {
 		Map.of("binaryList", AttributeValue.builder().bs(
 			SdkBytes.fromByteArray(BYTE_STRING_1),
 			SdkBytes.fromByteArray(BYTE_STRING_2)
-		).build())
+		).build()),
+		EncodeDecode.DECODE_ONLY // @todo
 	),
 	LIST_STRING(
 		new TestObject().setListString(List.of("str1", "str2")),
@@ -85,7 +85,8 @@ public enum CodecTests {
 	),
 	INTEGER_LIST(
 		new TestObject().setNumberList(List.of(1, 2, 3)),
-		Map.of("numberList", AttributeValue.builder().ns("1", "2", "3").build())
+		Map.of("numberList", AttributeValue.builder().ns("1", "2", "3").build()),
+		EncodeDecode.DECODE_ONLY // @todo
 	),
 	NULL(
 		new TestObject(),
@@ -98,7 +99,8 @@ public enum CodecTests {
 	),
 	STRING_LIST(
 		new TestObject().setStringList(List.of("str1", "str2")),
-		Map.of("stringList", AttributeValue.builder().ss("str1", "str2").build())
+		Map.of("stringList", AttributeValue.builder().ss("str1", "str2").build()),
+		EncodeDecode.DECODE_ONLY // @todo
 	);
 
 	TestObject pojo;

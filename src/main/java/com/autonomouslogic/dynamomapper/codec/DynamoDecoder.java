@@ -96,7 +96,6 @@ public class DynamoDecoder {
 	}
 
 	private JsonNode decodeNumberSet(AttributeValue val) {
-
 		var arr = objectMapper.getNodeFactory().arrayNode();
 		for (var entry : val.ns()) {
 			arr.add(decodeNumber(entry));
