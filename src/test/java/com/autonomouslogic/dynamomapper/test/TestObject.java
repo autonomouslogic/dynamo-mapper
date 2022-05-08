@@ -1,4 +1,4 @@
-package com.autonomouslogic.dynamomapper;
+package com.autonomouslogic.dynamomapper.test;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
