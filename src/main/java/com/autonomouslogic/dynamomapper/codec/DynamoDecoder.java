@@ -57,7 +57,9 @@ public class DynamoDecoder {
 		if (val.s() != null) {
 			return nodeFactory.textNode(val.s());
 		}
-		// @todo ss
+		if (val.hasSs() && val.ss() != null) {
+			return decodeStringSet(val);
+		}
 		throw new IllegalArgumentException(val.toString());
 	}
 
@@ -98,6 +100,15 @@ public class DynamoDecoder {
 		var arr = objectMapper.getNodeFactory().arrayNode();
 		for (var entry : val.ns()) {
 			arr.add(decodeNumber(entry));
+		}
+		return arr;
+	}
+
+	private JsonNode decodeStringSet(AttributeValue val) {
+		var nodeFactory = objectMapper.getNodeFactory();
+		var arr = nodeFactory.arrayNode();
+		for (var entry : val.ss()) {
+			arr.add(nodeFactory.textNode(entry));
 		}
 		return arr;
 	}

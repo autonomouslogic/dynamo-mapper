@@ -20,8 +20,6 @@ public class TestObject {
 	@JsonProperty
 	protected List<byte[]> binaryList;
 	@JsonProperty
-	protected Set<byte[]> binarySet;
-	@JsonProperty
 	protected List<String> listString;
 	@JsonProperty
 	protected List<TestObject> listObject;
@@ -34,13 +32,9 @@ public class TestObject {
 	@JsonProperty
 	protected List<Number> numberList;
 	@JsonProperty
-	protected Set<Number> numberSet;
-	@JsonProperty
 	protected String nul;
 	@JsonProperty
 	protected String string;
 	@JsonProperty
 	protected List<String> stringList;
-	@JsonProperty
-	protected Set<String> stringSet;
 }

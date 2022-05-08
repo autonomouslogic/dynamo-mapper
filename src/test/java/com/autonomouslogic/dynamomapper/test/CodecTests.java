@@ -29,16 +29,6 @@ public enum CodecTests {
 		new TestObject().setBool(true),
 		Map.of("bool", AttributeValue.builder().bool(true).build())
 	),
-	BINARY_SET(
-		new TestObject().setBinarySet(Set.of(
-			BYTE_STRING_1,
-			BYTE_STRING_2
-		)),
-		Map.of("binarySet", AttributeValue.builder().bs(
-			SdkBytes.fromByteArray(BYTE_STRING_1),
-			SdkBytes.fromByteArray(BYTE_STRING_2)
-		).build())
-	),
 	BINARY_LIST(
 		new TestObject().setBinaryList(List.of(
 			BYTE_STRING_1,
@@ -97,10 +87,6 @@ public enum CodecTests {
 		new TestObject().setNumberList(List.of(1, 2, 3)),
 		Map.of("numberList", AttributeValue.builder().ns("1", "2", "3").build())
 	),
-	INTEGER_SET(
-		new TestObject().setNumberSet(Set.of(1, 2, 3)),
-		Map.of("numberSet", AttributeValue.builder().ns("1", "2", "3").build())
-	),
 	NULL(
 		new TestObject(),
 		Map.of("nul", AttributeValue.builder().nul(true).build()),
@@ -113,10 +99,6 @@ public enum CodecTests {
 	STRING_LIST(
 		new TestObject().setStringList(List.of("str1", "str2")),
 		Map.of("stringList", AttributeValue.builder().ss("str1", "str2").build())
-	),
-	STRING_SET(
-		new TestObject().setStringSet(Set.of("str1", "str2")),
-		Map.of("stringSet", AttributeValue.builder().ss("str1", "str2").build())
 	);
 
 	TestObject pojo;

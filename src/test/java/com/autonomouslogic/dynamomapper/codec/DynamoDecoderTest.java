@@ -33,7 +33,12 @@ public class DynamoDecoderTest {
 		var pojo = mapper.decode(test.getDdb(), TestObject.class);
 		var json = objectMapper.writeValueAsString(pojo);
 		var expectedJson = objectMapper.writeValueAsString(test.getPojo());
-		assertEquals(expectedJson, json);
+		if (test.name().contains("BINARY")) {
+			assertEquals(expectedJson, json);
+		}
+		else {
+			assertEquals(test.getPojo(), pojo);
+		}
 	}
 
 	public static List<CodecTests> loadTests() {
