@@ -1,5 +1,6 @@
 package com.autonomouslogic.dynamomapper.test;
 
+import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -34,6 +35,7 @@ public class TestObject {
 	@JsonProperty
 	protected String nul;
 	@JsonProperty
+	@DynamoHashKey
 	protected String string;
 	@JsonProperty
 	protected List<String> stringList;
