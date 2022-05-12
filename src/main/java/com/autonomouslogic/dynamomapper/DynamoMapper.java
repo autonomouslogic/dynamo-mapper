@@ -2,10 +2,14 @@ package com.autonomouslogic.dynamomapper;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
+import com.autonomouslogic.dynamomapper.function.NoopConsumer;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
+import com.autonomouslogic.dynamomapper.reflect.ReflectionUtil;
+import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.NopAnnotationIntrospector;
 import lombok.NonNull;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -21,6 +25,7 @@ import software.amazon.awssdk.services.dynamodb.model.RequestLimitExceededExcept
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.model.TransactionConflictException;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
@@ -29,11 +34,38 @@ public class DynamoMapper {
 	private final DynamoDbClient client;
 	private final DynamoEncoder encoder;
 	private final DynamoDecoder decoder;
+	private final RequestFactory requestFactory;
+	private final ReflectionUtil reflectionUtil;
 
 	public DynamoMapper(@NonNull DynamoDbClient client, @NonNull ObjectMapper objectMapper) {
 		this.client = client;
 		encoder = new DynamoEncoder(objectMapper);
 		decoder = new DynamoDecoder(objectMapper);
+		reflectionUtil = new ReflectionUtil(objectMapper);
+		requestFactory = new RequestFactory(encoder, objectMapper, reflectionUtil);
+	}
+
+	public <T> MappedGetItemResponse<T> getItem(@NonNull Object hashKey, @NonNull Class<T> clazz) throws IOException {
+		var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+		return getItem(builder.build(), clazz);
+	}
+
+	public <T> MappedGetItemResponse<T> getItem(@NonNull Object hashKey, @NonNull Class<T> clazz, Consumer<GetItemRequest.Builder> getItemRequest) throws IOException {
+		var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+		getItemRequest.accept(builder);
+		return getItem(builder.build(), clazz);
+	}
+	@SuppressWarnings("unchecked")
+	public <T> MappedGetItemResponse<T> getItem(@NonNull T keyObject) throws IOException {
+		var builder = requestFactory.getRequestFromKeyObject(keyObject);
+		return getItem(builder.build(), (Class<T>) keyObject.getClass());
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> MappedGetItemResponse<T> getItem(@NonNull T keyObject, Consumer<GetItemRequest.Builder> getItemRequest) throws IOException {
+		var builder = requestFactory.getRequestFromKeyObject(keyObject);
+		getItemRequest.accept(builder);
+		return getItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
 	public <T> MappedGetItemResponse<T> getItem(@NonNull GetItemRequest request, @NonNull Class<T> clazz) throws JsonProcessingException {
