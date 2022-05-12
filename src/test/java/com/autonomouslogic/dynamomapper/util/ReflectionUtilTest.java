@@ -1,10 +1,11 @@
-package com.autonomouslogic.dynamomapper.reflect;
+package com.autonomouslogic.dynamomapper.util;
 
 import com.autonomouslogic.dynamomapper.test.MethodTestObject;
 import com.autonomouslogic.dynamomapper.test.ModifiedMethodTestObject;
 import com.autonomouslogic.dynamomapper.test.ModifiedTestObject;
 import com.autonomouslogic.dynamomapper.test.StdObjectMapper;
 import com.autonomouslogic.dynamomapper.test.TestObject;
+import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 

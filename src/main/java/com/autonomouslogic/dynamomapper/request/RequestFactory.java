@@ -1,8 +1,7 @@
 package com.autonomouslogic.dynamomapper.request;
 
-import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
-import com.autonomouslogic.dynamomapper.reflect.ReflectionUtil;
+import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;

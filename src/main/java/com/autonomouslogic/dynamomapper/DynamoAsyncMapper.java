@@ -5,6 +5,9 @@ import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.function.CheckedFunction;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
+import com.autonomouslogic.dynamomapper.util.FutureUtil;
+import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
+import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
@@ -20,11 +23,30 @@ public class DynamoAsyncMapper {
 	private final DynamoDbAsyncClient client;
 	private final DynamoEncoder encoder;
 	private final DynamoDecoder decoder;
+	private final RequestFactory requestFactory;
+	private final ReflectionUtil reflectionUtil;
 
 	public DynamoAsyncMapper(@NonNull DynamoDbAsyncClient client, @NonNull ObjectMapper objectMapper) {
 		this.client = client;
 		encoder = new DynamoEncoder(objectMapper);
 		decoder = new DynamoDecoder(objectMapper);
+		reflectionUtil = new ReflectionUtil(objectMapper);
+		requestFactory = new RequestFactory(encoder, objectMapper, reflectionUtil);
+	}
+
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey, @NonNull Class<T> clazz) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+			return getItem(builder.build(), clazz);
+		});
+	}
+
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey, @NonNull Class<T> clazz, Consumer<GetItemRequest.Builder> getItemRequest) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+			getItemRequest.accept(builder);
+			return getItem(builder.build(), clazz);
+		});
 	}
 
 	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(GetItemRequest getItemRequest, Class<T> clazz) {

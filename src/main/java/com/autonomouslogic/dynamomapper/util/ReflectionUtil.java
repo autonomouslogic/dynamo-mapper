@@ -1,4 +1,4 @@
-package com.autonomouslogic.dynamomapper.reflect;
+package com.autonomouslogic.dynamomapper.util;
 
 import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
 import com.fasterxml.jackson.databind.JsonMappingException;

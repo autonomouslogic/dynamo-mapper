@@ -2,14 +2,12 @@ package com.autonomouslogic.dynamomapper;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
-import com.autonomouslogic.dynamomapper.function.NoopConsumer;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
-import com.autonomouslogic.dynamomapper.reflect.ReflectionUtil;
+import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.NopAnnotationIntrospector;
 import lombok.NonNull;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
@@ -55,6 +53,7 @@ public class DynamoMapper {
 		getItemRequest.accept(builder);
 		return getItem(builder.build(), clazz);
 	}
+
 	@SuppressWarnings("unchecked")
 	public <T> MappedGetItemResponse<T> getItem(@NonNull T keyObject) throws IOException {
 		var builder = requestFactory.getRequestFromKeyObject(keyObject);
