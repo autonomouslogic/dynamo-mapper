@@ -1,0 +1,69 @@
+package com.autonomouslogic.dynamomapper;
+
+import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
+import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
+import com.autonomouslogic.dynamomapper.function.CheckedFunction;
+import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
+import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+
+public class DynamoAsyncMapper {
+	private final DynamoDbAsyncClient client;
+	private final DynamoEncoder encoder;
+	private final DynamoDecoder decoder;
+
+	public DynamoAsyncMapper(@NonNull DynamoDbAsyncClient client, @NonNull ObjectMapper objectMapper) {
+		this.client = client;
+		encoder = new DynamoEncoder(objectMapper);
+		decoder = new DynamoDecoder(objectMapper);
+	}
+
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(GetItemRequest getItemRequest, Class<T> clazz) {
+		return client.getItem(getItemRequest)
+			.thenApply(new CheckedFunction<>() {
+				@Override
+				public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
+					return decoder.mapGetItemResponse(response, clazz);
+				}
+			});
+	}
+
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(Consumer<GetItemRequest.Builder> getItemRequest, Class<T> clazz) {
+		return client.getItem(getItemRequest)
+			.thenApply(new CheckedFunction<>() {
+				@Override
+				public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
+					return decoder.mapGetItemResponse(response, clazz);
+				}
+			});
+	}
+
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(PutItemRequest putItemRequest, Class<T> clazz) {
+		return client.putItem(putItemRequest)
+			.thenApply(new CheckedFunction<>() {
+				@Override
+				public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
+					return decoder.mapPutItemResponse(response, clazz);
+				}
+			});
+	}
+
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(Consumer<PutItemRequest.Builder> putItemRequest, Class<T> clazz) {
+		return client.putItem(putItemRequest)
+			.thenApply(new CheckedFunction<>() {
+				@Override
+				public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
+					return decoder.mapPutItemResponse(response, clazz);
+				}
+			});
+	}
+}

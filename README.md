@@ -40,3 +40,5 @@ Dynamo Mapper follows [semantic versioning](https://semver.org/).
 ## Resources
 * https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html
 * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html
+* https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.html
+* https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/dynamodb-enhanced-client.html
