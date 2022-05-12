@@ -21,12 +21,12 @@ public class DynamoDecoder {
 	private final ObjectMapper objectMapper;
 
 	public <T> MappedGetItemResponse<T> mapGetItemResponse(GetItemResponse response, Class<T> clazz) throws JsonProcessingException {
-		var item = response.hasItem() ? decode(response.item(), clazz);
+		var item = response.hasItem() ? decode(response.item(), clazz) : null;
 		return new MappedGetItemResponse<>(response, item);
 	}
 
 	public <T> MappedPutItemResponse<T> mapPutItemResponse(PutItemResponse response, Class<T> clazz) throws JsonProcessingException {
-		var item = response.hasAttributes() ? decode(response.attributes(), clazz);
+		var item = response.hasAttributes() ? decode(response.attributes(), clazz) : null;
 		return new MappedPutItemResponse<>(response, item);
 	}
 

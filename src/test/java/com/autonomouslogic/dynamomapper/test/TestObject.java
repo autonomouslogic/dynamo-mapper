@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-@Accessors(chain = true)
+@Accessors(fluent = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TestObject {
 	@JsonProperty

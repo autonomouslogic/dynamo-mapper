@@ -22,9 +22,9 @@ public class DynamoDecoderTest {
 	@MethodSource("loadTests")
 	@SneakyThrows
 	public void shouldDecode(CodecTests test) {
-		var pojo = decoder.decode(test.getDdb(), TestObject.class);
+		var pojo = decoder.decode(test.ddb(), TestObject.class);
 		var json = objectMapper.writeValueAsString(pojo);
-		var expectedJson = objectMapper.writeValueAsString(test.getPojo());
+		var expectedJson = objectMapper.writeValueAsString(test.pojo());
 		assertEquals(expectedJson, json);
 	}
 

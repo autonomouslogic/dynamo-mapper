@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class DynamoEncoderTest {
 	DynamoEncoder encoder = new DynamoEncoder(StdObjectMapper.objectMapper());
 
@@ -17,8 +19,8 @@ public class DynamoEncoderTest {
 	@MethodSource("loadTests")
 	@SneakyThrows
 	public void shouldEncode(CodecTests test) {
-		var ddb = encoder.encode(test.getPojo());
-		assertEquals(test.getDdb(), ddb);
+		var ddb = encoder.encode(test.pojo());
+		assertEquals(test.ddb(), ddb);
 	}
 
 	public static List<CodecTests> loadTests() {
