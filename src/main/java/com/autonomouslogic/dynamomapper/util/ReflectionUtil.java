@@ -1,6 +1,7 @@
 package com.autonomouslogic.dynamomapper.util;
 
 import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
+import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
@@ -14,11 +15,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor
 public class ReflectionUtil {
-	private static final Map<Class, List<String>> cache = new ConcurrentHashMap<>();
+	private static final Map<Class<?>, List<String>> hashKeyCache = new ConcurrentHashMap<>();
+	private static final Map<Class<?>, String> tableNameCache = new ConcurrentHashMap<>();
 	private final ObjectMapper objectMapper;
 
 	public List<String> resolveHashKeyFields(Class clazz) {
-		return cache.computeIfAbsent(clazz, ignore -> {
+		return hashKeyCache.computeIfAbsent(clazz, ignore -> {
 			var properties = getProperties(clazz);
 			var hashKeyFields = new ArrayList<String>();
 			for (PropertyWriter property : properties) {
@@ -43,5 +45,15 @@ public class ReflectionUtil {
 		catch (JsonMappingException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public String resolveTableName(Class<?> clazz) {
+		return tableNameCache.computeIfAbsent(clazz, ignore -> {
+			var tableName = clazz.getAnnotation(DynamoTableName.class);
+			if (tableName == null) {
+				throw new IllegalArgumentException(String.format("Class %s is not annotated with @DynamoTableName", clazz.getSimpleName()));
+			}
+			return tableName.value();
+		});
 	}
 }

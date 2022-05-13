@@ -29,7 +29,7 @@ public class RequestFactory {
 		}
 		var hashKeyValue = encoder.encodeValue(objectMapper.valueToTree(hashKey));
 		return GetItemRequest.builder()
-			.tableName("@todo")
+			.tableName(reflectionUtil.resolveTableName(clazz))
 			.key(Map.of(hashKeys.get(0), hashKeyValue));
 	}
 
@@ -41,14 +41,14 @@ public class RequestFactory {
 			keyValues.put(field, encoded.get(field));
 		}
 		return GetItemRequest.builder()
-			.tableName("@todo")
+			.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
 			.key(keyValues);
 	}
 
 	public PutItemRequest.Builder putRequestFromObject(@NonNull Object obj) throws IOException {
 		var encoded = encoder.encode(obj);
 		return PutItemRequest.builder()
-			.tableName("@todo")
+			.tableName(reflectionUtil.resolveTableName(obj.getClass()))
 			.item(encoded);
 	}
 }
