@@ -1,5 +1,6 @@
 package com.autonomouslogic.dynamomapper.test;
 
+import com.autonomouslogic.dynamomapper.model.TestObject;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import software.amazon.awssdk.core.SdkBytes;
