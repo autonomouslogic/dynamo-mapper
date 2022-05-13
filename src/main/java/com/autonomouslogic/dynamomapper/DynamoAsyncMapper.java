@@ -41,7 +41,7 @@ public class DynamoAsyncMapper {
 		});
 	}
 
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey, @NonNull Class<T> clazz, Consumer<GetItemRequest.Builder> getItemRequest) {
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey, @NonNull Consumer<GetItemRequest.Builder> getItemRequest, @NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
 			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
 			getItemRequest.accept(builder);
@@ -49,7 +49,7 @@ public class DynamoAsyncMapper {
 		});
 	}
 
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(GetItemRequest getItemRequest, Class<T> clazz) {
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(GetItemRequest getItemRequest, @NonNull Class<T> clazz) {
 		return client.getItem(getItemRequest)
 			.thenApply(new CheckedFunction<>() {
 				@Override
@@ -59,7 +59,7 @@ public class DynamoAsyncMapper {
 			});
 	}
 
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(Consumer<GetItemRequest.Builder> getItemRequest, Class<T> clazz) {
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Consumer<GetItemRequest.Builder> getItemRequest, @NonNull Class<T> clazz) {
 		return client.getItem(getItemRequest)
 			.thenApply(new CheckedFunction<>() {
 				@Override
@@ -69,7 +69,7 @@ public class DynamoAsyncMapper {
 			});
 	}
 
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(PutItemRequest putItemRequest, Class<T> clazz) {
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull PutItemRequest putItemRequest, @NonNull Class<T> clazz) {
 		return client.putItem(putItemRequest)
 			.thenApply(new CheckedFunction<>() {
 				@Override
@@ -79,7 +79,7 @@ public class DynamoAsyncMapper {
 			});
 	}
 
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(Consumer<PutItemRequest.Builder> putItemRequest, Class<T> clazz) {
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull Consumer<PutItemRequest.Builder> putItemRequest, @NonNull Class<T> clazz) {
 		return client.putItem(putItemRequest)
 			.thenApply(new CheckedFunction<>() {
 				@Override
