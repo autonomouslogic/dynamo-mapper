@@ -1,5 +1,7 @@
 package com.autonomouslogic.dynamomapper.test;
 
+import org.apache.commons.math3.random.ISAACRandom;
+import org.apache.commons.math3.random.RandomGenerator;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.providers.AwsRegionProvider;
@@ -10,6 +12,8 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import java.util.Optional;
 
 public class IntegrationTestUtil {
+	public static final RandomGenerator RNG = new ISAACRandom();
+
 	public static DynamoDbClient client() {
 		return DynamoDbClient.builder()
 			.credentialsProvider(credentialsProvider())
