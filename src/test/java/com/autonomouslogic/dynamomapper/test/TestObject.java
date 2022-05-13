@@ -1,5 +1,6 @@
 package com.autonomouslogic.dynamomapper.test;
 
+import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -7,10 +8,9 @@ import lombok.experimental.Accessors;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Data
-@Accessors(chain = true)
+@Accessors(fluent = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TestObject {
 	@JsonProperty
@@ -34,6 +34,7 @@ public class TestObject {
 	@JsonProperty
 	protected String nul;
 	@JsonProperty
+	@DynamoHashKey
 	protected String string;
 	@JsonProperty
 	protected List<String> stringList;

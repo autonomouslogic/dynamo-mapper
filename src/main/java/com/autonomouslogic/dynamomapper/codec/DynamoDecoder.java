@@ -1,5 +1,7 @@
 package com.autonomouslogic.dynamomapper.codec;
 
+import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
+import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,14 +10,25 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 @RequiredArgsConstructor
 public class DynamoDecoder {
 	@NonNull
 	private final ObjectMapper objectMapper;
+
+	public <T> MappedGetItemResponse<T> mapGetItemResponse(GetItemResponse response, Class<T> clazz) throws JsonProcessingException {
+		var item = response.hasItem() ? decode(response.item(), clazz) : null;
+		return new MappedGetItemResponse<>(response, item);
+	}
+
+	public <T> MappedPutItemResponse<T> mapPutItemResponse(PutItemResponse response, Class<T> clazz) throws JsonProcessingException {
+		var item = response.hasAttributes() ? decode(response.attributes(), clazz) : null;
+		return new MappedPutItemResponse<>(response, item);
+	}
 
 	/**
 	 * Decodes DynamoDB values into a POJO.

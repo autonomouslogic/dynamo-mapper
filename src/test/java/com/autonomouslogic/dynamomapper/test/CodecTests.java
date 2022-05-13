@@ -2,13 +2,11 @@ package com.autonomouslogic.dynamomapper.test;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.apache.commons.codec.binary.Base64;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.autonomouslogic.dynamomapper.test.Util.BYTE_STRING_1;
 import static com.autonomouslogic.dynamomapper.test.Util.BYTE_STRING_2;

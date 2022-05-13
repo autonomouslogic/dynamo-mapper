@@ -40,7 +40,7 @@ public class DynamoEncoder {
 		return map;
 	}
 
-	private AttributeValue encodeValue(JsonNode node) throws IOException {
+	public AttributeValue encodeValue(JsonNode node) throws IOException {
 		if (node == null || node.isNull()) {
 			return AttributeValue.builder().nul(true).build();
 		}
