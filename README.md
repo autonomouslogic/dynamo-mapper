@@ -48,6 +48,8 @@ Dynamo Mapper is licensed under the [MIT-0 license](https://spdx.org/licenses/MI
 [![Language grade: Java](https://img.shields.io/lgtm/grade/java/g/autonomouslogic/dynamo-mapper.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/autonomouslogic/dynamo-mapper/context:java)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/autonomouslogic/dynamo-mapper.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/autonomouslogic/dynamo-mapper/alerts/)
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/04243b52f38c8cecf66c/maintainability)](https://codeclimate.com/github/autonomouslogic/dynamo-mapper/maintainability)
+
 ![Libraries.io dependency status for latest release](https://img.shields.io/librariesio/release/maven/com.autonomouslogic.dynamomapper:dynamo-mapper)
 
 [![Known Vulnerabilities](https://snyk.io/test/github/autonomouslogic/dynamo-mapper/badge.svg)](https://snyk.io/test/github/autonomouslogic/dynamo-mapper)
