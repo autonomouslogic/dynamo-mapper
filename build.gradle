@@ -25,9 +25,40 @@ dependencies {
     testImplementation "commons-codec:commons-codec:1.15"
     testImplementation "software.amazon.awssdk:dynamodb-enhanced:2.17.189"
     testImplementation "com.amazonaws:aws-java-sdk-dynamodb:1.12.218"
+    testImplementation "org.apache.commons:commons-math3:3.6.1"
+}
+
+sourceSets {
+    integrationTest {
+        java.srcDir "src/integrationTest/java"
+        resources.srcDir "src/integrationTest/resources"
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 test {
+    useJUnitPlatform()
+
+    testLogging {
+        events = [ "FAILED", "PASSED", "SKIPPED" ]
+        showExceptions = true
+        exceptionFormat = "FULL"
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+    }
+}
+
+task integrationTest(type: Test, description: "Runs the integration tests", group: "verification") {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+
     useJUnitPlatform()
 
     testLogging {
