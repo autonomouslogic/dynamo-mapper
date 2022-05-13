@@ -69,6 +69,21 @@ public class DynamoAsyncMapper {
 			});
 	}
 
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull Object obj) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.putRequestFromObject(obj);
+			return putItem(builder.build());
+		});
+	}
+
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull Object obj, @NonNull Consumer<PutItemRequest.Builder> putItemRequest) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.putRequestFromObject(obj);
+			putItemRequest.accept(builder);
+			return putItem(builder.build());
+		});
+	}
+
 	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull PutItemRequest putItemRequest, @NonNull Class<T> clazz) {
 		return client.putItem(putItemRequest)
 			.thenApply(new CheckedFunction<>() {

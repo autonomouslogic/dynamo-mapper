@@ -3,9 +3,11 @@ package com.autonomouslogic.dynamomapper.request;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,7 +19,7 @@ public class RequestFactory {
 	private final ObjectMapper objectMapper;
 	private final ReflectionUtil reflectionUtil;
 
-	public <T> GetItemRequest.Builder getRequestFromHashKey(Object hashKey, Class<T> clazz) throws IOException {
+	public <T> GetItemRequest.Builder getRequestFromHashKey(@NonNull Object hashKey, @NonNull Class<T> clazz) throws IOException {
 		var hashKeys = reflectionUtil.resolveHashKeyFields(clazz);
 		if (hashKeys.isEmpty()) {
 			throw new IllegalArgumentException(String.format("No hash key defined on %s", clazz.getSimpleName()));
@@ -31,7 +33,7 @@ public class RequestFactory {
 			.key(Map.of(hashKeys.get(0), hashKeyValue));
 	}
 
-	public <T> GetItemRequest.Builder getRequestFromKeyObject(Object keyObject) throws IOException {
+	public <T> GetItemRequest.Builder getRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
 		var encoded = encoder.encode(keyObject);
 		var hashKeys = reflectionUtil.resolveHashKeyFields(keyObject.getClass());
 		var keyValues = new HashMap<String, AttributeValue>();
@@ -41,5 +43,12 @@ public class RequestFactory {
 		return GetItemRequest.builder()
 			.tableName("@todo")
 			.key(keyValues);
+	}
+
+	public PutItemRequest.Builder putRequestFromObject(@NonNull Object obj) throws IOException {
+		var encoded = encoder.encode(obj);
+		return PutItemRequest.builder()
+			.tableName("@todo")
+			.item(encoded);
 	}
 }

@@ -75,6 +75,16 @@ public class DynamoMapper {
 		return decoder.mapGetItemResponse(client.getItem(getItemRequest), clazz);
 	}
 
+	public <T> MappedPutItemResponse<T> putItem(@NonNull Object obj) throws IOException {
+		return putItem(requestFactory.putRequestFromObject(obj).build());
+	}
+
+	public <T> MappedPutItemResponse<T> putItem(@NonNull Object obj, @NonNull Consumer<PutItemRequest.Builder> putItemRequest) throws IOException {
+		var builder = requestFactory.putRequestFromObject(obj);
+		putItemRequest.accept(builder);
+		return putItem(builder.build());
+	}
+
 	public <T> MappedPutItemResponse<T> putItem(@NonNull PutItemRequest putItemRequest, @NonNull Class<T> clazz) throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException, ItemCollectionSizeLimitExceededException, TransactionConflictException, RequestLimitExceededException, InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException {
 		return decoder.mapPutItemResponse(client.putItem(putItemRequest), clazz);
 	}
