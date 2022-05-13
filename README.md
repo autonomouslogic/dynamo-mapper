@@ -52,4 +52,6 @@ Dynamo Mapper is licensed under the [MIT-0 license](https://spdx.org/licenses/MI
 
 ![Libraries.io dependency status for latest release](https://img.shields.io/librariesio/release/maven/com.autonomouslogic.dynamomapper:dynamo-mapper)
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=autonomouslogic_dynamo-mapper&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=autonomouslogic_dynamo-mapper)
+
 [![Known Vulnerabilities](https://snyk.io/test/github/autonomouslogic/dynamo-mapper/badge.svg)](https://snyk.io/test/github/autonomouslogic/dynamo-mapper)
