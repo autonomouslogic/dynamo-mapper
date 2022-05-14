@@ -2,6 +2,7 @@ package com.autonomouslogic.dynamomapper;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
+import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
@@ -13,6 +14,7 @@ import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.InternalServerErrorException;
@@ -94,5 +96,37 @@ public class DynamoMapper {
 
 	public <T> MappedPutItemResponse<T> putItem(@NonNull Consumer<PutItemRequest.Builder> putItemRequest, @NonNull Class<T> clazz) throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException, ItemCollectionSizeLimitExceededException, TransactionConflictException, RequestLimitExceededException, InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException {
 		return decoder.mapPutItemResponse(client.putItem(putItemRequest), clazz);
+	}
+
+	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull DeleteItemRequest deleteItemRequest, @NonNull Class<T> clazz) throws JsonProcessingException {
+		return decoder.mapDeleteItemResponse(client.deleteItem(deleteItemRequest), clazz);
+	}
+
+	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull Consumer<DeleteItemRequest.Builder> deleteItemRequest, @NonNull Class<T> clazz) throws JsonProcessingException {
+		return decoder.mapDeleteItemResponse(client.deleteItem(deleteItemRequest), clazz);
+	}
+
+	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull Object hashKey, @NonNull Class<T> clazz) throws IOException {
+		var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
+		return deleteItem(builder.build(), clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull T keyObject) throws IOException {
+		var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+		return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
+	}
+
+	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull Object hashKey, @NonNull Consumer<DeleteItemRequest.Builder> deleteItemRequest, @NonNull Class<T> clazz) throws IOException {
+		var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
+		deleteItemRequest.accept(builder);
+		return deleteItem(builder.build(), clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull T keyObject, @NonNull Consumer<DeleteItemRequest.Builder> deleteItemRequest) throws IOException {
+		var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+		deleteItemRequest.accept(builder);
+		return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 }

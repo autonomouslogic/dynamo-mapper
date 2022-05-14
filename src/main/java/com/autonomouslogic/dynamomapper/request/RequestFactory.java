@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 
@@ -20,6 +21,37 @@ public class RequestFactory {
 	private final ReflectionUtil reflectionUtil;
 
 	public <T> GetItemRequest.Builder getRequestFromHashKey(@NonNull Object hashKey, @NonNull Class<T> clazz) throws IOException {
+		return GetItemRequest.builder()
+			.tableName(reflectionUtil.resolveTableName(clazz))
+			.key(createKeyValue(hashKey, clazz));
+	}
+
+	public <T> GetItemRequest.Builder getRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
+		return GetItemRequest.builder()
+			.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
+			.key(createKeyValue(keyObject));
+	}
+
+	public PutItemRequest.Builder putRequestFromObject(@NonNull Object obj) throws IOException {
+		var encoded = encoder.encode(obj);
+		return PutItemRequest.builder()
+			.tableName(reflectionUtil.resolveTableName(obj.getClass()))
+			.item(encoded);
+	}
+
+	public <T> DeleteItemRequest.Builder deleteRequestFromHashKey(@NonNull Object hashKey, @NonNull Class<T> clazz) throws IOException {
+		return DeleteItemRequest.builder()
+			.tableName(reflectionUtil.resolveTableName(clazz))
+			.key(createKeyValue(hashKey, clazz));
+	}
+
+	public DeleteItemRequest.Builder deleteRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
+		return DeleteItemRequest.builder()
+			.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
+			.key(createKeyValue(keyObject));
+	}
+
+	private <T> Map<String, AttributeValue> createKeyValue(@NonNull Object hashKey, @NonNull Class<T> clazz) throws IOException {
 		var hashKeys = reflectionUtil.resolveHashKeyFields(clazz);
 		if (hashKeys.isEmpty()) {
 			throw new IllegalArgumentException(String.format("No hash key defined on %s", clazz.getSimpleName()));
@@ -28,27 +60,16 @@ public class RequestFactory {
 			throw new IllegalArgumentException(String.format("Multiple hash keys defined on %s", clazz.getSimpleName()));
 		}
 		var hashKeyValue = encoder.encodeValue(objectMapper.valueToTree(hashKey));
-		return GetItemRequest.builder()
-			.tableName(reflectionUtil.resolveTableName(clazz))
-			.key(Map.of(hashKeys.get(0), hashKeyValue));
+		return Map.of(hashKeys.get(0), hashKeyValue);
 	}
 
-	public <T> GetItemRequest.Builder getRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
+	private <T> Map<String, AttributeValue> createKeyValue(@NonNull T keyObject) throws IOException {
 		var encoded = encoder.encode(keyObject);
 		var hashKeys = reflectionUtil.resolveHashKeyFields(keyObject.getClass());
 		var keyValues = new HashMap<String, AttributeValue>();
 		for (String field : hashKeys) {
 			keyValues.put(field, encoded.get(field));
 		}
-		return GetItemRequest.builder()
-			.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
-			.key(keyValues);
-	}
-
-	public PutItemRequest.Builder putRequestFromObject(@NonNull Object obj) throws IOException {
-		var encoded = encoder.encode(obj);
-		return PutItemRequest.builder()
-			.tableName(reflectionUtil.resolveTableName(obj.getClass()))
-			.item(encoded);
+		return keyValues;
 	}
 }

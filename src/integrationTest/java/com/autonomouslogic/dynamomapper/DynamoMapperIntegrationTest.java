@@ -9,6 +9,7 @@ import org.apache.commons.math3.random.ISAACRandom;
 import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.services.dynamodb.model.ReturnValue;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -25,10 +26,15 @@ public class DynamoMapperIntegrationTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldPutAndGet() {
+	public void shouldPutAndGetAndDelete() {
 		var obj = IntegrationTestObjects.simple();
-		dynamoMapper.putItem(obj);
-		var loaded = dynamoMapper.getItem(obj.partitionKey(), IntegrationTestObject.class);
-		assertEquals(obj, loaded.item());
+		// Put.
+		var putResponse = dynamoMapper.putItem(obj);
+		// Get.
+		var getResponse = dynamoMapper.getItem(obj.partitionKey(), IntegrationTestObject.class);
+		assertEquals(obj, getResponse.item());
+		// Delete.
+		var deleteResponse = dynamoMapper.deleteItem(obj.partitionKey(), req -> req.returnValues(ReturnValue.ALL_OLD), IntegrationTestObject.class);
+		assertEquals(obj, deleteResponse.item());
 	}
 }
