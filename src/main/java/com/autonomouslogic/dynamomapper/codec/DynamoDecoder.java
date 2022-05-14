@@ -1,5 +1,6 @@
 package com.autonomouslogic.dynamomapper.codec;
 
+import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,6 +11,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 
@@ -28,6 +30,11 @@ public class DynamoDecoder {
 	public <T> MappedPutItemResponse<T> mapPutItemResponse(PutItemResponse response, Class<T> clazz) throws JsonProcessingException {
 		var item = response.hasAttributes() ? decode(response.attributes(), clazz) : null;
 		return new MappedPutItemResponse<>(response, item);
+	}
+
+	public <T> MappedDeleteItemResponse<T> mapDeleteItemResponse(DeleteItemResponse response, Class<T> clazz) throws JsonProcessingException {
+		var item = response.hasAttributes() ? decode(response.attributes(), clazz) : null;
+		return new MappedDeleteItemResponse<>(response, item);
 	}
 
 	/**
