@@ -38,3 +38,4 @@ public class DynamoAsyncMapperIntegrationTest {
 		assertEquals(obj, deleteResponse.item());
 	}
 }
+
