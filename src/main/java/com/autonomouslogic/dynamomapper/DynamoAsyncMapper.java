@@ -3,6 +3,7 @@ package com.autonomouslogic.dynamomapper;
 import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.function.CheckedFunction;
+import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
 import com.autonomouslogic.dynamomapper.util.FutureUtil;
@@ -11,6 +12,8 @@ import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
@@ -102,6 +105,41 @@ public class DynamoAsyncMapper {
 				@Override
 				public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
 					return decoder.mapPutItemResponse(response, clazz);
+				}
+			});
+	}
+
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Object hashKey, @NonNull Class<T> clazz) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
+			return deleteItem(builder.build(), clazz);
+		});
+	}
+
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Object hashKey, @NonNull Consumer<DeleteItemRequest.Builder> deleteItemRequest, @NonNull Class<T> clazz) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
+			deleteItemRequest.accept(builder);
+			return deleteItem(builder.build(), clazz);
+		});
+	}
+
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull DeleteItemRequest deleteItemRequest, @NonNull Class<T> clazz) {
+		return client.deleteItem(deleteItemRequest)
+			.thenApply(new CheckedFunction<>() {
+				@Override
+				public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
+					return decoder.mapDeleteItemResponse(response, clazz);
+				}
+			});
+	}
+
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Consumer<DeleteItemRequest.Builder> deleteItemRequest, @NonNull Class<T> clazz) {
+		return client.deleteItem(deleteItemRequest)
+			.thenApply(new CheckedFunction<>() {
+				@Override
+				public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
+					return decoder.mapDeleteItemResponse(response, clazz);
 				}
 			});
 	}

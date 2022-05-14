@@ -29,7 +29,7 @@ public class DynamoMapperIntegrationTest {
 	public void shouldPutAndGetAndDelete() {
 		var obj = IntegrationTestObjects.simple();
 		// Put.
-		var putResponse = dynamoMapper.putItem(obj);
+		dynamoMapper.putItem(obj);
 		// Get.
 		var getResponse = dynamoMapper.getItem(obj.partitionKey(), IntegrationTestObject.class);
 		assertEquals(obj, getResponse.item());
