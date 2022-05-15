@@ -2,15 +2,13 @@ package com.autonomouslogic.dynamomapper.codegen;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.squareup.javapoet.WildcardTypeName;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.gradle.api.logging.Logger;
@@ -28,7 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.field;
-import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.genericClass;
+import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.CLASS_T;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedDeleteItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedGetItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedPutItemResponse;
@@ -118,8 +116,9 @@ public class MapperGenerator {
 		}
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.getName())
-			.addModifiers(Modifier.PUBLIC);
-		wrapper.returns(TypeHelper.genericWildcard(returnType));
+			.addModifiers(Modifier.PUBLIC)
+			.addTypeVariable(TypeHelper.T);
+		wrapper.returns(TypeHelper.genericCapture(returnType));
 		wrapper.addExceptions(Stream.of(method.getExceptionTypes())
 			.map(e -> ClassName.get(e))
 			.collect(Collectors.toList())
@@ -132,7 +131,7 @@ public class MapperGenerator {
 				delegateParams.size(), method.getName()));
 		}
 		wrapper.addParameter(delegateParams.get(0), requestVar);
-		wrapper.addParameter(genericClass, "clazz");
+		wrapper.addParameter(CLASS_T, "clazz");
 		// Write body.
 		wrapper.addStatement("return decoder.$L(client.$L($L), clazz)",
 			decoderMethod,
@@ -148,7 +147,8 @@ public class MapperGenerator {
 	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName) {
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.name)
-			.addModifiers(Modifier.PUBLIC);
+			.addModifiers(Modifier.PUBLIC)
+			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
 		wrapper.addExceptions(method.exceptions);
 		wrapper.addException(IOException.class);
@@ -172,10 +172,14 @@ public class MapperGenerator {
 	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName) {
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.name)
-			.addModifiers(Modifier.PUBLIC);
+			.addModifiers(Modifier.PUBLIC)
+			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
 		wrapper.addExceptions(method.exceptions);
 		wrapper.addException(IOException.class);
+		wrapper.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
+			.addMember("value", "\"unchecked\"")
+			.build());
 		// Add parameters.
 		wrapper.addParameter(Object.class, "keyObject");
 		var params = new ArrayList<>(method.parameters);
@@ -188,7 +192,7 @@ public class MapperGenerator {
 		if (firstParamTypeName instanceof ParameterizedTypeName) {
 			wrapper.addStatement("consumer.accept(builder)");
 		}
-		wrapper.addStatement("return $L(builder.build(), keyObject.getClass())", method.name);
+		wrapper.addStatement("return $L(builder.build(), ($T) keyObject.getClass())", method.name, CLASS_T);
 
 		TypeHelper.nonNullParameters(wrapper);
 		mapper.addMethod(wrapper.build());

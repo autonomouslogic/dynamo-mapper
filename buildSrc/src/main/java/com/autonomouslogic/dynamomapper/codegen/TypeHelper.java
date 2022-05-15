@@ -3,9 +3,9 @@ package com.autonomouslogic.dynamomapper.codegen;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
 import lombok.NonNull;
 
@@ -29,9 +29,9 @@ public class TypeHelper {
 	public static final ClassName mappedGetItemResponse = mapperType("model", "MappedGetItemResponse");
 	public static final ClassName mappedPutItemResponse = mapperType("model", "MappedPutItemResponse");
 
-	public static final ParameterizedTypeName genericClass = ParameterizedTypeName.get(
-		ClassName.get(Class.class),
-		WildcardTypeName.subtypeOf(TypeName.OBJECT));
+	public static final TypeVariableName T = TypeVariableName.get("T");
+
+	public static final ParameterizedTypeName CLASS_T = ParameterizedTypeName.get(ClassName.get(Class.class), T);
 
 	public static ClassName mapperType(String subPackage, String className) {
 		var fullPackage = PACKAGE_NAME + "." + subPackage;
@@ -60,6 +60,10 @@ public class TypeHelper {
 
 	public static ParameterizedTypeName genericWildcard(ClassName type) {
 		return ParameterizedTypeName.get(type, WildcardTypeName.subtypeOf(TypeName.OBJECT));
+	}
+
+	public static ParameterizedTypeName genericCapture(ClassName type) {
+		return ParameterizedTypeName.get(type, TypeVariableName.get("T"));
 	}
 
 	public static MethodSpec.Builder nonNullParameters(MethodSpec.Builder builder) {
