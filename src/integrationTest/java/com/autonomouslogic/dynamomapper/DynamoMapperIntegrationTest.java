@@ -3,16 +3,11 @@ package com.autonomouslogic.dynamomapper;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
-import com.autonomouslogic.dynamomapper.test.StdObjectMapper;
+import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
 import lombok.SneakyThrows;
-import org.apache.commons.math3.random.ISAACRandom;
-import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.dynamodb.model.ReturnValue;
-
-import java.time.Duration;
-import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -21,7 +16,7 @@ public class DynamoMapperIntegrationTest {
 
 	@BeforeAll
 	public static void setup() {
-		dynamoMapper = new DynamoMapper(IntegrationTestUtil.client(), StdObjectMapper.objectMapper());
+		dynamoMapper = DynamoMapper.builder().client(IntegrationTestUtil.client()).build();
 	}
 
 	@Test

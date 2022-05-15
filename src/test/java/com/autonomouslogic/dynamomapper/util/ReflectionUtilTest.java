@@ -3,7 +3,6 @@ package com.autonomouslogic.dynamomapper.util;
 import com.autonomouslogic.dynamomapper.model.MethodTestObject;
 import com.autonomouslogic.dynamomapper.model.ModifiedMethodTestObject;
 import com.autonomouslogic.dynamomapper.model.ModifiedTestObject;
-import com.autonomouslogic.dynamomapper.test.StdObjectMapper;
 import com.autonomouslogic.dynamomapper.model.TestObject;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;

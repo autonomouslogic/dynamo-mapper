@@ -49,6 +49,7 @@ public class MapperGenerator {
 		generateGetWrappers();
 		generatePutWrappers();
 		generateDeleteWrappers();
+		generateBuilder();
 	}
 
 	protected void generateFields() {
@@ -66,7 +67,7 @@ public class MapperGenerator {
 
 	protected void generateConstructor() {
 		var constructor = MethodSpec.constructorBuilder()
-			.addModifiers(Modifier.PUBLIC);
+			.addModifiers(Modifier.PROTECTED);
 		var client = ParameterSpec.builder(clientField.type, "client")
 			.build();
 		var objectMapper = ParameterSpec.builder(ObjectMapper.class, "objectMapper")
@@ -198,10 +199,12 @@ public class MapperGenerator {
 		mapper.addMethod(wrapper.build());
 	}
 
-	private String paramName(Type type) {
-		if (type instanceof ParameterizedType) {
-			return paramName(((ParameterizedType) type).getOwnerType());
-		}
-		return StringUtils.uncapitalize(type.getTypeName());
+	private void generateBuilder() {
+		mapper.addMethod(MethodSpec.methodBuilder("builder")
+			.addModifiers(Modifier.PUBLIC)
+			.addModifiers(Modifier.STATIC)
+			.returns(TypeHelper.dynamoMapperBuilder)
+			.addStatement("return new $T()", TypeHelper.dynamoMapperBuilder)
+			.build());
 	}
 }
