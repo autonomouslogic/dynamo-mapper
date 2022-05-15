@@ -1,3 +1,4 @@
+// This is a generated file, do not edit manually.
 package com.autonomouslogic.dynamomapper;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
@@ -6,10 +7,16 @@ import com.autonomouslogic.dynamomapper.function.CheckedFunction;
 import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
+import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.autonomouslogic.dynamomapper.util.FutureUtil;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
-import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.lang.Class;
+import java.lang.Exception;
+import java.lang.Object;
+import java.lang.SuppressWarnings;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import lombok.NonNull;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
@@ -19,17 +26,18 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-
 public class DynamoAsyncMapper {
 	private final DynamoDbAsyncClient client;
-	private final DynamoEncoder encoder;
-	private final DynamoDecoder decoder;
-	private final RequestFactory requestFactory;
-	private final ReflectionUtil reflectionUtil;
 
-	public DynamoAsyncMapper(@NonNull DynamoDbAsyncClient client, @NonNull ObjectMapper objectMapper) {
+	final DynamoEncoder encoder;
+
+	final DynamoDecoder decoder;
+
+	final RequestFactory requestFactory;
+
+	final ReflectionUtil reflectionUtil;
+
+	protected DynamoAsyncMapper(DynamoDbAsyncClient client, ObjectMapper objectMapper) {
 		this.client = client;
 		encoder = new DynamoEncoder(objectMapper);
 		decoder = new DynamoDecoder(objectMapper);
@@ -37,111 +45,158 @@ public class DynamoAsyncMapper {
 		requestFactory = new RequestFactory(encoder, objectMapper, reflectionUtil);
 	}
 
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey, @NonNull Class<T> clazz) {
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull GetItemRequest request,
+			@NonNull Class<T> clazz) {
+		return client.getItem(request)
+					.thenApply(new CheckedFunction<>() {
+						@Override
+						public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
+							return decoder.mapGetItemResponse(response, clazz);
+						}
+					});
+	}
+
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey,
+			@NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
 			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
 			return getItem(builder.build(), clazz);
 		});
 	}
 
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey, @NonNull Consumer<GetItemRequest.Builder> getItemRequest, @NonNull Class<T> clazz) {
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull T keyObject) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.getRequestFromKeyObject(keyObject);
+			return getItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
+	}
+
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
+			@NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
+		return client.getItem(consumer)
+					.thenApply(new CheckedFunction<>() {
+						@Override
+						public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
+							return decoder.mapGetItemResponse(response, clazz);
+						}
+					});
+	}
+
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey,
+			@NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
 			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
-			getItemRequest.accept(builder);
+			consumer.accept(builder);
 			return getItem(builder.build(), clazz);
 		});
 	}
 
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(GetItemRequest getItemRequest, @NonNull Class<T> clazz) {
-		return client.getItem(getItemRequest)
-			.thenApply(new CheckedFunction<>() {
-				@Override
-				public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
-					return decoder.mapGetItemResponse(response, clazz);
-				}
-			});
-	}
-
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Consumer<GetItemRequest.Builder> getItemRequest, @NonNull Class<T> clazz) {
-		return client.getItem(getItemRequest)
-			.thenApply(new CheckedFunction<>() {
-				@Override
-				public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
-					return decoder.mapGetItemResponse(response, clazz);
-				}
-			});
-	}
-
 	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull T obj) {
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull T keyObject,
+			@NonNull Consumer<GetItemRequest.Builder> consumer) {
 		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.putRequestFromObject(obj);
-			return putItem(builder.build(), (Class<T>) obj.getClass());
+			var builder = requestFactory.getRequestFromKeyObject(keyObject);
+			consumer.accept(builder);
+			return getItem(builder.build(), (Class<T>) keyObject.getClass());
 		});
 	}
 
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull PutItemRequest request,
+			@NonNull Class<T> clazz) {
+		return client.putItem(request)
+					.thenApply(new CheckedFunction<>() {
+						@Override
+						public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
+							return decoder.mapPutItemResponse(response, clazz);
+						}
+					});
+	}
+
 	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull T obj, @NonNull Consumer<PutItemRequest.Builder> putItemRequest) {
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull T keyObject) {
 		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.putRequestFromObject(obj);
-			putItemRequest.accept(builder);
-			return putItem(builder.build(), (Class<T>) obj.getClass());
+			var builder = requestFactory.putRequestFromObject(keyObject);
+			return putItem(builder.build(), (Class<T>) keyObject.getClass());
 		});
 	}
 
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull PutItemRequest putItemRequest, @NonNull Class<T> clazz) {
-		return client.putItem(putItemRequest)
-			.thenApply(new CheckedFunction<>() {
-				@Override
-				public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
-					return decoder.mapPutItemResponse(response, clazz);
-				}
-			});
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(
+			@NonNull Consumer<PutItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
+		return client.putItem(consumer)
+					.thenApply(new CheckedFunction<>() {
+						@Override
+						public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
+							return decoder.mapPutItemResponse(response, clazz);
+						}
+					});
 	}
 
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull Consumer<PutItemRequest.Builder> putItemRequest, @NonNull Class<T> clazz) {
-		return client.putItem(putItemRequest)
-			.thenApply(new CheckedFunction<>() {
-				@Override
-				public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
-					return decoder.mapPutItemResponse(response, clazz);
-				}
-			});
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull T keyObject,
+			@NonNull Consumer<PutItemRequest.Builder> consumer) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.putRequestFromObject(keyObject);
+			consumer.accept(builder);
+			return putItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
 	}
 
-	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Object hashKey, @NonNull Class<T> clazz) {
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
+			@NonNull DeleteItemRequest request, @NonNull Class<T> clazz) {
+		return client.deleteItem(request)
+					.thenApply(new CheckedFunction<>() {
+						@Override
+						public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
+							return decoder.mapDeleteItemResponse(response, clazz);
+						}
+					});
+	}
+
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Object hashKey,
+			@NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
 			var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
 			return deleteItem(builder.build(), clazz);
 		});
 	}
 
-	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Object hashKey, @NonNull Consumer<DeleteItemRequest.Builder> deleteItemRequest, @NonNull Class<T> clazz) {
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull T keyObject) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+			return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
+	}
+
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
+			@NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
+		return client.deleteItem(consumer)
+					.thenApply(new CheckedFunction<>() {
+						@Override
+						public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
+							return decoder.mapDeleteItemResponse(response, clazz);
+						}
+					});
+	}
+
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Object hashKey,
+			@NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
 			var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
-			deleteItemRequest.accept(builder);
+			consumer.accept(builder);
 			return deleteItem(builder.build(), clazz);
 		});
 	}
 
-	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull DeleteItemRequest deleteItemRequest, @NonNull Class<T> clazz) {
-		return client.deleteItem(deleteItemRequest)
-			.thenApply(new CheckedFunction<>() {
-				@Override
-				public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
-					return decoder.mapDeleteItemResponse(response, clazz);
-				}
-			});
-	}
-
-	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Consumer<DeleteItemRequest.Builder> deleteItemRequest, @NonNull Class<T> clazz) {
-		return client.deleteItem(deleteItemRequest)
-			.thenApply(new CheckedFunction<>() {
-				@Override
-				public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
-					return decoder.mapDeleteItemResponse(response, clazz);
-				}
-			});
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull T keyObject,
+			@NonNull Consumer<DeleteItemRequest.Builder> consumer) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+			consumer.accept(builder);
+			return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
 	}
 
 	public static DynamoAsyncMapperBuilder builder() {

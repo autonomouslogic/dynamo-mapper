@@ -12,6 +12,7 @@ import lombok.NonNull;
 import javax.lang.model.element.Modifier;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,7 +24,9 @@ public class TypeHelper {
 
 	public static final ClassName dynamoDecoder = mapperType("codec", "DynamoDecoder");
 	public static final ClassName dynamoEncoder = mapperType("codec", "DynamoEncoder");
+	public static final ClassName checkedFunction = mapperType("function", "CheckedFunction");
 	public static final ClassName reflectionUtil = mapperType("util", "ReflectionUtil");
+	public static final ClassName futureUtil = mapperType("util", "FutureUtil");
 	public static final ClassName requestFactory = mapperType("request", "RequestFactory");
 	public static final ClassName mappedDeleteItemResponse = mapperType("model", "MappedDeleteItemResponse");
 	public static final ClassName mappedGetItemResponse = mapperType("model", "MappedGetItemResponse");
@@ -71,6 +74,10 @@ public class TypeHelper {
 
 	public static ParameterizedTypeName genericCapture(ClassName type) {
 		return ParameterizedTypeName.get(type, TypeVariableName.get("T"));
+	}
+
+	public static ParameterizedTypeName futureGenericCapture(ClassName type) {
+		return ParameterizedTypeName.get(ClassName.get(CompletableFuture.class), genericCapture(type));
 	}
 
 	public static MethodSpec.Builder nonNullParameters(MethodSpec.Builder builder) {

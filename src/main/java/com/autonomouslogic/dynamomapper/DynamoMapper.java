@@ -66,7 +66,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedGetItemResponse<T> getItem(@NonNull Object keyObject) throws
+	public <T> MappedGetItemResponse<T> getItem(@NonNull T keyObject) throws
 			ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 			InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
 			JsonProcessingException, IOException {
@@ -92,7 +92,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedGetItemResponse<T> getItem(@NonNull Object keyObject,
+	public <T> MappedGetItemResponse<T> getItem(@NonNull T keyObject,
 			@NonNull Consumer<GetItemRequest.Builder> consumer) throws
 			ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 			InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
@@ -112,7 +112,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedPutItemResponse<T> putItem(@NonNull Object keyObject) throws
+	public <T> MappedPutItemResponse<T> putItem(@NonNull T keyObject) throws
 			ConditionalCheckFailedException, ProvisionedThroughputExceededException,
 			ResourceNotFoundException, ItemCollectionSizeLimitExceededException,
 			TransactionConflictException, RequestLimitExceededException, InternalServerErrorException,
@@ -132,7 +132,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedPutItemResponse<T> putItem(@NonNull Object keyObject,
+	public <T> MappedPutItemResponse<T> putItem(@NonNull T keyObject,
 			@NonNull Consumer<PutItemRequest.Builder> consumer) throws ConditionalCheckFailedException,
 			ProvisionedThroughputExceededException, ResourceNotFoundException,
 			ItemCollectionSizeLimitExceededException, TransactionConflictException,
@@ -163,7 +163,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull Object keyObject) throws
+	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull T keyObject) throws
 			ConditionalCheckFailedException, ProvisionedThroughputExceededException,
 			ResourceNotFoundException, ItemCollectionSizeLimitExceededException,
 			TransactionConflictException, RequestLimitExceededException, InternalServerErrorException,
@@ -195,7 +195,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull Object keyObject,
+	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull T keyObject,
 			@NonNull Consumer<DeleteItemRequest.Builder> consumer) throws ConditionalCheckFailedException,
 			ProvisionedThroughputExceededException, ResourceNotFoundException,
 			ItemCollectionSizeLimitExceededException, TransactionConflictException,
