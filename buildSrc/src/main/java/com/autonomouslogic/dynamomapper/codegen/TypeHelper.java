@@ -28,10 +28,16 @@ public class TypeHelper {
 	public static final ClassName mappedDeleteItemResponse = mapperType("model", "MappedDeleteItemResponse");
 	public static final ClassName mappedGetItemResponse = mapperType("model", "MappedGetItemResponse");
 	public static final ClassName mappedPutItemResponse = mapperType("model", "MappedPutItemResponse");
+	public static final ClassName dynamoMapperBuilder = mapperType("DynamoMapperBuilder");
+	public static final ClassName dynamoAsyncMapperBuilder = mapperType("DynamoAsyncMapperBuilder");
 
 	public static final TypeVariableName T = TypeVariableName.get("T");
 
 	public static final ParameterizedTypeName CLASS_T = ParameterizedTypeName.get(ClassName.get(Class.class), T);
+
+	public static ClassName mapperType(String className) {
+		return ClassName.get(PACKAGE_NAME, className);
+	}
 
 	public static ClassName mapperType(String subPackage, String className) {
 		var fullPackage = PACKAGE_NAME + "." + subPackage;
@@ -40,6 +46,7 @@ public class TypeHelper {
 
 	public static FieldSpec field(Class clazz, String value) {
 		return FieldSpec.builder(clazz, value)
+			.addModifiers(Modifier.PRIVATE)
 			.addModifiers(Modifier.FINAL)
 			.build();
 	}

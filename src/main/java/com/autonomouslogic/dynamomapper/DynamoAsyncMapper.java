@@ -143,4 +143,8 @@ public class DynamoAsyncMapper {
 				}
 			});
 	}
+
+	public static DynamoAsyncMapperBuilder builder() {
+		return new DynamoAsyncMapperBuilder();
+	}
 }
