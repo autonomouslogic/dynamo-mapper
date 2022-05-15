@@ -70,10 +70,8 @@ public class MapperGenerator {
 		var constructor = MethodSpec.constructorBuilder()
 			.addModifiers(Modifier.PUBLIC);
 		var client = ParameterSpec.builder(clientField.type, "client")
-			.addAnnotation(NonNull.class)
 			.build();
 		var objectMapper = ParameterSpec.builder(ObjectMapper.class, "objectMapper")
-			.addAnnotation(NonNull.class)
 			.build();
 		constructor.addParameter(client);
 		constructor.addParameter(objectMapper);
@@ -140,6 +138,7 @@ public class MapperGenerator {
 			method.getName(),
 			requestVar);
 
+		TypeHelper.nonNullParameters(wrapper);
 		var built = wrapper.build();
 		mapper.addMethod(built);
 		return built;
@@ -164,6 +163,8 @@ public class MapperGenerator {
 			wrapper.addStatement("consumer.accept(builder)");
 		}
 		wrapper.addStatement("return $L(builder.build(), clazz)", method.name);
+
+		TypeHelper.nonNullParameters(wrapper);
 		mapper.addMethod(wrapper.build());
 	}
 
@@ -187,6 +188,8 @@ public class MapperGenerator {
 			wrapper.addStatement("consumer.accept(builder)");
 		}
 		wrapper.addStatement("return $L(builder.build(), keyObject.getClass())", method.name);
+
+		TypeHelper.nonNullParameters(wrapper);
 		mapper.addMethod(wrapper.build());
 	}
 
