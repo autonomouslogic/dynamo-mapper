@@ -22,7 +22,7 @@ public class Codegen extends DefaultTask {
 		log = getLogger();
 		srcDir = getProject().getProjectDir().toPath().resolve("src").resolve("main").resolve("java");
 		// Init.
-		mapper = TypeSpec.classBuilder("DynamoMapper2");
+		mapper = TypeSpec.classBuilder("DynamoMapper");
 		// Generate.
 		new MapperGenerator(mapper, log).generate();
 		// Write.
