@@ -11,7 +11,6 @@ import java.io.FileWriter;
 import java.nio.file.Path;
 
 public class Codegen extends DefaultTask {
-	public static final String PACKAGE_NAME = "com.autonomouslogic.dynamomapper";
 
 	private Logger log;
 	private Path srcDir;
@@ -27,7 +26,7 @@ public class Codegen extends DefaultTask {
 		// Generate.
 		new MapperGenerator(mapper, log).generate();
 		// Write.
-		writeType(PACKAGE_NAME, mapper.build());
+		writeType(TypeHelper.PACKAGE_NAME, mapper.build());
 	}
 
 	@SneakyThrows
