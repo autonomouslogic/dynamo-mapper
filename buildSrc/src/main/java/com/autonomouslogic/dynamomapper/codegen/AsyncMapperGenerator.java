@@ -87,7 +87,35 @@ public class AsyncMapperGenerator extends MapperGenerator {
 
 	@Override
 	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName) {
-		return;
+		// Create signature.
+		var wrapper = MethodSpec.methodBuilder(method.name)
+			.addModifiers(Modifier.PUBLIC)
+			.addTypeVariable(TypeHelper.T);
+		wrapper.returns(method.returnType);
+		wrapper.addExceptions(method.exceptions);
+		// Add parameters.
+		wrapper.addParameter(Object.class, "hashKey");
+		var params = new ArrayList<>(method.parameters);
+		params.removeIf(p -> p.name.equals("request"));
+		wrapper.addParameters(params);
+		// Write body.
+		var code = CodeBlock.builder();
+		code.add(CodeBlock.of(
+			"return $T.wrapFuture(() -> {\n" +
+			"\tvar builder = requestFactory.$L(hashKey, clazz);\n",
+			TypeHelper.futureUtil, factoryMethodName
+		));
+		var firstParamTypeName = method.parameters.get(0).type;
+		if (firstParamTypeName instanceof ParameterizedTypeName) {
+			code.addStatement("\tconsumer.accept(builder)");
+		}
+		code.add(CodeBlock.of(
+			"\treturn $L(builder.build(), clazz);\n" +
+			"});", method.name));
+		wrapper.addCode(code.build());
+
+		TypeHelper.nonNullParameters(wrapper);
+		mapper.addMethod(wrapper.build());
 	}
 
 	@Override

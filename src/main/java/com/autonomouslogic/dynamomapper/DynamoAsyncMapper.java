@@ -8,10 +8,12 @@ import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
 import com.autonomouslogic.dynamomapper.request.RequestFactory;
+import com.autonomouslogic.dynamomapper.util.FutureUtil;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.Class;
 import java.lang.Exception;
+import java.lang.Object;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import lombok.NonNull;
@@ -53,6 +55,14 @@ public class DynamoAsyncMapper {
 					});
 	}
 
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey,
+			@NonNull Class<T> clazz) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+			return getItem(builder.build(), clazz);
+		});
+	}
+
 	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
 			@NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
 		return client.getItem(consumer)
@@ -62,6 +72,15 @@ public class DynamoAsyncMapper {
 							return decoder.mapGetItemResponse(response, clazz);
 						}
 					});
+	}
+
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey,
+			@NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+			consumer.accept(builder);
+			return getItem(builder.build(), clazz);
+		});
 	}
 
 	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull PutItemRequest request,
@@ -97,6 +116,14 @@ public class DynamoAsyncMapper {
 					});
 	}
 
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Object hashKey,
+			@NonNull Class<T> clazz) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
+			return deleteItem(builder.build(), clazz);
+		});
+	}
+
 	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
 			@NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
 		return client.deleteItem(consumer)
@@ -106,6 +133,15 @@ public class DynamoAsyncMapper {
 							return decoder.mapDeleteItemResponse(response, clazz);
 						}
 					});
+	}
+
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Object hashKey,
+			@NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
+			consumer.accept(builder);
+			return deleteItem(builder.build(), clazz);
+		});
 	}
 
 	public static DynamoAsyncMapperBuilder builder() {
