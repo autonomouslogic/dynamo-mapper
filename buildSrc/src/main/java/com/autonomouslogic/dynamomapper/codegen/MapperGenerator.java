@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.field;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.genericClass;
@@ -120,8 +121,7 @@ public class MapperGenerator {
 		var wrapper = MethodSpec.methodBuilder(method.getName())
 			.addModifiers(Modifier.PUBLIC);
 		wrapper.returns(TypeHelper.genericWildcard(returnType));
-		wrapper.addExceptions(List.of(method.getExceptionTypes())
-			.stream()
+		wrapper.addExceptions(Stream.of(method.getExceptionTypes())
 			.map(e -> ClassName.get(e))
 			.collect(Collectors.toList())
 		);
