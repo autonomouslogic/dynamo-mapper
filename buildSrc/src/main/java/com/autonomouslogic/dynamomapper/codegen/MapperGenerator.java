@@ -96,7 +96,8 @@ public class MapperGenerator {
 
 	protected void generatePutWrappers() {
 		for (Method method : overridableMethods(DynamoDbClient.class, "putItem")) {
-			generateDelegateWrapper(method, mappedPutItemResponse, "mapPutItemResponse");
+			var delegate = generateDelegateWrapper(method, mappedPutItemResponse, "mapPutItemResponse");
+			generateKeyObjectWrapper(delegate, "putRequestFromObject");
 		}
 	}
 
