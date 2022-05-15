@@ -58,36 +58,54 @@ class DynamoMapper2 {
 		return decoder.mapGetItemResponse(client.getItem(request), clazz);
 	}
 
-	public MappedGetItemResponse<?> getItem(Object hashKey, GetItemRequest request, Class<?> clazz)
-			throws ProvisionedThroughputExceededException, ResourceNotFoundException,
-			RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-			SdkClientException, DynamoDbException, JsonProcessingException, IOException {
+	public MappedGetItemResponse<?> getItem(Object hashKey, Class<?> clazz) throws
+			ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
+			InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
+			JsonProcessingException, IOException {
 		var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
 		return getItem(builder.build(), clazz);
 	}
 
-	public MappedGetItemResponse<?> getItem(Consumer<GetItemRequest.Builder> request, Class<?> clazz)
+	public MappedGetItemResponse<?> getItem(Object keyObject) throws
+			ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
+			InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
+			JsonProcessingException, IOException {
+		var builder = requestFactory.getRequestFromKeyObject(keyObject);
+		return getItem(builder.build(), keyObject.getClass());
+	}
+
+	public MappedGetItemResponse<?> getItem(Consumer<GetItemRequest.Builder> consumer, Class<?> clazz)
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException,
 			RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 			SdkClientException, DynamoDbException, JsonProcessingException {
-		return decoder.mapGetItemResponse(client.getItem(request), clazz);
+		return decoder.mapGetItemResponse(client.getItem(consumer), clazz);
 	}
 
-	public MappedGetItemResponse<?> getItem(Object hashKey, Consumer<GetItemRequest.Builder> request,
+	public MappedGetItemResponse<?> getItem(Object hashKey, Consumer<GetItemRequest.Builder> consumer,
 			Class<?> clazz) throws ProvisionedThroughputExceededException, ResourceNotFoundException,
 			RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 			SdkClientException, DynamoDbException, JsonProcessingException, IOException {
 		var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
-		request.accept(builder);
+		consumer.accept(builder);
 		return getItem(builder.build(), clazz);
 	}
 
-	public MappedPutItemResponse<?> putItem(Consumer<PutItemRequest.Builder> request, Class<?> clazz)
+	public MappedGetItemResponse<?> getItem(Object keyObject,
+			Consumer<GetItemRequest.Builder> consumer) throws ProvisionedThroughputExceededException,
+			ResourceNotFoundException, RequestLimitExceededException, InternalServerErrorException,
+			AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException,
+			IOException {
+		var builder = requestFactory.getRequestFromKeyObject(keyObject);
+		consumer.accept(builder);
+		return getItem(builder.build(), keyObject.getClass());
+	}
+
+	public MappedPutItemResponse<?> putItem(Consumer<PutItemRequest.Builder> consumer, Class<?> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException,
 			ResourceNotFoundException, ItemCollectionSizeLimitExceededException,
 			TransactionConflictException, RequestLimitExceededException, InternalServerErrorException,
 			AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException {
-		return decoder.mapPutItemResponse(client.putItem(request), clazz);
+		return decoder.mapPutItemResponse(client.putItem(consumer), clazz);
 	}
 
 	public MappedPutItemResponse<?> putItem(PutItemRequest request, Class<?> clazz) throws
@@ -98,24 +116,35 @@ class DynamoMapper2 {
 		return decoder.mapPutItemResponse(client.putItem(request), clazz);
 	}
 
-	public MappedDeleteItemResponse<?> deleteItem(Consumer<DeleteItemRequest.Builder> request,
+	public MappedDeleteItemResponse<?> deleteItem(Consumer<DeleteItemRequest.Builder> consumer,
 			Class<?> clazz) throws ConditionalCheckFailedException, ProvisionedThroughputExceededException,
 			ResourceNotFoundException, ItemCollectionSizeLimitExceededException,
 			TransactionConflictException, RequestLimitExceededException, InternalServerErrorException,
 			AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException {
-		return decoder.mapDeleteItemResponse(client.deleteItem(request), clazz);
+		return decoder.mapDeleteItemResponse(client.deleteItem(consumer), clazz);
 	}
 
 	public MappedDeleteItemResponse<?> deleteItem(Object hashKey,
-			Consumer<DeleteItemRequest.Builder> request, Class<?> clazz) throws
+			Consumer<DeleteItemRequest.Builder> consumer, Class<?> clazz) throws
 			ConditionalCheckFailedException, ProvisionedThroughputExceededException,
 			ResourceNotFoundException, ItemCollectionSizeLimitExceededException,
 			TransactionConflictException, RequestLimitExceededException, InternalServerErrorException,
 			AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException,
 			IOException {
 		var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
-		request.accept(builder);
+		consumer.accept(builder);
 		return deleteItem(builder.build(), clazz);
+	}
+
+	public MappedDeleteItemResponse<?> deleteItem(Object keyObject,
+			Consumer<DeleteItemRequest.Builder> consumer) throws ConditionalCheckFailedException,
+			ProvisionedThroughputExceededException, ResourceNotFoundException,
+			ItemCollectionSizeLimitExceededException, TransactionConflictException,
+			RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
+			SdkClientException, DynamoDbException, JsonProcessingException, IOException {
+		var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+		consumer.accept(builder);
+		return deleteItem(builder.build(), keyObject.getClass());
 	}
 
 	public MappedDeleteItemResponse<?> deleteItem(DeleteItemRequest request, Class<?> clazz) throws
@@ -126,13 +155,23 @@ class DynamoMapper2 {
 		return decoder.mapDeleteItemResponse(client.deleteItem(request), clazz);
 	}
 
-	public MappedDeleteItemResponse<?> deleteItem(Object hashKey, DeleteItemRequest request,
-			Class<?> clazz) throws ConditionalCheckFailedException, ProvisionedThroughputExceededException,
+	public MappedDeleteItemResponse<?> deleteItem(Object hashKey, Class<?> clazz) throws
+			ConditionalCheckFailedException, ProvisionedThroughputExceededException,
 			ResourceNotFoundException, ItemCollectionSizeLimitExceededException,
 			TransactionConflictException, RequestLimitExceededException, InternalServerErrorException,
 			AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException,
 			IOException {
 		var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
 		return deleteItem(builder.build(), clazz);
+	}
+
+	public MappedDeleteItemResponse<?> deleteItem(Object keyObject) throws
+			ConditionalCheckFailedException, ProvisionedThroughputExceededException,
+			ResourceNotFoundException, ItemCollectionSizeLimitExceededException,
+			TransactionConflictException, RequestLimitExceededException, InternalServerErrorException,
+			AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException,
+			IOException {
+		var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+		return deleteItem(builder.build(), keyObject.getClass());
 	}
 }

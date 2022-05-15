@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.field;
@@ -89,6 +91,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(DynamoDbClient.class, "getItem")) {
 			var delegate = generateDelegateWrapper(method, mappedGetItemResponse, "mapGetItemResponse");
 			generateHashKeyWrapper(delegate, "getRequestFromHashKey");
+			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
 		}
 	}
 
@@ -102,10 +105,17 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(DynamoDbClient.class, "deleteItem")) {
 			var delegate = generateDelegateWrapper(method, mappedDeleteItemResponse, "mapDeleteItemResponse");
 			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey");
+			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject");
 		}
 	}
 
 	protected MethodSpec generateDelegateWrapper(Method method, ClassName returnType, String decoderMethod) {
+		// Detect consumer.
+		var requestVar = "request";
+		var firstParamTypeName = method.getParameterTypes()[0];
+		if (firstParamTypeName.equals(Consumer.class)) {
+			requestVar = "consumer";
+		}
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.getName())
 			.addModifiers(Modifier.PUBLIC);
@@ -122,12 +132,13 @@ public class MapperGenerator {
 			throw new IllegalArgumentException(String.format("Delegate param generation only supports 1 param, %s seen for %s",
 				delegateParams.size(), method.getName()));
 		}
-		wrapper.addParameter(delegateParams.get(0), "request");
+		wrapper.addParameter(delegateParams.get(0), requestVar);
 		wrapper.addParameter(genericClass, "clazz");
 		// Write body.
-		wrapper.addStatement("return decoder.$L(client.$L(request), clazz)",
+		wrapper.addStatement("return decoder.$L(client.$L($L), clazz)",
 			decoderMethod,
-			method.getName());
+			method.getName(),
+			requestVar);
 
 		var built = wrapper.build();
 		mapper.addMethod(built);
@@ -143,14 +154,39 @@ public class MapperGenerator {
 		wrapper.addException(IOException.class);
 		// Add parameters.
 		wrapper.addParameter(Object.class, "hashKey");
-		wrapper.addParameters(method.parameters);
+		var params = new ArrayList<>(method.parameters);
+		params.removeIf(p -> p.name.equals("request"));
+		wrapper.addParameters(params);
 		// Write body.
 		wrapper.addStatement("var builder = requestFactory.$L(hashKey, clazz)", factoryMethodName);
 		var firstParamTypeName = method.parameters.get(0).type;
 		if (firstParamTypeName instanceof ParameterizedTypeName) {
-			wrapper.addStatement("request.accept(builder)");
+			wrapper.addStatement("consumer.accept(builder)");
 		}
 		wrapper.addStatement("return $L(builder.build(), clazz)", method.name);
+		mapper.addMethod(wrapper.build());
+	}
+
+	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName) {
+		// Create signature.
+		var wrapper = MethodSpec.methodBuilder(method.name)
+			.addModifiers(Modifier.PUBLIC);
+		wrapper.returns(method.returnType);
+		wrapper.addExceptions(method.exceptions);
+		wrapper.addException(IOException.class);
+		// Add parameters.
+		wrapper.addParameter(Object.class, "keyObject");
+		var params = new ArrayList<>(method.parameters);
+		params.removeIf(p -> p.name.equals("request"));
+		params.removeIf(p -> p.name.equals("clazz"));
+		wrapper.addParameters(params);
+		// Write body.
+		wrapper.addStatement("var builder = requestFactory.$L(keyObject)", factoryMethodName);
+		var firstParamTypeName = method.parameters.get(0).type;
+		if (firstParamTypeName instanceof ParameterizedTypeName) {
+			wrapper.addStatement("consumer.accept(builder)");
+		}
+		wrapper.addStatement("return $L(builder.build(), keyObject.getClass())", method.name);
 		mapper.addMethod(wrapper.build());
 	}
 
