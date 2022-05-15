@@ -1,0 +1,43 @@
+{
+    "dryRun": false,
+    "ci": false,
+    "branches":
+    [
+        "main"
+    ],
+    "tagFormat": "${version}",
+    "plugins":
+    [
+        [
+            "@semantic-release/commit-analyzer",
+            {
+                "preset": "conventionalcommits"
+            }
+        ],
+        [
+            "@semantic-release/release-notes-generator",
+            {
+                "preset": "conventionalcommits"
+            }
+        ],
+        [
+            "@semantic-release/exec",
+            {
+                "verifyConditionsCmd": "./gradlew signMavenJavaPublication",
+                "publishCmd": "./publish.sh ${nextRelease.version}"
+            }
+        ],
+        [
+            "@semantic-release/github",
+            {
+                "assets":
+                [
+                    {
+                        "path": "build/libs/dynamo-mapper-*.jar"
+                    }
+                ],
+                "addReleases": "bottom"
+            }
+        ]
+    ]
+}
