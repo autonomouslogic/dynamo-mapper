@@ -12,7 +12,11 @@ import com.squareup.javapoet.TypeSpec;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.gradle.api.logging.Logger;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
@@ -34,14 +38,14 @@ import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.overridableMet
 
 @RequiredArgsConstructor
 public class MapperGenerator {
-	private final TypeSpec.Builder mapper;
-	private final Logger log;
+	protected final TypeSpec.Builder mapper;
+	protected final Logger log;
 
-	private FieldSpec clientField;
-	private FieldSpec encoderField;
-	private FieldSpec decoderField;
-	private FieldSpec requestFactoryField;
-	private FieldSpec reflectionUtilField;
+	protected FieldSpec clientField;
+	protected FieldSpec encoderField;
+	protected FieldSpec decoderField;
+	protected FieldSpec requestFactoryField;
+	protected FieldSpec reflectionUtilField;
 
 	public void generate() {
 		generateFields();
@@ -51,9 +55,16 @@ public class MapperGenerator {
 		generateDeleteWrappers();
 		generateBuilder();
 	}
+	protected Class<?> clientClass() {
+		return DynamoDbClient.class;
+	}
+
+	protected ClassName builderClass() {
+		return TypeHelper.dynamoMapperBuilder;
+	}
 
 	protected void generateFields() {
-		clientField = field(DynamoDbClient.class, "client");
+		clientField = field(clientClass(), "client");
 		mapper.addField(clientField);
 		encoderField = field(TypeHelper.dynamoEncoder, "encoder");
 		mapper.addField(encoderField);
@@ -86,35 +97,33 @@ public class MapperGenerator {
 	}
 
 	protected void generateGetWrappers() {
-		for (Method method : overridableMethods(DynamoDbClient.class, "getItem")) {
-			var delegate = generateDelegateWrapper(method, mappedGetItemResponse, "mapGetItemResponse");
+		for (Method method : overridableMethods(clientClass(), "getItem")) {
+			var delegate = generateDelegateWrapper(
+				method, mappedGetItemResponse, "mapGetItemResponse", GetItemResponse.class);
 			generateHashKeyWrapper(delegate, "getRequestFromHashKey");
 			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
 		}
 	}
 
 	protected void generatePutWrappers() {
-		for (Method method : overridableMethods(DynamoDbClient.class, "putItem")) {
-			var delegate = generateDelegateWrapper(method, mappedPutItemResponse, "mapPutItemResponse");
+		for (Method method : overridableMethods(clientClass(), "putItem")) {
+			var delegate = generateDelegateWrapper(
+				method, mappedPutItemResponse, "mapPutItemResponse", PutItemResponse.class);
 			generateKeyObjectWrapper(delegate, "putRequestFromObject");
 		}
 	}
 
 	protected void generateDeleteWrappers() {
-		for (Method method : overridableMethods(DynamoDbClient.class, "deleteItem")) {
-			var delegate = generateDelegateWrapper(method, mappedDeleteItemResponse, "mapDeleteItemResponse");
+		for (Method method : overridableMethods(clientClass(), "deleteItem")) {
+			var delegate = generateDelegateWrapper(
+				method, mappedDeleteItemResponse, "mapDeleteItemResponse", DeleteItemResponse.class);
 			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey");
 			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject");
 		}
 	}
 
-	protected MethodSpec generateDelegateWrapper(Method method, ClassName returnType, String decoderMethod) {
-		// Detect consumer.
-		var requestVar = "request";
-		var firstParamTypeName = method.getParameterTypes()[0];
-		if (firstParamTypeName.equals(Consumer.class)) {
-			requestVar = "consumer";
-		}
+	protected MethodSpec generateDelegateWrapper(Method method, ClassName returnType, String decoderMethod, Class<?> responseClass) {
+		var requestVar = detectRequestOrConsumer(method);
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.getName())
 			.addModifiers(Modifier.PUBLIC)
@@ -199,12 +208,21 @@ public class MapperGenerator {
 		mapper.addMethod(wrapper.build());
 	}
 
-	private void generateBuilder() {
+	protected void generateBuilder() {
 		mapper.addMethod(MethodSpec.methodBuilder("builder")
 			.addModifiers(Modifier.PUBLIC)
 			.addModifiers(Modifier.STATIC)
-			.returns(TypeHelper.dynamoMapperBuilder)
-			.addStatement("return new $T()", TypeHelper.dynamoMapperBuilder)
+			.returns(builderClass())
+			.addStatement("return new $T()", builderClass())
 			.build());
+	}
+
+	protected String detectRequestOrConsumer(Method method) {
+		var requestVar = "request";
+		var firstParamTypeName = method.getParameterTypes()[0];
+		if (firstParamTypeName.equals(Consumer.class)) {
+			requestVar = "consumer";
+		}
+		return requestVar;
 	}
 }
