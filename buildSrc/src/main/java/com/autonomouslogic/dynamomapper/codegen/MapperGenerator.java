@@ -41,6 +41,8 @@ public class MapperGenerator {
 		generateFields();
 		generateConstructor();
 		generateGetWrappers();
+		generatePutWrappers();
+		generateDeleteWrappers();
 	}
 
 	protected void generateFields() {
@@ -84,6 +86,18 @@ public class MapperGenerator {
 		}
 	}
 
+	protected void generatePutWrappers() {
+		for (Method method : overridableMethods(DynamoDbClient.class, "putItem")) {
+			generateDelegateGetWrapper(method, TypeHelper.mappedPutItemResponse, "mapPutItemResponse");
+		}
+	}
+
+	protected void generateDeleteWrappers() {
+		for (Method method : overridableMethods(DynamoDbClient.class, "deleteItem")) {
+			generateDelegateGetWrapper(method, TypeHelper.mappedDeleteItemResponse, "mapDeleteItemResponse");
+		}
+	}
+
 	protected void generateDelegateGetWrapper(Method method, ClassName returnType, String decoderMethod) {
 		var wrapper = MethodSpec.methodBuilder(method.getName())
 			.addModifiers(Modifier.PUBLIC);
@@ -101,8 +115,9 @@ public class MapperGenerator {
 		}
 		wrapper.addParameter(delegateParams.get(0), "request");
 		wrapper.addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(TypeName.OBJECT)), "clazz");
-		wrapper.addStatement("return decoder.$L(client.getItem(request), clazz)",
-			decoderMethod);
+		wrapper.addStatement("return decoder.$L(client.$L(request), clazz)",
+			decoderMethod,
+			method.getName());
 		wrapper.returns(ParameterizedTypeName.get(returnType, WildcardTypeName.subtypeOf(TypeName.OBJECT)));
 		mapper.addMethod(wrapper.build());
 
