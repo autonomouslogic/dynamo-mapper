@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.Class;
 import java.lang.Exception;
 import java.lang.Object;
+import java.lang.SuppressWarnings;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import lombok.NonNull;
@@ -63,6 +64,14 @@ public class DynamoAsyncMapper {
 		});
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull T keyObject) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.getRequestFromKeyObject(keyObject);
+			return getItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
+	}
+
 	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
 			@NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
 		return client.getItem(consumer)
@@ -83,6 +92,16 @@ public class DynamoAsyncMapper {
 		});
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull T keyObject,
+			@NonNull Consumer<GetItemRequest.Builder> consumer) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.getRequestFromKeyObject(keyObject);
+			consumer.accept(builder);
+			return getItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
+	}
+
 	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull PutItemRequest request,
 			@NonNull Class<T> clazz) {
 		return client.putItem(request)
@@ -94,6 +113,14 @@ public class DynamoAsyncMapper {
 					});
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull T keyObject) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.putRequestFromObject(keyObject);
+			return putItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
+	}
+
 	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(
 			@NonNull Consumer<PutItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
 		return client.putItem(consumer)
@@ -103,6 +130,16 @@ public class DynamoAsyncMapper {
 							return decoder.mapPutItemResponse(response, clazz);
 						}
 					});
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull T keyObject,
+			@NonNull Consumer<PutItemRequest.Builder> consumer) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.putRequestFromObject(keyObject);
+			consumer.accept(builder);
+			return putItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
 	}
 
 	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
@@ -124,6 +161,14 @@ public class DynamoAsyncMapper {
 		});
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull T keyObject) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+			return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
+	}
+
 	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
 			@NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
 		return client.deleteItem(consumer)
@@ -141,6 +186,16 @@ public class DynamoAsyncMapper {
 			var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
 			consumer.accept(builder);
 			return deleteItem(builder.build(), clazz);
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull T keyObject,
+			@NonNull Consumer<DeleteItemRequest.Builder> consumer) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+			consumer.accept(builder);
+			return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
 		});
 	}
 

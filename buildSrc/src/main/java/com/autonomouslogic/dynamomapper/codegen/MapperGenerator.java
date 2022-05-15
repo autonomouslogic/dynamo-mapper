@@ -191,7 +191,7 @@ public class MapperGenerator {
 			.addMember("value", "\"unchecked\"")
 			.build());
 		// Add parameters.
-		wrapper.addParameter(Object.class, "keyObject");
+		wrapper.addParameter(TypeHelper.T, "keyObject");
 		var params = new ArrayList<>(method.parameters);
 		params.removeIf(p -> p.name.equals("request"));
 		params.removeIf(p -> p.name.equals("clazz"));

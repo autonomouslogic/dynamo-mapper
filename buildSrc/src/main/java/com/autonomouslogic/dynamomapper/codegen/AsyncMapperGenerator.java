@@ -120,6 +120,38 @@ public class AsyncMapperGenerator extends MapperGenerator {
 
 	@Override
 	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName) {
-		return;
+		// Create signature.
+		var wrapper = MethodSpec.methodBuilder(method.name)
+			.addModifiers(Modifier.PUBLIC)
+			.addTypeVariable(TypeHelper.T);
+		wrapper.returns(method.returnType);
+		wrapper.addExceptions(method.exceptions);
+		wrapper.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
+			.addMember("value", "\"unchecked\"")
+			.build());
+		// Add parameters.
+		wrapper.addParameter(TypeHelper.T, "keyObject");
+		var params = new ArrayList<>(method.parameters);
+		params.removeIf(p -> p.name.equals("request"));
+		params.removeIf(p -> p.name.equals("clazz"));
+		wrapper.addParameters(params);
+		// Write body.
+		var code = CodeBlock.builder();
+		code.add(CodeBlock.of(
+			"return $T.wrapFuture(() -> {\n" +
+				"\tvar builder = requestFactory.$L(keyObject);\n",
+			TypeHelper.futureUtil, factoryMethodName
+		));
+		var firstParamTypeName = method.parameters.get(0).type;
+		if (firstParamTypeName instanceof ParameterizedTypeName) {
+			code.addStatement("\tconsumer.accept(builder)");
+		}
+		code.add(CodeBlock.of(
+			"\treturn $L(builder.build(), (Class<T>) keyObject.getClass());\n" +
+				"});", method.name));
+		wrapper.addCode(code.build());
+
+		TypeHelper.nonNullParameters(wrapper);
+		mapper.addMethod(wrapper.build());
 	}
 }
