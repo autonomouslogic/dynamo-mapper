@@ -17,6 +17,7 @@ import org.gradle.api.logging.Logger;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import javax.lang.model.element.Modifier;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -24,6 +25,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.field;
+import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.genericClass;
+import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedDeleteItemResponse;
+import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedGetItemResponse;
+import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedPutItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.overridableMethods;
 
 @RequiredArgsConstructor
@@ -82,45 +87,71 @@ public class MapperGenerator {
 
 	protected void generateGetWrappers() {
 		for (Method method : overridableMethods(DynamoDbClient.class, "getItem")) {
-			generateDelegateGetWrapper(method, TypeHelper.mappedGetItemResponse, "mapGetItemResponse");
+			var delegate = generateDelegateWrapper(method, mappedGetItemResponse, "mapGetItemResponse");
+			generateHashKeyWrapper(delegate, "getRequestFromHashKey");
 		}
 	}
 
 	protected void generatePutWrappers() {
 		for (Method method : overridableMethods(DynamoDbClient.class, "putItem")) {
-			generateDelegateGetWrapper(method, TypeHelper.mappedPutItemResponse, "mapPutItemResponse");
+			generateDelegateWrapper(method, mappedPutItemResponse, "mapPutItemResponse");
 		}
 	}
 
 	protected void generateDeleteWrappers() {
 		for (Method method : overridableMethods(DynamoDbClient.class, "deleteItem")) {
-			generateDelegateGetWrapper(method, TypeHelper.mappedDeleteItemResponse, "mapDeleteItemResponse");
+			var delegate = generateDelegateWrapper(method, mappedDeleteItemResponse, "mapDeleteItemResponse");
+			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey");
 		}
 	}
 
-	protected void generateDelegateGetWrapper(Method method, ClassName returnType, String decoderMethod) {
+	protected MethodSpec generateDelegateWrapper(Method method, ClassName returnType, String decoderMethod) {
+		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.getName())
 			.addModifiers(Modifier.PUBLIC);
+		wrapper.returns(TypeHelper.genericWildcard(returnType));
 		wrapper.addExceptions(List.of(method.getExceptionTypes())
 			.stream()
 			.map(e -> ClassName.get(e))
 			.collect(Collectors.toList())
 		);
 		wrapper.addException(JsonProcessingException.class);
-
+		// Add parameters.
 		var delegateParams = List.of(method.getGenericParameterTypes());
 		if (delegateParams.size() != 1) {
 			throw new IllegalArgumentException(String.format("Delegate param generation only supports 1 param, %s seen for %s",
 				delegateParams.size(), method.getName()));
 		}
 		wrapper.addParameter(delegateParams.get(0), "request");
-		wrapper.addParameter(ParameterizedTypeName.get(ClassName.get(Class.class), WildcardTypeName.subtypeOf(TypeName.OBJECT)), "clazz");
+		wrapper.addParameter(genericClass, "clazz");
+		// Write body.
 		wrapper.addStatement("return decoder.$L(client.$L(request), clazz)",
 			decoderMethod,
 			method.getName());
-		wrapper.returns(ParameterizedTypeName.get(returnType, WildcardTypeName.subtypeOf(TypeName.OBJECT)));
-		mapper.addMethod(wrapper.build());
 
+		var built = wrapper.build();
+		mapper.addMethod(built);
+		return built;
+	}
+
+	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName) {
+		// Create signature.
+		var wrapper = MethodSpec.methodBuilder(method.name)
+			.addModifiers(Modifier.PUBLIC);
+		wrapper.returns(method.returnType);
+		wrapper.addExceptions(method.exceptions);
+		wrapper.addException(IOException.class);
+		// Add parameters.
+		wrapper.addParameter(Object.class, "hashKey");
+		wrapper.addParameters(method.parameters);
+		// Write body.
+		wrapper.addStatement("var builder = requestFactory.$L(hashKey, clazz)", factoryMethodName);
+		var firstParamTypeName = method.parameters.get(0).type;
+		if (firstParamTypeName instanceof ParameterizedTypeName) {
+			wrapper.addStatement("request.accept(builder)");
+		}
+		wrapper.addStatement("return $L(builder.build(), clazz)", method.name);
+		mapper.addMethod(wrapper.build());
 	}
 
 	private String paramName(Type type) {
