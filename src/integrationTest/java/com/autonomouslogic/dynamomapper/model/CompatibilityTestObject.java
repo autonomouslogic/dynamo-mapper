@@ -7,6 +7,7 @@ import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
 import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
@@ -14,22 +15,23 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbParti
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
 @DynamoTableName("integration-test-table")
-@DynamoDBTable(tableName = "integration-test-table")
-@DynamoDbBean
+@DynamoDBTable(tableName = "integration-test-table") // v1
+@DynamoDbBean // v2
+@NoArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class CompatibilityTestObject {
 	@DynamoHashKey
 	@JsonProperty
-	@DynamoDBHashKey
+	@DynamoDBHashKey // v1
 	String partitionKey;
 
-	@DynamoDBAttribute
+	@DynamoDBAttribute // v1
 	@JsonProperty
 	long ttl;
 
-	@DynamoDbAttribute("partitionKey")
-	@DynamoDbPartitionKey
+//	@DynamoDbAttribute("partitionKey")
+	@DynamoDbPartitionKey // v2
 	public String getPartitionKey() {
 		return partitionKey;
 	}
@@ -39,7 +41,6 @@ public class CompatibilityTestObject {
 		return this;
 	}
 
-	@DynamoDbAttribute("ttl")
 	public long getTtl() {
 		return ttl;
 	}
