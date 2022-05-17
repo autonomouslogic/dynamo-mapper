@@ -73,12 +73,12 @@ public class ModelObject {
 ### Getting items
 Using the synchronous API:
 ```java
-var item = dynamoMapper.getItem("partiion-key-value", ModelObject.class).item();
+var item = dynamoMapper.getItem("partition-key-value", ModelObject.class).item();
 ```
 
 Using the asynchronous API:
 ```java
-dynamoMapper.getItem("partiion-key-value", ModelObject.class).thenAccept(response -> {
+dynamoMapper.getItem("partition-key-value", ModelObject.class).thenAccept(response -> {
 	var item = response.item();
 });
 ```
@@ -100,7 +100,7 @@ dynamoMapper.putItem(item).thenAccept(response -> {
 
 ## Best practices
 * Jackson will include all null values, to prevent this taking up space in DynamoDB, use `@JsonInclude(JsonInclude.Include.NON_NULL)`
-* To properly serialize BigDecimals, use `mapper.enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)`
+* To properly serialize BigDecimals, use `objectMapper.enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)`
 * To encode `java.time` objects properly, use `jackson-datatype-jsr310`
 
 ## Comparison with DynamoDBMapper and DynamoDB Enhanced
