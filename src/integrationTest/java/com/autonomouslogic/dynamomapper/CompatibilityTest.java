@@ -29,8 +29,7 @@ public class CompatibilityTest {
 		v2Client = DynamoDbEnhancedClient.builder()
 			.dynamoDbClient(IntegrationTestUtil.client())
 			.build();
-		v2Schema = TableSchema.fromClass(CompatibilityTestObject.class);
-		assertEquals("partitionKey", v2Schema.tableMetadata().primaryPartitionKey());
+		v2Schema = TableSchema.fromBean(CompatibilityTestObject.class);
 		v2Table = v2Client.table("integration-test-table", v2Schema);
 	}
 

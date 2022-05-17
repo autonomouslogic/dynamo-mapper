@@ -9,10 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
-import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
 @DynamoTableName("integration-test-table")
 @DynamoDBTable(tableName = "integration-test-table") // v1
@@ -30,7 +28,6 @@ public class CompatibilityTestObject {
 	@JsonProperty
 	long ttl;
 
-//	@DynamoDbAttribute("partitionKey")
 	@DynamoDbPartitionKey // v2
 	public String getPartitionKey() {
 		return partitionKey;
