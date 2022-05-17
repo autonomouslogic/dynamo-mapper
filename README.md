@@ -6,31 +6,124 @@
 
 A simple mapper for converting to and from DynamoDB AttributeValues and POJOs using Jackson.
 
-## In Development
-Dynamo Mapper is still in development. Breaking changes may be introduced without warning.
+## In development
+Dynamo Mapper is still in development.
+Currently, only single gets, puts, and deletes are supported.
+More is planned in the future and submissions are welcome.
+
+## Installation
+Dynamo Mapper is available from [Maven Central](https://search.maven.org/search?q=g:com.autonomouslogic.dynamomapper%20AND%20a:dynamo-mapper).
+
+### Gradle
+
+```groovy
+implementation 'com.autonomouslogic.dynamomapper:dynamo-mapper:version'
+```
+
+### Maven
+
+```xml
+<dependency>
+    <groupId>com.autonomouslogic.dynamomapper</groupId>
+    <artifactId>dynamo-mapper</artifactId>
+    <version>version</version>
+</dependency>
+```
 
 ## Usage
-* ObjectMapper constructions, JSR timestamps, big decimals
-* `@JsonInclude(JsonInclude.Include.NON_NULL)`
+Dynamo Mapper functions as a wrapper around the existing AWS DynamoDB v2 SDK.
+First, you need to construct a DynamoDB client object and a Jackson ObjectMapper, and then pass those to the
+Dynamo Mapper builder.
+If you do not provide a DynamoDB client or Jackson ObjectMapper, defaults will be used.
+
+```java
+var dynamoMapper = DynamoMapper.builder()
+    .client(DynamoDbClient.create())
+    .objectMapper(new ObjectMapper())
+    .build();
+```
+
+Or, for the asynchronous API:
+```java
+var asyncDynamoMapper = DynamoAsyncMapper.builder()
+    .client(DynamoDbAsyncClient.create())
+    .objectMapper(new ObjectMapper())
+    .build();
+```
+
+### Defining schemas
+Dynamo Mapper relies on Jackson for its serialization.
+Generally, anything that works in Jackson will work in Dynamo Mapper.
+Only a few extra annotations are required.
+
+```java
+@DynamoTableName("table-name")
+public class ModelObject {
+	@JsonProperty
+	@DynamoHashKey
+	private String partitionKey;
+	
+	@JsonProperty
+	private String otherValue;
+	
+	/* etc. */
+}
+```
+
+### Getting items
+Using the synchronous API:
+```java
+var item = dynamoMapper.getItem("partition-key-value", ModelObject.class).item();
+```
+
+Using the asynchronous API:
+```java
+dynamoMapper.getItem("partition-key-value", ModelObject.class).thenAccept(response -> {
+	var item = response.item();
+});
+```
+
+### Putting items
+Using the synchronous API:
+```java
+var item = new ModelObject();
+var response = dynamoMapper.putItem(item);
+```
+
+Using the asynchronous API:
+```java
+var item = new ModelObject();
+dynamoMapper.putItem(item).thenAccept(response -> {
+	// etc.
+});
+```
+
+## Best practices
+* Jackson will include all null values, to prevent this taking up space in DynamoDB, use `@JsonInclude(JsonInclude.Include.NON_NULL)`
+* To properly serialize BigDecimals, use `objectMapper.enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)`
+* To encode `java.time` objects properly, use `jackson-datatype-jsr310`
 
 ## Comparison with DynamoDBMapper and DynamoDB Enhanced
-The DynamoDBMapper in the v1 AWS SDK and the DynamoDB Enhanced Client in the v2 AWS SDK both provide similar mapping
-functionality.
+The [DynamoDBMapper in the v1 AWS SDK](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.html)
+and the [DynamoDB Enhanced Client in the v2 AWS SDK](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/dynamodb-enhanced-client.html)
+both provide similar mapping functionality.
 
-This idea for this library was originally created to provide the same mapping as the v1 mapper, but for the v2 SDK.
-The v2 SDK now provides this mapping functionality officially, but this library addresses a few short-comings of both
-of the implementations by AWS:
+This idea for this library was originally created to provide the same mapping as the v1 mapper, but for the v2 SDK,
+before the enhanced client was released.
+The v2 SDK now provides this mapping functionality officially, but has a few short-comings.
+For instance, the annotations must be added to methods and not properties.
+This makes Lombok models useless.
+Additionally, Jackson is a widely used and mature library.
+It has a lot of advanced features that I feel will never be implemented in the enhanced client.
 
-* The annotation must be added to methods and not properties. This makes libraries such as Lombok useless.
-* The AWS mappers don't work well with builder classes, which again makes Lombok's `@Value`s useless.
-* Java 17 records?
-* Custom serializers.
+However, there are some cons to doing it this way.
+For instance, it's not possible to have a different schema in the DynamoDB and JSON versions of an object.
 
-To address all of these, this library uses a well-known JSON parser: Jackson.
-However, there are some cons to doing it this way:
-
-* It's not possible to have a different schema in the DynamoDB and JSON versions of an object.
-* Speed may be an issue (verify).
+| Feature           | Dynamo Mapper | DynamoDBMapper (v1) | DynamoDb Enhanced Client (v2) |
+|-------------------|---------------|---------------------|-------------------------------|
+| Synchronous API   | Yes           | Yes                 | Yes                           |
+| Asynchronous API  | Yes           | No                  | Yes                           |
+| Lombok compatible | Yes           | Partial?            | No?                           |
 
 ## Resources
 * https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html
