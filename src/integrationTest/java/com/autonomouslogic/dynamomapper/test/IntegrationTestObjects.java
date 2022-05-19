@@ -13,17 +13,4 @@ public class IntegrationTestObjects {
 			.ttl(IntegrationTestUtil.ttl())
 			.build();
 	}
-
-	public static IntegrationTestObject simple() {
-		return IntegrationTestObject.builder()
-			.partitionKey(IntegrationTestUtil.partitionKey("integration"))
-			.ttl(IntegrationTestUtil.ttl())
-			.build();
-	}
-
-	public static CompatibilityTestObject compatibility() {
-		return new CompatibilityTestObject()
-			.setPartitionKey(IntegrationTestUtil.partitionKey("compatibility"))
-			.setTtl(IntegrationTestUtil.ttl());
-	}
 }
