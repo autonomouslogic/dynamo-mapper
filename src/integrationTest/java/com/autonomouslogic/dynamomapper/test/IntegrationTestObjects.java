@@ -7,16 +7,10 @@ import java.time.Duration;
 import java.time.Instant;
 
 public class IntegrationTestObjects {
-	public static IntegrationTestObject simple() {
-		return IntegrationTestObject.builder()
+	public static IntegrationTestObject setKeyAndTtl(IntegrationTestObject obj) {
+		return obj.toBuilder()
 			.partitionKey(IntegrationTestUtil.partitionKey("integration"))
 			.ttl(IntegrationTestUtil.ttl())
 			.build();
-	}
-
-	public static CompatibilityTestObject compatibility() {
-		return new CompatibilityTestObject()
-			.setPartitionKey(IntegrationTestUtil.partitionKey("compatibility"))
-			.setTtl(IntegrationTestUtil.ttl());
 	}
 }

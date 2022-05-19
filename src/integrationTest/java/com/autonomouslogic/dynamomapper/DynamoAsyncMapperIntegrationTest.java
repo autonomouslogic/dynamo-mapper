@@ -7,6 +7,8 @@ import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import software.amazon.awssdk.services.dynamodb.model.ReturnValue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,10 +21,12 @@ public class DynamoAsyncMapperIntegrationTest {
 		dynamoAsyncMapper = DynamoAsyncMapper.builder().client(IntegrationTestUtil.asyncClient()).build();
 	}
 
-	@Test
+	@ParameterizedTest
+	@MethodSource("com.autonomouslogic.dynamomapper.test.IntegrationTestUtil#loadIntegrationTestObjects")
 	@SneakyThrows
-	public void shouldPutAndGetAndDelete() {
-		var obj = IntegrationTestObjects.simple();
+	public void shouldPutAndGetAndDelete(IntegrationTestObject obj) {
+		obj = IntegrationTestObjects.setKeyAndTtl(obj);
+		System.out.println(obj);
 		// Put.
 		dynamoAsyncMapper.putItem(obj).join();
 		// Get.

@@ -2,15 +2,14 @@ package com.autonomouslogic.dynamomapper.test;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSCredentialsProviderChain;
-import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
-import com.amazonaws.auth.EC2ContainerCredentialsProviderWrapper;
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
-import com.amazonaws.auth.SystemPropertiesCredentialsProvider;
-import com.amazonaws.auth.WebIdentityTokenCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
+import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
+import com.autonomouslogic.jacksonobjectstream.JacksonObjectStreamFactory;
+import lombok.SneakyThrows;
 import org.apache.commons.math3.random.ISAACRandom;
 import org.apache.commons.math3.random.RandomGenerator;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -22,6 +21,9 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class IntegrationTestUtil {
@@ -76,5 +78,15 @@ public class IntegrationTestUtil {
 	public static String profileName() {
 		return Optional.ofNullable(System.getenv("AWS_PROFILE"))
 			.orElseThrow(() -> new RuntimeException("AWS_PROFILE not set"));
+	}
+
+	@SneakyThrows
+	public static List<IntegrationTestObject> loadIntegrationTestObjects() {
+		var in = Objects.requireNonNull(IntegrationTestUtil.class.getResourceAsStream("/integration-tests.jsonl"));
+		var factory = new JacksonObjectStreamFactory(StdObjectMapper.objectMapper());
+		var iterator = factory.createReader(in, IntegrationTestObject.class);
+		var list = new ArrayList<IntegrationTestObject>();
+		iterator.forEachRemaining(list::add);
+		return list;
 	}
 }
