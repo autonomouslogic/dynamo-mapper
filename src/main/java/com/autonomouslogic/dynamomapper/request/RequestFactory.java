@@ -5,10 +5,13 @@ import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -37,6 +40,23 @@ public class RequestFactory {
 		return PutItemRequest.builder()
 			.tableName(reflectionUtil.resolveTableName(obj.getClass()))
 			.item(encoded);
+	}
+
+	public UpdateItemRequest.Builder updateRequestFromObject(@NonNull Object obj) throws IOException {
+		var encoded = encoder.encode(obj);
+		var key = createKeyValue(obj);
+		for (String k : key.keySet()) {
+			encoded.remove(k);
+		}
+		var updates = new HashMap<String, AttributeValueUpdate>();
+		encoded.forEach((k, val) -> updates.put(k, AttributeValueUpdate.builder()
+			.value(val)
+			.action(AttributeAction.PUT)
+			.build()));
+		return UpdateItemRequest.builder()
+			.tableName(reflectionUtil.resolveTableName(obj.getClass()))
+			.key(key)
+			.attributeUpdates(updates);
 	}
 
 	public <T> DeleteItemRequest.Builder deleteRequestFromHashKey(@NonNull Object hashKey, @NonNull Class<T> clazz) throws IOException {

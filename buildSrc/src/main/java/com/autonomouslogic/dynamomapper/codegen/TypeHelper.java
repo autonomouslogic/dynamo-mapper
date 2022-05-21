@@ -31,6 +31,7 @@ public class TypeHelper {
 	public static final ClassName mappedDeleteItemResponse = mapperType("model", "MappedDeleteItemResponse");
 	public static final ClassName mappedGetItemResponse = mapperType("model", "MappedGetItemResponse");
 	public static final ClassName mappedPutItemResponse = mapperType("model", "MappedPutItemResponse");
+	public static final ClassName mappedUpdateItemResponse = mapperType("model", "MappedUpdateItemResponse");
 	public static final ClassName dynamoMapperBuilder = mapperType("DynamoMapperBuilder");
 	public static final ClassName dynamoAsyncMapperBuilder = mapperType("DynamoAsyncMapperBuilder");
 

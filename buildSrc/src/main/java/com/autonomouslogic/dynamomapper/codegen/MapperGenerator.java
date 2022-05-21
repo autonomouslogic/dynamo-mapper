@@ -17,6 +17,7 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
 
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
@@ -34,6 +35,7 @@ import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.CLASS_T;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedDeleteItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedGetItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedPutItemResponse;
+import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedUpdateItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.overridableMethods;
 
 @RequiredArgsConstructor
@@ -52,6 +54,7 @@ public class MapperGenerator {
 		generateConstructor();
 		generateGetWrappers();
 		generatePutWrappers();
+		generateUpdateWrappers();
 		generateDeleteWrappers();
 		generateBuilder();
 	}
@@ -110,6 +113,14 @@ public class MapperGenerator {
 			var delegate = generateDelegateWrapper(
 				method, mappedPutItemResponse, "mapPutItemResponse", PutItemResponse.class);
 			generateKeyObjectWrapper(delegate, "putRequestFromObject");
+		}
+	}
+
+	protected void generateUpdateWrappers() {
+		for (Method method : overridableMethods(clientClass(), "updateItem")) {
+			var delegate = generateDelegateWrapper(
+				method, mappedUpdateItemResponse, "mapUpdateItemResponse", UpdateItemResponse.class);
+			generateKeyObjectWrapper(delegate, "updateRequestFromObject");
 		}
 	}
 

@@ -8,7 +8,7 @@ A simple mapper for converting to and from DynamoDB AttributeValues and POJOs us
 
 ## In development
 Dynamo Mapper is still in development.
-Currently, only single gets, puts, and deletes are supported.
+Currently, only single gets, puts, updates, and deletes are supported.
 More is planned in the future and submissions are welcome.
 
 ## Installation
