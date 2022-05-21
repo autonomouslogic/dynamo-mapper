@@ -24,7 +24,7 @@ public class DynamoMapperIntegrationTest {
 	@ParameterizedTest
 	@MethodSource("com.autonomouslogic.dynamomapper.test.IntegrationTestUtil#loadIntegrationTestObjects")
 	@SneakyThrows
-	public void shouldPutAndGetAndDelete(IntegrationTestObject obj) {
+	public void shouldPutAndGetAndUpdateAndDelete(IntegrationTestObject obj) {
 		obj = IntegrationTestObjects.setKeyAndTtl(obj);
 		System.out.println(obj);
 		// Put.
@@ -32,8 +32,14 @@ public class DynamoMapperIntegrationTest {
 		// Get.
 		var getResponse = dynamoMapper.getItem(obj.partitionKey(), IntegrationTestObject.class);
 		assertEquals(obj, getResponse.item());
+		// Update.
+		var obj2 = obj.toBuilder()
+			.str("new-val")
+			.build();
+		var updateResponse = dynamoMapper.updateItem(obj2, req -> req.returnValues(ReturnValue.ALL_OLD));
+		assertEquals(obj, updateResponse.item());
 		// Delete.
 		var deleteResponse = dynamoMapper.deleteItem(obj.partitionKey(), req -> req.returnValues(ReturnValue.ALL_OLD), IntegrationTestObject.class);
-		assertEquals(obj, deleteResponse.item());
+		assertEquals(obj2, deleteResponse.item());
 	}
 }

@@ -32,9 +32,15 @@ public class DynamoAsyncMapperIntegrationTest {
 		// Get.
 		var getResponse = dynamoAsyncMapper.getItem(obj.partitionKey(), IntegrationTestObject.class).join();
 		assertEquals(obj, getResponse.item());
+		// Update.
+		var obj2 = obj.toBuilder()
+			.str("new-val")
+			.build();
+		var updateResponse = dynamoAsyncMapper.updateItem(obj2, req -> req.returnValues(ReturnValue.ALL_OLD)).join();
+		assertEquals(obj, updateResponse.item());
 		// Delete.
 		var deleteResponse = dynamoAsyncMapper.deleteItem(obj.partitionKey(), req -> req.returnValues(ReturnValue.ALL_OLD), IntegrationTestObject.class).join();
-		assertEquals(obj, deleteResponse.item());
+		assertEquals(obj2, deleteResponse.item());
 	}
 }
 

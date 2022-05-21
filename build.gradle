@@ -32,7 +32,9 @@ dependencies {
     testImplementation "com.autonomouslogic.jacksonobjectstream:jackson-object-stream:0.2.5"
 }
 
-task codegen(type: com.autonomouslogic.dynamomapper.codegen.Codegen)
+task codegen(type: com.autonomouslogic.dynamomapper.codegen.Codegen) {
+    group "build"
+}
 
 sourceSets {
     integrationTest {
