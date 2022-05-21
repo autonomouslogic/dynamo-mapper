@@ -9,6 +9,6 @@ git push --force origin $VERSION
 
 ./gradlew clean
 
-./gradlew publishToSonatype closeSonatypeStagingRepository
+#./gradlew publishToSonatype closeSonatypeStagingRepository
 # Use the command below to automatically release.
-# ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
