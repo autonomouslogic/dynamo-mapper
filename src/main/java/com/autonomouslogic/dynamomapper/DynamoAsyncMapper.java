@@ -186,6 +186,33 @@ public class DynamoAsyncMapper {
 	}
 
 	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
+			@NonNull DeleteItemRequest request, @NonNull Class<T> clazz) {
+		return client.deleteItem(request)
+					.thenApply(new CheckedFunction<>() {
+						@Override
+						public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
+							return decoder.mapDeleteItemResponse(response, clazz);
+						}
+					});
+	}
+
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Object hashKey,
+			@NonNull Class<T> clazz) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
+			return deleteItem(builder.build(), clazz);
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull T keyObject) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+			return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
+	}
+
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
 			@NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
 		return client.deleteItem(consumer)
 					.thenApply(new CheckedFunction<>() {
@@ -211,33 +238,6 @@ public class DynamoAsyncMapper {
 		return FutureUtil.wrapFuture(() -> {
 			var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
 			consumer.accept(builder);
-			return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
-		});
-	}
-
-	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
-			@NonNull DeleteItemRequest request, @NonNull Class<T> clazz) {
-		return client.deleteItem(request)
-					.thenApply(new CheckedFunction<>() {
-						@Override
-						public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
-							return decoder.mapDeleteItemResponse(response, clazz);
-						}
-					});
-	}
-
-	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull Object hashKey,
-			@NonNull Class<T> clazz) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
-			return deleteItem(builder.build(), clazz);
-		});
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull T keyObject) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
 			return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
 		});
 	}

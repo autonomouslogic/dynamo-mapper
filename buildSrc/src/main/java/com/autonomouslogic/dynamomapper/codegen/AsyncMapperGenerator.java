@@ -48,6 +48,11 @@ public class AsyncMapperGenerator extends MapperGenerator {
 	}
 
 	@Override
+	protected void generateScanWrappers() {
+		// @todo
+	}
+
+	@Override
 	protected MethodSpec generateDelegateWrapper(Method method, ClassName returnType, String decoderMethod, Class<?> responseClass) {
 		var requestVar = detectRequestOrConsumer(method);
 		// Create signature.

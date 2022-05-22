@@ -17,6 +17,7 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
 
 import javax.lang.model.element.Modifier;
@@ -35,6 +36,7 @@ import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.CLASS_T;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedDeleteItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedGetItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedPutItemResponse;
+import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedScanResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedUpdateItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.overridableMethods;
 
@@ -56,6 +58,7 @@ public class MapperGenerator {
 		generatePutWrappers();
 		generateUpdateWrappers();
 		generateDeleteWrappers();
+		generateScanWrappers();
 		generateBuilder();
 	}
 	protected Class<?> clientClass() {
@@ -130,6 +133,15 @@ public class MapperGenerator {
 				method, mappedDeleteItemResponse, "mapDeleteItemResponse", DeleteItemResponse.class);
 			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey");
 			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject");
+		}
+	}
+
+	protected void generateScanWrappers() {
+		for (Method method : overridableMethods(clientClass(), "scan")) {
+			var delegate = generateDelegateWrapper(
+				method, mappedScanResponse, "mapScanItemResponse", ScanResponse.class);
+//			generateHashKeyWrapper(delegate, "scanRequestFromHashKey");
+//			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
 		}
 	}
 

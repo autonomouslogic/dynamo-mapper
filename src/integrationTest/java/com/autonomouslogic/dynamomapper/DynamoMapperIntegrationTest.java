@@ -5,11 +5,15 @@ import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
 import lombok.SneakyThrows;
+import org.apache.commons.math3.random.RandomGenerator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import software.amazon.awssdk.services.dynamodb.model.ReturnValue;
+import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
+
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -41,5 +45,26 @@ public class DynamoMapperIntegrationTest {
 		// Delete.
 		var deleteResponse = dynamoMapper.deleteItem(obj.partitionKey(), req -> req.returnValues(ReturnValue.ALL_OLD), IntegrationTestObject.class);
 		assertEquals(obj2, deleteResponse.item());
+	}
+
+	@Test
+	@SneakyThrows
+	public void shouldScan() {
+		String shared = Long.toString(IntegrationTestUtil.RNG.nextLong());
+		int n = 10;
+		for (int i = 0; i < n; i++) {
+			var obj = IntegrationTestObjects.setKeyAndTtl(IntegrationTestObject.builder()
+				.str(shared)
+				.build());
+			dynamoMapper.putItem(obj);
+		}
+		var scanResult = dynamoMapper.scan(ScanRequest.builder()
+			.tableName("integration-test-table") // @todo this should be auto-filled.
+			.build(),
+			IntegrationTestObject.class);
+		var filtered = scanResult.items().stream()
+			.filter(o -> o.str().equals(shared))
+			.collect(Collectors.toList());
+		assertEquals(n, filtered.size());
 	}
 }
