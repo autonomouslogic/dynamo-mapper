@@ -25,3 +25,6 @@ jobs:
 
       - name: Test
         run: ./gradlew test --stacktrace
+
+      - name: Integration test
+        run: ./gradlew integrationTest --stacktrace
