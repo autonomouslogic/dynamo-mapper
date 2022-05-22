@@ -76,8 +76,7 @@ public class IntegrationTestUtil {
 	}
 
 	public static String profileName() {
-		return Optional.ofNullable(System.getenv("AWS_PROFILE"))
-			.orElseThrow(() -> new RuntimeException("AWS_PROFILE not set"));
+		return System.getenv("AWS_PROFILE");
 	}
 
 	@SneakyThrows
