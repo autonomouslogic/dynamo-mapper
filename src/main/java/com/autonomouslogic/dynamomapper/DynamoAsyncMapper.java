@@ -7,6 +7,7 @@ import com.autonomouslogic.dynamomapper.function.CheckedFunction;
 import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
+import com.autonomouslogic.dynamomapper.model.MappedScanResponse;
 import com.autonomouslogic.dynamomapper.model.MappedUpdateItemResponse;
 import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.autonomouslogic.dynamomapper.util.FutureUtil;
@@ -26,6 +27,8 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
+import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
 
@@ -240,6 +243,28 @@ public class DynamoAsyncMapper {
 			consumer.accept(builder);
 			return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
 		});
+	}
+
+	public <T> CompletableFuture<MappedScanResponse<T>> scan(
+			@NonNull Consumer<ScanRequest.Builder> consumer, @NonNull Class<T> clazz) {
+		return client.scan(consumer)
+					.thenApply(new CheckedFunction<>() {
+						@Override
+						public MappedScanResponse<T> checkedApply(ScanResponse response) throws Exception {
+							return decoder.mapScanItemResponse(response, clazz);
+						}
+					});
+	}
+
+	public <T> CompletableFuture<MappedScanResponse<T>> scan(@NonNull ScanRequest request,
+			@NonNull Class<T> clazz) {
+		return client.scan(request)
+					.thenApply(new CheckedFunction<>() {
+						@Override
+						public MappedScanResponse<T> checkedApply(ScanResponse response) throws Exception {
+							return decoder.mapScanItemResponse(response, clazz);
+						}
+					});
 	}
 
 	public static DynamoAsyncMapperBuilder builder() {
