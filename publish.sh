@@ -6,6 +6,7 @@
 VERSION="$1"
 git tag -a -f -m $VERSION $VERSION
 git push --force origin $VERSION
+./gradlew properties | grep version
 
 ./gradlew clean
 
