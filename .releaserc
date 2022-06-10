@@ -1,43 +1,47 @@
 {
-    "dryRun": false,
-    "ci": false,
-    "branches":
+  "dryRun": false,
+  "ci": false,
+  "branches": [
+    "main"
+  ],
+  "tagFormat": "${version}",
+  "plugins": [
     [
-        "main"
-    ],
-    "tagFormat": "${version}",
-    "plugins":
-    [
-        [
-            "@semantic-release/commit-analyzer",
-            {
-                "preset": "conventionalcommits"
-            }
-        ],
-        [
-            "@semantic-release/release-notes-generator",
-            {
-                "preset": "conventionalcommits"
-            }
-        ],
-        [
-            "@semantic-release/exec",
-            {
-                "verifyConditionsCmd": "./gradlew signMavenJavaPublication --stacktrace",
-                "publishCmd": "./publish.sh ${nextRelease.version}"
-            }
-        ],
-        [
-            "@semantic-release/github",
-            {
-                "assets":
-                [
-                    {
-                        "path": "build/libs/dynamo-mapper-*.jar"
-                    }
-                ],
-                "addReleases": "bottom"
-            }
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits",
+        "releaseRules": [
+          {
+            "type": "chore",
+            "scope": "deps",
+            "release": "patch"
+          }
         ]
+      }
+    ],
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "preset": "conventionalcommits"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "verifyConditionsCmd": "./gradlew signMavenJavaPublication --stacktrace",
+        "publishCmd": "./publish.sh ${nextRelease.version}"
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "build/libs/dynamo-mapper-*.jar"
+          }
+        ],
+        "addReleases": "bottom"
+      }
     ]
+  ]
 }
