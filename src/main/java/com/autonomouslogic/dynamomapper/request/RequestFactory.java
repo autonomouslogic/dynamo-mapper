@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
@@ -147,6 +148,17 @@ public class RequestFactory {
 	}
 
 	public ScanRequest.Builder acceptScanRequest(@NonNull ScanRequest.Builder req, @NonNull Class<?> clazz) {
+		return req.tableName(reflectionUtil.resolveTableName(clazz));
+	}
+
+	public QueryRequest acceptQueryRequest(@NonNull QueryRequest req, @NonNull Class<?> clazz) {
+		if (req.tableName() == null) {
+			return acceptQueryRequest(req.toBuilder(), clazz).build();
+		}
+		return req;
+	}
+
+	public QueryRequest.Builder acceptQueryRequest(@NonNull QueryRequest.Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
 }
