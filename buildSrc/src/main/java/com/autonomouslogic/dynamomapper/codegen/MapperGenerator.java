@@ -20,6 +20,8 @@ import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
+import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
@@ -41,6 +43,7 @@ import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.CLASS_T;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedDeleteItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedGetItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedPutItemResponse;
+import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedQueryResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedScanResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedUpdateItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.overridableMethods;
@@ -64,6 +67,7 @@ public class MapperGenerator {
 		generateUpdateWrappers();
 		generateDeleteWrappers();
 		generateScanWrappers();
+		generateQueryWrappers();
 		generateBuilder();
 	}
 	protected Class<?> clientClass() {
@@ -144,9 +148,14 @@ public class MapperGenerator {
 	protected void generateScanWrappers() {
 		for (Method method : overridableMethods(clientClass(), "scan")) {
 			var delegate = generateDelegateWrapper(
-				method, mappedScanResponse, "mapScanItemResponse", ScanRequest.class, ScanResponse.class);
-//			generateHashKeyWrapper(delegate, "scanRequestFromHashKey");
-//			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
+				method, mappedScanResponse, "mapScanResponse", ScanRequest.class, ScanResponse.class);
+		}
+	}
+
+	protected void generateQueryWrappers() {
+		for (Method method : overridableMethods(clientClass(), "query")) {
+			var delegate = generateDelegateWrapper(
+				method, mappedQueryResponse, "mapQueryResponse", QueryRequest.class, QueryResponse.class);
 		}
 	}
 
