@@ -51,36 +51,13 @@ public class DynamoAsyncMapper {
 		requestFactory = new RequestFactory(encoder, objectMapper, reflectionUtil);
 	}
 
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull GetItemRequest request,
-			@NonNull Class<T> clazz) {
-		return client.getItem(request)
-					.thenApply(new CheckedFunction<>() {
-						@Override
-						public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
-							return decoder.mapGetItemResponse(response, clazz);
-						}
-					});
-	}
-
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey,
-			@NonNull Class<T> clazz) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
-			return getItem(builder.build(), clazz);
-		});
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull T keyObject) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.getRequestFromKeyObject(keyObject);
-			return getItem(builder.build(), (Class<T>) keyObject.getClass());
-		});
-	}
-
 	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
 			@NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
-		return client.getItem(consumer)
+		Consumer<GetItemRequest.Builder> reqOrConsumer = (builder) -> { {
+			requestFactory.acceptGetItemRequest(builder, clazz);
+			consumer.accept(builder);
+		} };
+		return client.getItem(reqOrConsumer)
 					.thenApply(new CheckedFunction<>() {
 						@Override
 						public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
@@ -108,28 +85,41 @@ public class DynamoAsyncMapper {
 		});
 	}
 
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull PutItemRequest request,
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull GetItemRequest request,
 			@NonNull Class<T> clazz) {
-		return client.putItem(request)
+		var reqOrConsumer = requestFactory.acceptGetItemRequest(request, clazz);
+		return client.getItem(reqOrConsumer)
 					.thenApply(new CheckedFunction<>() {
 						@Override
-						public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
-							return decoder.mapPutItemResponse(response, clazz);
+						public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
+							return decoder.mapGetItemResponse(response, clazz);
 						}
 					});
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull T keyObject) {
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey,
+			@NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.putRequestFromObject(keyObject);
-			return putItem(builder.build(), (Class<T>) keyObject.getClass());
+			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+			return getItem(builder.build(), clazz);
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull T keyObject) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.getRequestFromKeyObject(keyObject);
+			return getItem(builder.build(), (Class<T>) keyObject.getClass());
 		});
 	}
 
 	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(
 			@NonNull Consumer<PutItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
-		return client.putItem(consumer)
+		Consumer<PutItemRequest.Builder> reqOrConsumer = (builder) -> { {
+			requestFactory.acceptPutItemRequest(builder, clazz);
+			consumer.accept(builder);
+		} };
+		return client.putItem(reqOrConsumer)
 					.thenApply(new CheckedFunction<>() {
 						@Override
 						public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
@@ -148,9 +138,33 @@ public class DynamoAsyncMapper {
 		});
 	}
 
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull PutItemRequest request,
+			@NonNull Class<T> clazz) {
+		var reqOrConsumer = requestFactory.acceptPutItemRequest(request, clazz);
+		return client.putItem(reqOrConsumer)
+					.thenApply(new CheckedFunction<>() {
+						@Override
+						public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
+							return decoder.mapPutItemResponse(response, clazz);
+						}
+					});
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull T keyObject) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.putRequestFromObject(keyObject);
+			return putItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
+	}
+
 	public <T> CompletableFuture<MappedUpdateItemResponse<T>> updateItem(
 			@NonNull Consumer<UpdateItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
-		return client.updateItem(consumer)
+		Consumer<UpdateItemRequest.Builder> reqOrConsumer = (builder) -> { {
+			requestFactory.acceptUpdateItemRequest(builder, clazz);
+			consumer.accept(builder);
+		} };
+		return client.updateItem(reqOrConsumer)
 					.thenApply(new CheckedFunction<>() {
 						@Override
 						public MappedUpdateItemResponse<T> checkedApply(UpdateItemResponse response) throws Exception {
@@ -171,7 +185,8 @@ public class DynamoAsyncMapper {
 
 	public <T> CompletableFuture<MappedUpdateItemResponse<T>> updateItem(
 			@NonNull UpdateItemRequest request, @NonNull Class<T> clazz) {
-		return client.updateItem(request)
+		var reqOrConsumer = requestFactory.acceptUpdateItemRequest(request, clazz);
+		return client.updateItem(reqOrConsumer)
 					.thenApply(new CheckedFunction<>() {
 						@Override
 						public MappedUpdateItemResponse<T> checkedApply(UpdateItemResponse response) throws Exception {
@@ -190,7 +205,8 @@ public class DynamoAsyncMapper {
 
 	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
 			@NonNull DeleteItemRequest request, @NonNull Class<T> clazz) {
-		return client.deleteItem(request)
+		var reqOrConsumer = requestFactory.acceptDeleteItemRequest(request, clazz);
+		return client.deleteItem(reqOrConsumer)
 					.thenApply(new CheckedFunction<>() {
 						@Override
 						public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
@@ -217,7 +233,11 @@ public class DynamoAsyncMapper {
 
 	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
 			@NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
-		return client.deleteItem(consumer)
+		Consumer<DeleteItemRequest.Builder> reqOrConsumer = (builder) -> { {
+			requestFactory.acceptDeleteItemRequest(builder, clazz);
+			consumer.accept(builder);
+		} };
+		return client.deleteItem(reqOrConsumer)
 					.thenApply(new CheckedFunction<>() {
 						@Override
 						public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
@@ -247,7 +267,11 @@ public class DynamoAsyncMapper {
 
 	public <T> CompletableFuture<MappedScanResponse<T>> scan(
 			@NonNull Consumer<ScanRequest.Builder> consumer, @NonNull Class<T> clazz) {
-		return client.scan(consumer)
+		Consumer<ScanRequest.Builder> reqOrConsumer = (builder) -> { {
+			requestFactory.acceptScanRequest(builder, clazz);
+			consumer.accept(builder);
+		} };
+		return client.scan(reqOrConsumer)
 					.thenApply(new CheckedFunction<>() {
 						@Override
 						public MappedScanResponse<T> checkedApply(ScanResponse response) throws Exception {
@@ -258,7 +282,8 @@ public class DynamoAsyncMapper {
 
 	public <T> CompletableFuture<MappedScanResponse<T>> scan(@NonNull ScanRequest request,
 			@NonNull Class<T> clazz) {
-		return client.scan(request)
+		var reqOrConsumer = requestFactory.acceptScanRequest(request, clazz);
+		return client.scan(reqOrConsumer)
 					.thenApply(new CheckedFunction<>() {
 						@Override
 						public MappedScanResponse<T> checkedApply(ScanResponse response) throws Exception {

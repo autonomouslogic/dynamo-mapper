@@ -58,11 +58,11 @@ public class DynamoMapperIntegrationTest {
 				.build());
 			dynamoMapper.putItem(obj);
 		}
-		var scanResult = dynamoMapper.scan(ScanRequest.builder()
-			.tableName("integration-test-table") // @todo this should be auto-filled.
-			.build(),
-			IntegrationTestObject.class);
+		var scanResult = dynamoMapper.scan(req -> {
+			assertEquals("integration-test-table", req.build().tableName());
+		}, IntegrationTestObject.class);
 		var filtered = scanResult.items().stream()
+			.filter(o -> o.str() != null)
 			.filter(o -> o.str().equals(shared))
 			.collect(Collectors.toList());
 		assertEquals(n, filtered.size());

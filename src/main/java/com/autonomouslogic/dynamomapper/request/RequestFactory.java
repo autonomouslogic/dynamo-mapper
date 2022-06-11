@@ -10,7 +10,9 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
 import java.io.IOException;
@@ -91,5 +93,60 @@ public class RequestFactory {
 			keyValues.put(field, encoded.get(field));
 		}
 		return keyValues;
+	}
+
+	public GetItemRequest acceptGetItemRequest(@NonNull GetItemRequest req, @NonNull Class<?> clazz) {
+		if (req.tableName() == null) {
+			return acceptGetItemRequest(req.toBuilder(), clazz).build();
+		}
+		return req;
+	}
+
+	public GetItemRequest.Builder acceptGetItemRequest(@NonNull GetItemRequest.Builder req, @NonNull Class<?> clazz) {
+		return req.tableName(reflectionUtil.resolveTableName(clazz));
+	}
+
+	public PutItemRequest acceptPutItemRequest(@NonNull PutItemRequest req, @NonNull Class<?> clazz) {
+		if (req.tableName() == null) {
+			return acceptPutItemRequest(req.toBuilder(), clazz).build();
+		}
+		return req;
+	}
+
+	public PutItemRequest.Builder acceptPutItemRequest(@NonNull PutItemRequest.Builder req, @NonNull Class<?> clazz) {
+		return req.tableName(reflectionUtil.resolveTableName(clazz));
+	}
+
+	public UpdateItemRequest acceptUpdateItemRequest(@NonNull UpdateItemRequest req, @NonNull Class<?> clazz) {
+		if (req.tableName() == null) {
+			return acceptUpdateItemRequest(req.toBuilder(), clazz).build();
+		}
+		return req;
+	}
+
+	public UpdateItemRequest.Builder acceptUpdateItemRequest(@NonNull UpdateItemRequest.Builder req, @NonNull Class<?> clazz) {
+		return req.tableName(reflectionUtil.resolveTableName(clazz));
+	}
+
+	public DeleteItemRequest acceptDeleteItemRequest(@NonNull DeleteItemRequest req, @NonNull Class<?> clazz) {
+		if (req.tableName() == null) {
+			return acceptDeleteItemRequest(req.toBuilder(), clazz).build();
+		}
+		return req;
+	}
+
+	public DeleteItemRequest.Builder acceptDeleteItemRequest(@NonNull DeleteItemRequest.Builder req, @NonNull Class<?> clazz) {
+		return req.tableName(reflectionUtil.resolveTableName(clazz));
+	}
+
+	public ScanRequest acceptScanRequest(@NonNull ScanRequest req, @NonNull Class<?> clazz) {
+		if (req.tableName() == null) {
+			return acceptScanRequest(req.toBuilder(), clazz).build();
+		}
+		return req;
+	}
+
+	public ScanRequest.Builder acceptScanRequest(@NonNull ScanRequest.Builder req, @NonNull Class<?> clazz) {
+		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
 }

@@ -14,10 +14,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.gradle.api.logging.Logger;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
 
 import javax.lang.model.element.Modifier;
@@ -105,7 +110,7 @@ public class MapperGenerator {
 	protected void generateGetWrappers() {
 		for (Method method : overridableMethods(clientClass(), "getItem")) {
 			var delegate = generateDelegateWrapper(
-				method, mappedGetItemResponse, "mapGetItemResponse", GetItemResponse.class);
+				method, mappedGetItemResponse, "mapGetItemResponse", GetItemRequest.class, GetItemResponse.class);
 			generateHashKeyWrapper(delegate, "getRequestFromHashKey");
 			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
 		}
@@ -114,7 +119,7 @@ public class MapperGenerator {
 	protected void generatePutWrappers() {
 		for (Method method : overridableMethods(clientClass(), "putItem")) {
 			var delegate = generateDelegateWrapper(
-				method, mappedPutItemResponse, "mapPutItemResponse", PutItemResponse.class);
+				method, mappedPutItemResponse, "mapPutItemResponse", PutItemRequest.class, PutItemResponse.class);
 			generateKeyObjectWrapper(delegate, "putRequestFromObject");
 		}
 	}
@@ -122,7 +127,7 @@ public class MapperGenerator {
 	protected void generateUpdateWrappers() {
 		for (Method method : overridableMethods(clientClass(), "updateItem")) {
 			var delegate = generateDelegateWrapper(
-				method, mappedUpdateItemResponse, "mapUpdateItemResponse", UpdateItemResponse.class);
+				method, mappedUpdateItemResponse, "mapUpdateItemResponse", UpdateItemRequest.class, UpdateItemResponse.class);
 			generateKeyObjectWrapper(delegate, "updateRequestFromObject");
 		}
 	}
@@ -130,7 +135,7 @@ public class MapperGenerator {
 	protected void generateDeleteWrappers() {
 		for (Method method : overridableMethods(clientClass(), "deleteItem")) {
 			var delegate = generateDelegateWrapper(
-				method, mappedDeleteItemResponse, "mapDeleteItemResponse", DeleteItemResponse.class);
+				method, mappedDeleteItemResponse, "mapDeleteItemResponse", DeleteItemRequest.class, DeleteItemResponse.class);
 			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey");
 			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject");
 		}
@@ -139,13 +144,13 @@ public class MapperGenerator {
 	protected void generateScanWrappers() {
 		for (Method method : overridableMethods(clientClass(), "scan")) {
 			var delegate = generateDelegateWrapper(
-				method, mappedScanResponse, "mapScanItemResponse", ScanResponse.class);
+				method, mappedScanResponse, "mapScanItemResponse", ScanRequest.class, ScanResponse.class);
 //			generateHashKeyWrapper(delegate, "scanRequestFromHashKey");
 //			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
 		}
 	}
 
-	protected MethodSpec generateDelegateWrapper(Method method, ClassName returnType, String decoderMethod, Class<?> responseClass) {
+	protected MethodSpec generateDelegateWrapper(Method method, ClassName returnType, String decoderMethod, Class<?> requestClass, Class<?> responseClass) {
 		var requestVar = detectRequestOrConsumer(method);
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.getName())
@@ -166,15 +171,37 @@ public class MapperGenerator {
 		wrapper.addParameter(delegateParams.get(0), requestVar);
 		wrapper.addParameter(CLASS_T, "clazz");
 		// Write body.
-		wrapper.addStatement("return decoder.$L(client.$L($L), clazz)",
+		if (requestVar.equals("request")) {
+			generateRequestObjectWrapper(wrapper, requestClass, requestVar);
+		}
+		else if (requestVar.equals("consumer")) {
+			generateRequestConsumerWrapper(wrapper, requestClass, requestVar);
+		}
+		else {
+			throw new RuntimeException();
+		}
+		wrapper.addStatement("return decoder.$L(client.$L(reqOrConsumer), clazz)",
 			decoderMethod,
-			method.getName(),
-			requestVar);
+			method.getName());
 
 		TypeHelper.nonNullParameters(wrapper);
 		var built = wrapper.build();
 		mapper.addMethod(built);
 		return built;
+	}
+
+	protected void generateRequestObjectWrapper(MethodSpec.Builder wrapper, Class<?> requestClass, String requestVar) {
+		wrapper.addStatement("var reqOrConsumer = requestFactory.accept$L($L, clazz)",
+			requestClass.getSimpleName(),
+			requestVar);
+	}
+
+	protected void generateRequestConsumerWrapper(MethodSpec.Builder wrapper, Class<?> requestClass, String requestVar) {
+		wrapper
+			.beginControlFlow("Consumer<$T.Builder> reqOrConsumer = (builder) -> {", requestClass)
+			.addStatement("requestFactory.accept$L(builder, clazz)", requestClass.getSimpleName())
+			.addStatement("$L.accept(builder)", requestVar)
+			.endControlFlow("}");
 	}
 
 	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName) {
