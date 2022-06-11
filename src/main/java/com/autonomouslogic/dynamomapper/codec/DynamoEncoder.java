@@ -74,11 +74,4 @@ public class DynamoEncoder {
 		}
 		return AttributeValue.builder().l(values).build();
 	}
-
-	private AttributeValue encodePrimitive(JsonNode node) {
-		if (node.isTextual()) {
-			return AttributeValue.builder().s(node.textValue()).build();
-		}
-		throw new IllegalArgumentException();
-	}
 }
