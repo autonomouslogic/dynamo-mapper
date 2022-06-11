@@ -3,6 +3,7 @@ package com.autonomouslogic.dynamomapper.codec;
 import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
+import com.autonomouslogic.dynamomapper.model.MappedScanResponse;
 import com.autonomouslogic.dynamomapper.model.MappedUpdateItemResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,8 +16,11 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
+import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -42,6 +46,17 @@ public class DynamoDecoder {
 	public <T> MappedDeleteItemResponse<T> mapDeleteItemResponse(DeleteItemResponse response, Class<T> clazz) throws JsonProcessingException {
 		var item = response.hasAttributes() ? decode(response.attributes(), clazz) : null;
 		return new MappedDeleteItemResponse<>(response, item);
+	}
+
+	public <T> MappedScanResponse<T> mapScanItemResponse(ScanResponse response, Class<T> clazz) throws JsonProcessingException {
+		List<T> decoded = null;
+		if (response.hasItems()) {
+			decoded = new ArrayList<>(response.count());
+			for (var item : response.items()) {
+				decoded.add(decode(item, clazz));
+			}
+		}
+		return new MappedScanResponse<>(response, decoded);
 	}
 
 	/**

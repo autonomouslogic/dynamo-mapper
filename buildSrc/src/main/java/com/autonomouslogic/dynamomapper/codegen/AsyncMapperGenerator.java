@@ -48,7 +48,7 @@ public class AsyncMapperGenerator extends MapperGenerator {
 	}
 
 	@Override
-	protected MethodSpec generateDelegateWrapper(Method method, ClassName returnType, String decoderMethod, Class<?> responseClass) {
+	protected MethodSpec generateDelegateWrapper(Method method, ClassName returnType, String decoderMethod, Class<?> requestClass, Class<?> responseClass) {
 		var requestVar = detectRequestOrConsumer(method);
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.getName())
@@ -68,15 +68,24 @@ public class AsyncMapperGenerator extends MapperGenerator {
 		wrapper.addParameter(delegateParams.get(0), requestVar);
 		wrapper.addParameter(CLASS_T, "clazz");
 		// Write body.
+		if (requestVar.equals("request")) {
+			generateRequestObjectWrapper(wrapper, requestClass, requestVar);
+		}
+		else if (requestVar.equals("consumer")) {
+			generateRequestConsumerWrapper(wrapper, requestClass, requestVar);
+		}
+		else {
+			throw new RuntimeException();
+		}
 		wrapper.addStatement(CodeBlock.of(
-			"return client.$L($L)\n" +
+			"return client.$L(reqOrConsumer)\n" +
 			"\t.thenApply(new $T<>() {\n" +
 			"\t\t@Override\n" +
 			"\t\tpublic $T checkedApply($T response) throws $T {\n" +
 			"\t\t\treturn decoder.$L(response, clazz);\n" +
 			"\t\t}\n" +
 			"\t})"
-			, method.getName(), requestVar, TypeHelper.checkedFunction, TypeHelper.genericCapture(returnType),
+			, method.getName(), TypeHelper.checkedFunction, TypeHelper.genericCapture(returnType),
 			responseClass, Exception.class, decoderMethod));
 
 		TypeHelper.nonNullParameters(wrapper);

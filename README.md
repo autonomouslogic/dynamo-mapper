@@ -131,6 +131,8 @@ For instance, it's not possible to have a different schema in the DynamoDB and J
 * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html
 * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.html
 * https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/dynamodb-enhanced-client.html
+* https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/dynamodbv2/package-summary.html
+* https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/dynamodb/package-summary.html
 
 ## Versioning
 Dynamo Mapper follows [semantic versioning](https://semver.org/).

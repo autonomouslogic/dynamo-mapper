@@ -4,5 +4,5 @@ checks:
     config:
       threshold: 6
 exclude_patterns:
-  - "com/autonomouslogic/dynamomapper/DynamoMapper.java"
-  - "com/autonomouslogic/dynamomapper/DynamoAsyncMapper.java"
+  - "src/main/java/com/autonomouslogic/dynamomapper/DynamoMapper.java"
+  - "src/main/java/com/autonomouslogic/dynamomapper/DynamoAsyncMapper.java"

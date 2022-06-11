@@ -29,6 +29,7 @@ public class TypeHelper {
 	public static final ClassName futureUtil = mapperType("util", "FutureUtil");
 	public static final ClassName requestFactory = mapperType("request", "RequestFactory");
 	public static final ClassName mappedDeleteItemResponse = mapperType("model", "MappedDeleteItemResponse");
+	public static final ClassName mappedScanResponse = mapperType("model", "MappedScanResponse");
 	public static final ClassName mappedGetItemResponse = mapperType("model", "MappedGetItemResponse");
 	public static final ClassName mappedPutItemResponse = mapperType("model", "MappedPutItemResponse");
 	public static final ClassName mappedUpdateItemResponse = mapperType("model", "MappedUpdateItemResponse");

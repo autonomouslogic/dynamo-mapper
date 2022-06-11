@@ -46,5 +46,8 @@ public class IntegrationTestObject {
 	List<String> listString;
 
 	@JsonProperty
+	Number num;
+
+	@JsonProperty
 	long ttl;
 }
