@@ -5,8 +5,12 @@
 # https://github.com/autonomouslogic/semantic-release-gradle-sonatype-example/issues/5
 VERSION="$1"
 git tag -a -f -m $VERSION $VERSION
+./gradlew properties | grep version
+git tag -l -n
 if ./gradlew properties | grep version | grep -q -; then
   echo Cannot publish development version
+  git tag -d $VERSION
+  git push origin :refs/tags/$VERSION
   exit 1
 fi
 git push --force origin $VERSION
