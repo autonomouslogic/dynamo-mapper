@@ -14,7 +14,8 @@ jobs:
           distribution: adopt
           java-version: 11
 
-      - uses: actions/cache@v3
+      - name: Caches
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -24,13 +25,19 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Test
+        run: ./gradlew test --stacktrace
+
+      - name: Integration Test
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: ./gradlew test integrationTest jacocoTestReport --stacktrace
+        run: ./gradlew integrationTest --stacktrace
 
-      - name: Codecov upload
+      - name: Code Coverage
+        run: ./gradlew jacocoTestReport --stacktrace
+
+      - name: Codecov Upload
         uses: codecov/codecov-action@v2
         with:
           verbose: true
