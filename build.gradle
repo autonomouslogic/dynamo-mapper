@@ -3,6 +3,7 @@ plugins {
     id "idea"
     id "org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin" version "0.3.12"
     id "io.freefair.lombok" version "6.4.3.1"
+    id "jacoco"
     id "maven-publish"
     id "signing"
     id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
@@ -83,6 +84,13 @@ task integrationTest(type: Test, description: "Runs the integration tests", grou
         showExceptions = true
         showCauses = true
         showStackTraces = true
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
     }
 }
 
