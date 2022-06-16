@@ -46,6 +46,9 @@ import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.overridableMet
 
 @RequiredArgsConstructor
 public class MapperGenerator {
+	public static final String REQUEST = "request";
+	public static final String CONSUMER = "consumer";
+
 	protected final TypeSpec.Builder mapper;
 	protected final Logger log;
 
@@ -176,10 +179,10 @@ public class MapperGenerator {
 		wrapper.addParameter(delegateParams.get(0), requestVar);
 		wrapper.addParameter(CLASS_T, "clazz");
 		// Write body.
-		if (requestVar.equals("request")) {
+		if (requestVar.equals(REQUEST)) {
 			generateRequestObjectWrapper(wrapper, requestClass, requestVar);
 		}
-		else if (requestVar.equals("consumer")) {
+		else if (requestVar.equals(CONSUMER)) {
 			generateRequestConsumerWrapper(wrapper, requestClass, requestVar);
 		}
 		else {
@@ -220,7 +223,7 @@ public class MapperGenerator {
 		// Add parameters.
 		wrapper.addParameter(Object.class, "hashKey");
 		var params = new ArrayList<>(method.parameters);
-		params.removeIf(p -> p.name.equals("request"));
+		params.removeIf(p -> p.name.equals(REQUEST));
 		wrapper.addParameters(params);
 		// Write body.
 		wrapper.addStatement("var builder = requestFactory.$L(hashKey, clazz)", factoryMethodName);
@@ -248,7 +251,7 @@ public class MapperGenerator {
 		// Add parameters.
 		wrapper.addParameter(TypeHelper.T, "keyObject");
 		var params = new ArrayList<>(method.parameters);
-		params.removeIf(p -> p.name.equals("request"));
+		params.removeIf(p -> p.name.equals(REQUEST));
 		params.removeIf(p -> p.name.equals("clazz"));
 		wrapper.addParameters(params);
 		// Write body.
@@ -273,10 +276,10 @@ public class MapperGenerator {
 	}
 
 	protected String detectRequestOrConsumer(Method method) {
-		var requestVar = "request";
+		var requestVar = REQUEST;
 		var firstParamTypeName = method.getParameterTypes()[0];
 		if (firstParamTypeName.equals(Consumer.class)) {
-			requestVar = "consumer";
+			requestVar = CONSUMER;
 		}
 		return requestVar;
 	}

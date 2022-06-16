@@ -54,10 +54,10 @@ public class AsyncMapperGenerator extends MapperGenerator {
 		wrapper.addParameter(delegateParams.get(0), requestVar);
 		wrapper.addParameter(CLASS_T, "clazz");
 		// Write body.
-		if (requestVar.equals("request")) {
+		if (requestVar.equals(REQUEST)) {
 			generateRequestObjectWrapper(wrapper, requestClass, requestVar);
 		}
-		else if (requestVar.equals("consumer")) {
+		else if (requestVar.equals(CONSUMER)) {
 			generateRequestConsumerWrapper(wrapper, requestClass, requestVar);
 		}
 		else {
@@ -91,7 +91,7 @@ public class AsyncMapperGenerator extends MapperGenerator {
 		// Add parameters.
 		wrapper.addParameter(Object.class, "hashKey");
 		var params = new ArrayList<>(method.parameters);
-		params.removeIf(p -> p.name.equals("request"));
+		params.removeIf(p -> p.name.equals(REQUEST));
 		wrapper.addParameters(params);
 		// Write body.
 		var code = CodeBlock.builder();
@@ -127,7 +127,7 @@ public class AsyncMapperGenerator extends MapperGenerator {
 		// Add parameters.
 		wrapper.addParameter(TypeHelper.T, "keyObject");
 		var params = new ArrayList<>(method.parameters);
-		params.removeIf(p -> p.name.equals("request"));
+		params.removeIf(p -> p.name.equals(REQUEST));
 		params.removeIf(p -> p.name.equals("clazz"));
 		wrapper.addParameters(params);
 		// Write body.
