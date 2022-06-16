@@ -46,7 +46,7 @@ public class CompatibilityTest {
 	@ParameterizedTest
 	@MethodSource("loadCompatibilityTestObjects")
 	@SneakyThrows
-	public void shouldReadFromV1(CompatibilityTestObject obj) {
+	void shouldReadFromV1(CompatibilityTestObject obj) {
 		System.out.println(obj);
 		v1Client.save(obj);
 		assertEquals(obj, dynamoMapper.getItem(obj.getPartitionKey(), CompatibilityTestObject.class).item());
@@ -55,7 +55,7 @@ public class CompatibilityTest {
 	@ParameterizedTest
 	@MethodSource("loadCompatibilityTestObjects")
 	@SneakyThrows
-	public void shouldWriteToV1(CompatibilityTestObject obj) {
+	void shouldWriteToV1(CompatibilityTestObject obj) {
 		System.out.println(obj);
 		dynamoMapper.putItem(obj);
 		assertEquals(obj, v1Client.load(CompatibilityTestObject.class, obj.getPartitionKey()));
@@ -65,7 +65,7 @@ public class CompatibilityTest {
 	@MethodSource("loadCompatibilityTestObjects")
 	@Disabled // v2 SDK isn't set up correctly.
 	@SneakyThrows
-	public void shouldReadFromV2(CompatibilityTestObject obj) {
+	void shouldReadFromV2(CompatibilityTestObject obj) {
 		System.out.println(obj);
 		v2Table.putItem(obj);
 		assertEquals(obj, dynamoMapper.getItem(obj.getPartitionKey(), CompatibilityTestObject.class).item());
@@ -75,14 +75,14 @@ public class CompatibilityTest {
 	@MethodSource("loadCompatibilityTestObjects")
 	@Disabled // v2 SDK isn't set up correctly.
 	@SneakyThrows
-	public void shouldWriteToV2(CompatibilityTestObject obj) {
+	void shouldWriteToV2(CompatibilityTestObject obj) {
 		System.out.println(obj);
 		dynamoMapper.putItem(obj);
 		assertEquals(obj, v2Table.getItem(obj));
 	}
 
 	@SneakyThrows
-	public static List<CompatibilityTestObject> loadCompatibilityTestObjects() {
+	static List<CompatibilityTestObject> loadCompatibilityTestObjects() {
 		var objectMapper = StdObjectMapper.objectMapper();
 		var list = new ArrayList<CompatibilityTestObject>();
 		for (IntegrationTestObject obj : IntegrationTestUtil.loadIntegrationTestObjects()) {

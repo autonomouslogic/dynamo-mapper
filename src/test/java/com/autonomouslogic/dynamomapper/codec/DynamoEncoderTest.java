@@ -22,7 +22,7 @@ public class DynamoEncoderTest {
 	@ParameterizedTest
 	@MethodSource("loadTests")
 	@SneakyThrows
-	public void shouldEncode(CodecTests test) {
+	void shouldEncode(CodecTests test) {
 		var ddb = encoder.encode(test.pojo());
 		assertEquals(test.ddb(), ddb);
 	}
@@ -36,7 +36,7 @@ public class DynamoEncoderTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldEncodeRealNulls() {
+	void shouldEncodeRealNulls() {
 		var attr = encoder.encode(objectMapper.createObjectNode()
 			.put("null", (String) null));
 		assertTrue(attr.get("null").nul());
@@ -44,7 +44,7 @@ public class DynamoEncoderTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldEncodeJsonNulls() {
+	void shouldEncodeJsonNulls() {
 		var json = objectMapper.createObjectNode();
 		json.set("null", objectMapper.nullNode());
 		var attr = encoder.encode(json);

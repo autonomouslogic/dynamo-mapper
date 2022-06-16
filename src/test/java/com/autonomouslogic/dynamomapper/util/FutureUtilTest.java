@@ -23,7 +23,7 @@ public class FutureUtilTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldWrapFuture() {
+	void shouldWrapFuture() {
 		var f = CompletableFuture.completedFuture("test");
 		when(supplier.get()).thenReturn(f);
 		assertSame(f, FutureUtil.wrapFuture(() -> f));
@@ -31,7 +31,7 @@ public class FutureUtilTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldCatchExceptionsInSupplier() {
+	void shouldCatchExceptionsInSupplier() {
 		when(supplier.get()).thenThrow(new RuntimeException("test"));
 		var f = FutureUtil.wrapFuture(supplier);
 		assertThrows(RuntimeException.class, () -> f.join());
@@ -39,7 +39,7 @@ public class FutureUtilTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldWrapFailedExceptions() {
+	void shouldWrapFailedExceptions() {
 		var f = new CompletableFuture<String>();
 		f.completeExceptionally(new RuntimeException("test"));
 		when(supplier.get()).thenReturn(f);

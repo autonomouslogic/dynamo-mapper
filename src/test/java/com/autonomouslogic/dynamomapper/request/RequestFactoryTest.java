@@ -23,7 +23,7 @@ public class RequestFactoryTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldCreateGetItemRequestsFromHashKey() {
+	void shouldCreateGetItemRequestsFromHashKey() {
 		var request = factory.getRequestFromHashKey("key1", TestObject.class).build();
 		assertEquals(
 			Map.of("string", AttributeValue.builder().s("key1").build()),
@@ -32,7 +32,7 @@ public class RequestFactoryTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldCreateGetItemRequestsFromKeyObjects() {
+	void shouldCreateGetItemRequestsFromKeyObjects() {
 		var request = factory.getRequestFromKeyObject(new TestObject().setString("key1")).build();
 		assertEquals(
 			Map.of("string", AttributeValue.builder().s("key1").build()),

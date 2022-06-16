@@ -29,7 +29,7 @@ public class DynamoAsyncMapperIntegrationTest {
 	@ParameterizedTest
 	@MethodSource("com.autonomouslogic.dynamomapper.test.IntegrationTestUtil#loadIntegrationTestObjects")
 	@SneakyThrows
-	public void shouldPutAndGetAndDelete(IntegrationTestObject obj) {
+	void shouldPutAndGetAndDelete(IntegrationTestObject obj) {
 		obj = IntegrationTestObjects.setKeyAndTtl(obj);
 		System.out.println(obj);
 		// Put.
@@ -50,7 +50,7 @@ public class DynamoAsyncMapperIntegrationTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldScan() {
+	void shouldScan() {
 		String shared = Long.toString(IntegrationTestUtil.RNG.nextLong());
 		int n = 10;
 		for (int i = 0; i < n; i++) {
@@ -71,7 +71,7 @@ public class DynamoAsyncMapperIntegrationTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldQuery() {
+	void shouldQuery() {
 		var obj = IntegrationTestObjects.setKeyAndTtl(IntegrationTestObject.builder()
 			.str("str-1234")
 			.build());
