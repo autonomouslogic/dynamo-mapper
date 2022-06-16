@@ -51,25 +51,27 @@ public class DynamoDecoder {
 	}
 
 	public <T> MappedScanResponse<T> mapScanResponse(ScanResponse response, Class<T> clazz) throws JsonProcessingException {
-		List<T> decoded = null;
-		if (response.hasItems()) {
-			decoded = new ArrayList<>(response.count());
-			for (var item : response.items()) {
-				decoded.add(decode(item, clazz));
-			}
-		}
+		var decoded = decodeItems(response.items(), clazz);
 		return new MappedScanResponse<>(response, decoded);
 	}
 
 	public <T> MappedQueryResponse<T> mapQueryResponse(QueryResponse response, Class<T> clazz) throws JsonProcessingException {
-		List<T> decoded = null;
-		if (response.hasItems()) {
-			decoded = new ArrayList<>(response.count());
-			for (var item : response.items()) {
+		var decoded = decodeItems(response.items(), clazz);
+		return new MappedQueryResponse<>(response, decoded);
+	}
+
+	private <T> List<T> decodeItems(List<Map<String, AttributeValue>> items, Class<T> clazz) throws JsonProcessingException {
+		if (items == null) {
+			return null;
+		}
+		var decoded = new ArrayList<T>(items.size());
+		if (!items.isEmpty()) {
+			decoded = new ArrayList<>(items.size());
+			for (var item : items) {
 				decoded.add(decode(item, clazz));
 			}
 		}
-		return new MappedQueryResponse<>(response, decoded);
+		return decoded;
 	}
 
 	/**
