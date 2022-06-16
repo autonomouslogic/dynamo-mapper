@@ -1,6 +1,7 @@
 package com.autonomouslogic.dynamomapper;
 
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
+import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
@@ -20,10 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DynamoAsyncMapperIntegrationTest {
 	static DynamoAsyncMapper dynamoAsyncMapper;
+	static IntegrationTestHelper helper;
 
 	@BeforeAll
 	public static void setup() {
 		dynamoAsyncMapper = DynamoAsyncMapper.builder().client(IntegrationTestUtil.asyncClient()).build();
+		helper = new IntegrationTestHelper();
 	}
 
 	@ParameterizedTest
@@ -77,14 +80,7 @@ public class DynamoAsyncMapperIntegrationTest {
 			.build());
 		dynamoAsyncMapper.putItem(obj).join();
 		var queryResult = dynamoAsyncMapper.query(req -> {
-			assertEquals("integration-test-table", req.build().tableName());
-			req
-				.keyConditionExpression("partitionKey = :v")
-				.filterExpression("str = :s")
-				.expressionAttributeValues(Map.of(
-					":v", AttributeValue.builder().s(obj.partitionKey()).build(),
-					":s", AttributeValue.builder().s(obj.str()).build()
-				));
+			helper.prepQueryTest(obj, req);
 		}, IntegrationTestObject.class).join();
 		assertEquals(List.of(obj), queryResult.items());
 	}

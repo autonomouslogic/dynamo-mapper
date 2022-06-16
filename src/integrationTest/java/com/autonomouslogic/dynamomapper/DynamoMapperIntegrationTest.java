@@ -4,6 +4,7 @@ import com.amazonaws.services.dynamodbv2.document.QueryFilter;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
+import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import software.amazon.awssdk.services.dynamodb.model.ReturnValue;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 
@@ -26,11 +28,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DynamoMapperIntegrationTest {
 	static DynamoMapper dynamoMapper;
 	static DynamoEncoder encoder;
+	static IntegrationTestHelper helper;
 
 	@BeforeAll
 	public static void setup() {
 		dynamoMapper = DynamoMapper.builder().client(IntegrationTestUtil.client()).build();
 		encoder = dynamoMapper.encoder;
+		helper = new IntegrationTestHelper();
 	}
 
 	@ParameterizedTest
@@ -84,14 +88,7 @@ public class DynamoMapperIntegrationTest {
 			.build());
 		dynamoMapper.putItem(obj);
 		var queryResult = dynamoMapper.query(req -> {
-			assertEquals("integration-test-table", req.build().tableName());
-			req
-				.keyConditionExpression("partitionKey = :v")
-				.filterExpression("str = :s")
-				.expressionAttributeValues(Map.of(
-					":v", AttributeValue.builder().s(obj.partitionKey()).build(),
-					":s", AttributeValue.builder().s(obj.str()).build()
-				));
+			helper.prepQueryTest(obj, req);
 		}, IntegrationTestObject.class);
 		assertEquals(List.of(obj), queryResult.items());
 	}
