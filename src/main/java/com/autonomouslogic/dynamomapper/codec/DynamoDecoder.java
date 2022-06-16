@@ -9,7 +9,10 @@ import com.autonomouslogic.dynamomapper.model.MappedUpdateItemResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.SdkBytes;
@@ -24,6 +27,7 @@ import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class DynamoDecoder {
@@ -91,7 +95,7 @@ public class DynamoDecoder {
 			return decodeBinary(val.b());
 		}
 		if (val.bool() != null) {
-			return nodeFactory.booleanNode(val.bool());
+			return decodeBoolean(val);
 		}
 		if (val.hasBs() && val.bs() != null) {
 			return decodeBinarySet(val);
@@ -112,7 +116,7 @@ public class DynamoDecoder {
 			return nodeFactory.nullNode();
 		}
 		if (val.s() != null) {
-			return nodeFactory.textNode(val.s());
+			return decodeString(val.s());
 		}
 		if (val.hasSs() && val.ss() != null) {
 			return decodeStringSet(val);
@@ -120,12 +124,20 @@ public class DynamoDecoder {
 		throw new IllegalArgumentException(val.toString());
 	}
 
+	private BooleanNode decodeBoolean(AttributeValue val) {
+		return objectMapper.getNodeFactory().booleanNode(val.bool());
+	}
+
+	private TextNode decodeString(String val) {
+		return objectMapper.getNodeFactory().textNode(val);
+	}
+
 	private JsonNode decodeBinary(SdkBytes bytes) {
 		return objectMapper.getNodeFactory().binaryNode(bytes.asByteArray());
 	}
 
 	private JsonNode decodeNumber(String num) {
-		return objectMapper.getNodeFactory().textNode(num);
+		return decodeString(num);
 	}
 
 	private JsonNode decodeMap(AttributeValue val) {
@@ -153,18 +165,17 @@ public class DynamoDecoder {
 	}
 
 	private JsonNode decodeNumberSet(AttributeValue val) {
-		var arr = objectMapper.getNodeFactory().arrayNode();
-		for (var entry : val.ns()) {
-			arr.add(decodeNumber(entry));
-		}
-		return arr;
+		return decodeArray(val.ns(), this::decodeNumber);
 	}
 
 	private JsonNode decodeStringSet(AttributeValue val) {
-		var nodeFactory = objectMapper.getNodeFactory();
-		var arr = nodeFactory.arrayNode();
-		for (var entry : val.ss()) {
-			arr.add(nodeFactory.textNode(entry));
+		return decodeArray(val.ss(), this::decodeString);
+	}
+
+	private <T> ArrayNode decodeArray(List<T> vals, Function<T, JsonNode> f) {
+		var arr = objectMapper.getNodeFactory().arrayNode();
+		for (var val : vals) {
+			arr.add(f.apply(val));
 		}
 		return arr;
 	}
