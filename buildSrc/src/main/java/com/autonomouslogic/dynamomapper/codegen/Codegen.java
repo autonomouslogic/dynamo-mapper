@@ -6,8 +6,6 @@ import lombok.SneakyThrows;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.tasks.TaskAction;
-import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import javax.lang.model.element.Modifier;
 import java.io.FileWriter;

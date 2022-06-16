@@ -2,8 +2,6 @@ package com.autonomouslogic.dynamomapper.test;
 
 import com.autonomouslogic.dynamomapper.DynamoMapper;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;

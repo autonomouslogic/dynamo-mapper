@@ -14,12 +14,6 @@ import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.autonomouslogic.dynamomapper.util.FutureUtil;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.lang.Class;
-import java.lang.Exception;
-import java.lang.Object;
-import java.lang.SuppressWarnings;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import lombok.NonNull;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
@@ -34,6 +28,9 @@ import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class DynamoAsyncMapper {
 	private final DynamoDbAsyncClient client;

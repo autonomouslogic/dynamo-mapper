@@ -1,8 +1,8 @@
 package com.autonomouslogic.dynamomapper.codec;
 
+import com.autonomouslogic.dynamomapper.model.TestObject;
 import com.autonomouslogic.dynamomapper.test.CodecTests;
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
-import com.autonomouslogic.dynamomapper.model.TestObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.params.ParameterizedTest;

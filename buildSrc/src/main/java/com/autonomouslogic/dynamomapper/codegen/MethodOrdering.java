@@ -1,7 +1,6 @@
 package com.autonomouslogic.dynamomapper.codegen;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
