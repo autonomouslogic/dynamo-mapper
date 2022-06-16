@@ -69,6 +69,8 @@ test {
         showCauses = true
         showStackTraces = true
     }
+
+    dependsOn codegen
 }
 
 task integrationTest(type: Test, description: "Runs the integration tests", group: "verification") {
@@ -85,6 +87,8 @@ task integrationTest(type: Test, description: "Runs the integration tests", grou
         showCauses = true
         showStackTraces = true
     }
+
+    dependsOn codegen
 }
 
 jacocoTestReport {

@@ -16,7 +16,7 @@ public class ReflectionUtilTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldResolveHashKeyField() {
+	void shouldResolveHashKeyField() {
 		assertEquals(
 			List.of("string"),
 			reflectionUtil.resolveHashKeyFields(TestObject.class));
@@ -24,7 +24,7 @@ public class ReflectionUtilTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldResolveHashKeyFieldFromModifiedJsonProperty() {
+	void shouldResolveHashKeyFieldFromModifiedJsonProperty() {
 		assertEquals(
 			List.of("hash_key"),
 			reflectionUtil.resolveHashKeyFields(ModifiedTestObject.class));
@@ -32,7 +32,7 @@ public class ReflectionUtilTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldResolveHashKeyMethod() {
+	void shouldResolveHashKeyMethod() {
 		assertEquals(
 			List.of("hashKey"),
 			reflectionUtil.resolveHashKeyFields(MethodTestObject.class));
@@ -40,7 +40,7 @@ public class ReflectionUtilTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldResolveHashKeyMethodFromModifiedJsonProperty() {
+	void shouldResolveHashKeyMethodFromModifiedJsonProperty() {
 		assertEquals(
 			List.of("hash_key"),
 			reflectionUtil.resolveHashKeyFields(ModifiedMethodTestObject.class));

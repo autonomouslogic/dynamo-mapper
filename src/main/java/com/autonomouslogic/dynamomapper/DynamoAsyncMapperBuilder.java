@@ -2,10 +2,8 @@ package com.autonomouslogic.dynamomapper;
 
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
 import lombok.Setter;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.util.Optional;
 

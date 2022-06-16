@@ -1,35 +1,35 @@
 package com.autonomouslogic.dynamomapper;
 
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
+import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
-import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.ReturnValue;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DynamoAsyncMapperIntegrationTest {
 	static DynamoAsyncMapper dynamoAsyncMapper;
+	static IntegrationTestHelper helper;
 
 	@BeforeAll
 	public static void setup() {
 		dynamoAsyncMapper = DynamoAsyncMapper.builder().client(IntegrationTestUtil.asyncClient()).build();
+		helper = new IntegrationTestHelper();
 	}
 
 	@ParameterizedTest
 	@MethodSource("com.autonomouslogic.dynamomapper.test.IntegrationTestUtil#loadIntegrationTestObjects")
 	@SneakyThrows
-	public void shouldPutAndGetAndDelete(IntegrationTestObject obj) {
+	void shouldPutAndGetAndDelete(IntegrationTestObject obj) {
 		obj = IntegrationTestObjects.setKeyAndTtl(obj);
 		System.out.println(obj);
 		// Put.
@@ -50,7 +50,7 @@ public class DynamoAsyncMapperIntegrationTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldScan() {
+	void shouldScan() {
 		String shared = Long.toString(IntegrationTestUtil.RNG.nextLong());
 		int n = 10;
 		for (int i = 0; i < n; i++) {
@@ -71,20 +71,13 @@ public class DynamoAsyncMapperIntegrationTest {
 
 	@Test
 	@SneakyThrows
-	public void shouldQuery() {
+	void shouldQuery() {
 		var obj = IntegrationTestObjects.setKeyAndTtl(IntegrationTestObject.builder()
 			.str("str-1234")
 			.build());
 		dynamoAsyncMapper.putItem(obj).join();
 		var queryResult = dynamoAsyncMapper.query(req -> {
-			assertEquals("integration-test-table", req.build().tableName());
-			req
-				.keyConditionExpression("partitionKey = :v")
-				.filterExpression("str = :s")
-				.expressionAttributeValues(Map.of(
-					":v", AttributeValue.builder().s(obj.partitionKey()).build(),
-					":s", AttributeValue.builder().s(obj.str()).build()
-				));
+			helper.prepQueryTest(obj, req);
 		}, IntegrationTestObject.class).join();
 		assertEquals(List.of(obj), queryResult.items());
 	}

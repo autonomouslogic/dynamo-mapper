@@ -67,7 +67,6 @@ public class DynamoEncoder {
 	}
 
 	private AttributeValue encodeList(@NonNull JsonNode list) throws IOException {
-		var nodeFactory = objectMapper.getNodeFactory();
 		var values = new ArrayList<AttributeValue>();
 		for (var entry : list) {
 			values.add(encodeValue(entry));

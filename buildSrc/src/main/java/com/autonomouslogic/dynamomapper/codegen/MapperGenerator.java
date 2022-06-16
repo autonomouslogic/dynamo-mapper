@@ -10,9 +10,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.gradle.api.logging.Logger;
-import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
@@ -30,16 +28,14 @@ import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.field;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.CLASS_T;
+import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.field;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedDeleteItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedGetItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedPutItemResponse;
@@ -50,6 +46,9 @@ import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.overridableMet
 
 @RequiredArgsConstructor
 public class MapperGenerator {
+	public static final String REQUEST = "request";
+	public static final String CONSUMER = "consumer";
+
 	protected final TypeSpec.Builder mapper;
 	protected final Logger log;
 
@@ -180,10 +179,10 @@ public class MapperGenerator {
 		wrapper.addParameter(delegateParams.get(0), requestVar);
 		wrapper.addParameter(CLASS_T, "clazz");
 		// Write body.
-		if (requestVar.equals("request")) {
+		if (requestVar.equals(REQUEST)) {
 			generateRequestObjectWrapper(wrapper, requestClass, requestVar);
 		}
-		else if (requestVar.equals("consumer")) {
+		else if (requestVar.equals(CONSUMER)) {
 			generateRequestConsumerWrapper(wrapper, requestClass, requestVar);
 		}
 		else {
@@ -224,7 +223,7 @@ public class MapperGenerator {
 		// Add parameters.
 		wrapper.addParameter(Object.class, "hashKey");
 		var params = new ArrayList<>(method.parameters);
-		params.removeIf(p -> p.name.equals("request"));
+		params.removeIf(p -> p.name.equals(REQUEST));
 		wrapper.addParameters(params);
 		// Write body.
 		wrapper.addStatement("var builder = requestFactory.$L(hashKey, clazz)", factoryMethodName);
@@ -252,7 +251,7 @@ public class MapperGenerator {
 		// Add parameters.
 		wrapper.addParameter(TypeHelper.T, "keyObject");
 		var params = new ArrayList<>(method.parameters);
-		params.removeIf(p -> p.name.equals("request"));
+		params.removeIf(p -> p.name.equals(REQUEST));
 		params.removeIf(p -> p.name.equals("clazz"));
 		wrapper.addParameters(params);
 		// Write body.
@@ -277,10 +276,10 @@ public class MapperGenerator {
 	}
 
 	protected String detectRequestOrConsumer(Method method) {
-		var requestVar = "request";
+		var requestVar = REQUEST;
 		var firstParamTypeName = method.getParameterTypes()[0];
 		if (firstParamTypeName.equals(Consumer.class)) {
-			requestVar = "consumer";
+			requestVar = CONSUMER;
 		}
 		return requestVar;
 	}
