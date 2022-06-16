@@ -68,6 +68,7 @@ public class TypeHelper {
 			.filter(m -> m.getName().equals(methodName))
 			.filter(m -> !isStatic(m.getModifiers()))
 			.filter(m -> isPublic(m.getModifiers()))
+			.sorted(new MethodOrdering())
 			.collect(Collectors.toList());
 	}
 

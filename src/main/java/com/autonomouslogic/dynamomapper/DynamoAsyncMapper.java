@@ -54,34 +54,6 @@ public class DynamoAsyncMapper {
 		requestFactory = new RequestFactory(encoder, objectMapper, reflectionUtil);
 	}
 
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull GetItemRequest request,
-			@NonNull Class<T> clazz) {
-		var reqOrConsumer = requestFactory.acceptGetItemRequest(request, clazz);
-		return client.getItem(reqOrConsumer)
-					.thenApply(new CheckedFunction<>() {
-						@Override
-						public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
-							return decoder.mapGetItemResponse(response, clazz);
-						}
-					});
-	}
-
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey,
-			@NonNull Class<T> clazz) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
-			return getItem(builder.build(), clazz);
-		});
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull T keyObject) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.getRequestFromKeyObject(keyObject);
-			return getItem(builder.build(), (Class<T>) keyObject.getClass());
-		});
-	}
-
 	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
 			@NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
 		Consumer<GetItemRequest.Builder> reqOrConsumer = (builder) -> { {
@@ -116,23 +88,31 @@ public class DynamoAsyncMapper {
 		});
 	}
 
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull PutItemRequest request,
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull GetItemRequest request,
 			@NonNull Class<T> clazz) {
-		var reqOrConsumer = requestFactory.acceptPutItemRequest(request, clazz);
-		return client.putItem(reqOrConsumer)
+		var reqOrConsumer = requestFactory.acceptGetItemRequest(request, clazz);
+		return client.getItem(reqOrConsumer)
 					.thenApply(new CheckedFunction<>() {
 						@Override
-						public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
-							return decoder.mapPutItemResponse(response, clazz);
+						public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
+							return decoder.mapGetItemResponse(response, clazz);
 						}
 					});
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull T keyObject) {
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey,
+			@NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.putRequestFromObject(keyObject);
-			return putItem(builder.build(), (Class<T>) keyObject.getClass());
+			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+			return getItem(builder.build(), clazz);
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull T keyObject) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.getRequestFromKeyObject(keyObject);
+			return getItem(builder.build(), (Class<T>) keyObject.getClass());
 		});
 	}
 
@@ -157,6 +137,26 @@ public class DynamoAsyncMapper {
 		return FutureUtil.wrapFuture(() -> {
 			var builder = requestFactory.putRequestFromObject(keyObject);
 			consumer.accept(builder);
+			return putItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
+	}
+
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull PutItemRequest request,
+			@NonNull Class<T> clazz) {
+		var reqOrConsumer = requestFactory.acceptPutItemRequest(request, clazz);
+		return client.putItem(reqOrConsumer)
+					.thenApply(new CheckedFunction<>() {
+						@Override
+						public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
+							return decoder.mapPutItemResponse(response, clazz);
+						}
+					});
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull T keyObject) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.putRequestFromObject(keyObject);
 			return putItem(builder.build(), (Class<T>) keyObject.getClass());
 		});
 	}
