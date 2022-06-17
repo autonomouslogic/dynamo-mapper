@@ -17,7 +17,7 @@
       "automerge": true
     },
     {
-      "matchPackagePatterns": ["^software.amazon.awssdk:"],
+      "matchPackagePatterns": ["^software.amazon.awssdk:", "^com.amazonaws:aws-java-sdk-"],
       "matchUpdateTypes": ["patch"],
       "schedule": ["on the first day of the month"]
     }
