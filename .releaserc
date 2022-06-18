@@ -1,35 +1,31 @@
 {
-  "dryRun": false,
   "ci": false,
   "branches": [
     "main"
   ],
   "tagFormat": "${version}",
   "plugins": [
-    [
-      "@semantic-release/commit-analyzer",
-      {
-        "preset": "conventionalcommits",
-        "releaseRules": [
-          {
-            "type": "chore",
-            "scope": "deps",
-            "release": "patch"
-          }
-        ]
-      }
-    ],
-    [
-      "@semantic-release/release-notes-generator",
-      {
-        "preset": "conventionalcommits"
-      }
-    ],
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
     [
       "@semantic-release/exec",
       {
         "verifyConditionsCmd": "./gradlew signMavenJavaPublication --stacktrace",
         "publishCmd": "./publish.sh ${nextRelease.version}"
+      }
+    ],
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogTitle": "Dynamo Mapper Changelog"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "CHANGELOG.md"
+        ]
       }
     ],
     [
@@ -43,5 +39,67 @@
         "addReleases": "bottom"
       }
     ]
-  ]
+  ],
+  "preset": "conventionalcommits",
+  "presetConfig": {
+    "types": [
+      {
+        "type": "feat",
+        "section": "Features"
+      },
+      {
+        "type": "feature",
+        "section": "Features"
+      },
+      {
+        "type": "fix",
+        "section": "Bug Fixes"
+      },
+      {
+        "type": "perf",
+        "section": "Performance Improvements"
+      },
+      {
+        "type": "revert",
+        "section": "Reverts"
+      },
+      {
+        "type": "docs",
+        "section": "Documentation"
+      },
+      {
+        "type": "style",
+        "section": "Styles"
+      },
+      {
+        "type": "chore",
+        "section": "Miscellaneous Chores"
+      },
+      {
+        "type": "refactor",
+        "section": "Code Refactoring"
+      },
+      {
+        "type": "test",
+        "section": "Tests"
+      },
+      {
+        "type": "build",
+        "section": "Build System"
+      },
+      {
+        "type": "ci",
+        "section": "Continuous Integration"
+      }
+    ]
+  },
+  "analyzeCommits": {
+    "releaseRules": [
+      {
+        "type": "chore",
+        "scope": "deps",
+        "release": "patch"
+      }
+    ]
+  }
 }
