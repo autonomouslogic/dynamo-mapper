@@ -1,5 +1,12 @@
 Dynamo Mapper Changelog
 
+## [1.2.8](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.7...1.2.8) (2022-07-14)
+
+
+### Miscellaneous Chores
+
+* **deps:** update all non-major dependencies ([#52](https://github.com/autonomouslogic/dynamo-mapper/issues/52)) ([1a651d5](https://github.com/autonomouslogic/dynamo-mapper/commit/1a651d552a10840e19f1842c171d9fa1097eca75))
+
 ## [1.2.7](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.6...1.2.7) (2022-07-05)
 
 
