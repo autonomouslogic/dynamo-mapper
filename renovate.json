@@ -2,5 +2,14 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>autonomouslogic/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "matchPackageNames": [
+        "com.amazonaws"
+      ],
+      "semanticCommitType": "test",
+      "groupName": "test dependencies"
+    }
   ]
 }
