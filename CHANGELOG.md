@@ -1,5 +1,22 @@
 Dynamo Mapper Changelog
 
+## [1.2.13](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.12...1.2.13) (2022-08-23)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#58](https://github.com/autonomouslogic/dynamo-mapper/issues/58)) ([5584641](https://github.com/autonomouslogic/dynamo-mapper/commit/55846417f94062d6900bd6498922d9451b58fb18))
+
+
+### Continuous Integration
+
+* Switched to shared Renovte config [skip ci] ([f07588b](https://github.com/autonomouslogic/dynamo-mapper/commit/f07588b9222c902a199ff0d5d36b6ad43f5dbe49))
+
+
+### Build System
+
+* changed shared config repo name. ([8cd6a2b](https://github.com/autonomouslogic/dynamo-mapper/commit/8cd6a2b4484965cefb282839a16c054abb4e69df))
+
 ## [1.2.12](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.11...1.2.12) (2022-08-10)
 
 
