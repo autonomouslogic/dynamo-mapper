@@ -92,14 +92,5 @@
         "section": "Continuous Integration"
       }
     ]
-  },
-  "analyzeCommits": {
-    "releaseRules": [
-      {
-        "type": "chore",
-        "scope": "deps",
-        "release": "patch"
-      }
-    ]
   }
 }
