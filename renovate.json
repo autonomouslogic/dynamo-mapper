@@ -9,7 +9,8 @@
         "com.amazonaws"
       ],
       "semanticCommitType": "test",
-      "groupName": "test dependencies"
+      "groupName": "test dependencies",
+      "groupSlug": "test-dependencies"
     }
   ]
 }
