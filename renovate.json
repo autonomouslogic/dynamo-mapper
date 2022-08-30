@@ -5,9 +5,7 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": [
-        "com.amazonaws"
-      ],
+      "matchPackagePatterns": ["^com.amazonaws"],
       "semanticCommitType": "test",
       "groupName": "test dependencies",
       "groupSlug": "test-dependencies"
