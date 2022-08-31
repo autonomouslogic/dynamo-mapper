@@ -1,5 +1,20 @@
 Dynamo Mapper Changelog
 
+## [1.2.14](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.13...1.2.14) (2022-08-31)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#59](https://github.com/autonomouslogic/dynamo-mapper/issues/59)) ([52ff931](https://github.com/autonomouslogic/dynamo-mapper/commit/52ff931d71a9263293c1a9537695a027e0d07453))
+
+
+### Continuous Integration
+
+* Another attempt at separated dependencies ([b0b90e8](https://github.com/autonomouslogic/dynamo-mapper/commit/b0b90e847a08f260a0c4ebe1bd33ee469869efcb))
+* disabled auto-releases on dependency updates ([8277fb0](https://github.com/autonomouslogic/dynamo-mapper/commit/8277fb017b520c2fa1054212ffb996b1bdf0353e))
+* Switched AWS match to pattern. [skip ci] ([a33d6bf](https://github.com/autonomouslogic/dynamo-mapper/commit/a33d6bf3675b145eb6ac52021e42a8b1b9280e47))
+* v1 AWS SDK as test dependency [skip ci] ([73d0ff7](https://github.com/autonomouslogic/dynamo-mapper/commit/73d0ff7500683f4db0c528890e05f227665eea52))
+
 ## [1.2.13](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.12...1.2.13) (2022-08-23)
 
 
