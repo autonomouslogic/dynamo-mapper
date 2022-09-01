@@ -5,10 +5,10 @@
   ],
   "packageRules": [
     {
-      "matchPackagePatterns": ["^com.amazonaws"],
-      "semanticCommitType": "test",
-      "groupName": "test dependencies",
-      "groupSlug": "test-dependencies"
+      "matchPackageNames": ["software.amazon.awssdk:dynamodb"],
+      "semanticCommitType": "fix",
+      "groupName": "DynamoDB",
+      "groupSlug": "dynamodb-dependency"
     }
   ]
 }
