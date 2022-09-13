@@ -1,5 +1,12 @@
 Dynamo Mapper Changelog
 
+## [1.2.18](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.17...1.2.18) (2022-09-13)
+
+
+### Bug Fixes
+
+* **deps:** update dependency software.amazon.awssdk:dynamodb to v2.17.272 ([#65](https://github.com/autonomouslogic/dynamo-mapper/issues/65)) ([a4b1c49](https://github.com/autonomouslogic/dynamo-mapper/commit/a4b1c49b0eef97816ec6fbc1aa43a33c3c4ad560))
+
 ## [1.2.17](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.16...1.2.17) (2022-09-07)
 
 
