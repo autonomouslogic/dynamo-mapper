@@ -2,13 +2,5 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>autonomouslogic/renovate-config"
-  ],
-  "packageRules": [
-    {
-      "matchPackageNames": ["software.amazon.awssdk:dynamodb"],
-      "semanticCommitType": "fix",
-      "groupName": "DynamoDB",
-      "groupSlug": "dynamodb-dependency"
-    }
   ]
 }
