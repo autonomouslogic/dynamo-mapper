@@ -1,5 +1,17 @@
 Dynamo Mapper Changelog
 
+## [1.2.21](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.20...1.2.21) (2022-09-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency software.amazon.awssdk:dynamodb to v2.17.279 ([#67](https://github.com/autonomouslogic/dynamo-mapper/issues/67)) ([6f680c2](https://github.com/autonomouslogic/dynamo-mapper/commit/6f680c23a4d23646a845040f76b169a1c7f9493f))
+
+
+### Continuous Integration
+
+* Removed custom package rules again. ([06ae913](https://github.com/autonomouslogic/dynamo-mapper/commit/06ae9138c5023fc90308975f933bcb0d50dd33cf))
+
 ## [1.2.20](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.19...1.2.20) (2022-09-21)
 
 
