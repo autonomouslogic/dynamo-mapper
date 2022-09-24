@@ -17,6 +17,11 @@ jobs:
           distribution: adopt
           java-version: 11
 
+      - name: Github setup
+        run: |
+          git config --global user.email "kenneth+code-bot@autonomouslogic.com"
+          git config --global user.name "${GITHUB_ACTOR} (actions)"
+
       - name: Caches
         uses: actions/cache@v3
         with:
