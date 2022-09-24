@@ -1,10 +1,7 @@
 name: Spotless
 on: [ push ]
-concurrency:
-  group: ${{ github.ref }}
-  cancel-in-progress: true
 jobs:
-  Test:
+  Formatting:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
