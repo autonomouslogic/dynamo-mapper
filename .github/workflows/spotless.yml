@@ -1,5 +1,8 @@
-name: Test
+name: Spotless
 on: [ push ]
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   Test:
     timeout-minutes: 30
@@ -24,21 +27,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Test
-        run: ./gradlew test --stacktrace
-
-      - name: Integration Test
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: ./gradlew integrationTest --stacktrace
-
-      - name: Code Coverage
-        run: ./gradlew jacocoTestReport --stacktrace
-
-      - name: Codecov Upload
-        uses: codecov/codecov-action@v3
-        with:
-          verbose: true
-          token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Spotless
+        run: |
+          echo "Run './gradlew spotlessApply' to auto-format"
+          ./gradlew spotlessCheck
