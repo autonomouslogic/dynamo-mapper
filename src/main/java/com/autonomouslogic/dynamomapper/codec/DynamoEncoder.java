@@ -1,16 +1,16 @@
 package com.autonomouslogic.dynamomapper.codec;
 
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.core.SdkBytes;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
 @RequiredArgsConstructor
 public class DynamoEncoder {
@@ -24,9 +24,9 @@ public class DynamoEncoder {
 		var json = objectMapper.valueToTree(obj);
 		if (json.isObject()) {
 			return encodeObject(json);
-		}
-		else {
-			throw new IllegalArgumentException(String.format("Can only encode objects, %s supplied", json.getNodeType()));
+		} else {
+			throw new IllegalArgumentException(
+					String.format("Can only encode objects, %s supplied", json.getNodeType()));
 		}
 	}
 
@@ -45,7 +45,9 @@ public class DynamoEncoder {
 			return AttributeValue.builder().nul(true).build();
 		}
 		if (node.isBinary()) {
-			return AttributeValue.builder().b(SdkBytes.fromByteArrayUnsafe(node.binaryValue())).build();
+			return AttributeValue.builder()
+					.b(SdkBytes.fromByteArrayUnsafe(node.binaryValue()))
+					.build();
 		}
 		if (node.isBoolean()) {
 			return AttributeValue.builder().bool(node.booleanValue()).build();

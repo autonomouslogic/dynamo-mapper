@@ -1,18 +1,17 @@
 package com.autonomouslogic.dynamomapper.codec;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.autonomouslogic.dynamomapper.model.TestObject;
 import com.autonomouslogic.dynamomapper.test.CodecTests;
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import lombok.SneakyThrows;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class DynamoDecoderTest {
 	ObjectMapper objectMapper = StdObjectMapper.objectMapper();
@@ -29,8 +28,6 @@ public class DynamoDecoderTest {
 	}
 
 	public static List<CodecTests> loadTests() {
-		return Stream.of(CodecTests.values())
-			.filter(CodecTests::decodeTest)
-			.collect(Collectors.toList());
+		return Stream.of(CodecTests.values()).filter(CodecTests::decodeTest).collect(Collectors.toList());
 	}
 }

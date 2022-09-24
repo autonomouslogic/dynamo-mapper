@@ -1,14 +1,14 @@
 plugins {
-    id "java"
-    id "groovy"
-    id "idea"
-    id "org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin" version "0.3.18"
-    id "io.freefair.lombok" version "6.5.1"
-    id "jacoco"
-    id "maven-publish"
-    id "signing"
-    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
-    id "com.diffplug.spotless" version "6.11.0"
+	id "java"
+	id "groovy"
+	id "idea"
+	id "org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin" version "0.3.18"
+	id "io.freefair.lombok" version "6.5.1"
+	id "jacoco"
+	id "maven-publish"
+	id "signing"
+	id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+	id "com.diffplug.spotless" version "6.11.0"
 }
 
 group "com.autonomouslogic.dynamomapper"
@@ -17,144 +17,144 @@ sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 dependencies {
-    implementation "software.amazon.awssdk:dynamodb:2.17.279"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.13.4"
+	implementation "software.amazon.awssdk:dynamodb:2.17.279"
+	implementation "com.fasterxml.jackson.core:jackson-databind:2.13.4"
 
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.9.1"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:5.9.1"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.9.1"
-    testImplementation "org.mockito:mockito-core:4.8.0"
+	testImplementation "org.junit.jupiter:junit-jupiter-api:5.9.1"
+	testImplementation "org.junit.jupiter:junit-jupiter-params:5.9.1"
+	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.9.1"
+	testImplementation "org.mockito:mockito-core:4.8.0"
 
-    testImplementation "commons-codec:commons-codec:1.15"
-    testImplementation "software.amazon.awssdk:sts:2.17.278"
-    testImplementation "com.amazonaws:aws-java-sdk-sts:1.12.307"
-    testImplementation "software.amazon.awssdk:dynamodb-enhanced:2.17.278"
-    testImplementation "com.amazonaws:aws-java-sdk-dynamodb:1.12.307"
-    testImplementation "org.apache.commons:commons-math3:3.6.1"
-    testImplementation "com.autonomouslogic.jacksonobjectstream:jackson-object-stream:0.2.12"
+	testImplementation "commons-codec:commons-codec:1.15"
+	testImplementation "software.amazon.awssdk:sts:2.17.278"
+	testImplementation "com.amazonaws:aws-java-sdk-sts:1.12.307"
+	testImplementation "software.amazon.awssdk:dynamodb-enhanced:2.17.278"
+	testImplementation "com.amazonaws:aws-java-sdk-dynamodb:1.12.307"
+	testImplementation "org.apache.commons:commons-math3:3.6.1"
+	testImplementation "com.autonomouslogic.jacksonobjectstream:jackson-object-stream:0.2.12"
 }
 
 task codegen(type: com.autonomouslogic.dynamomapper.codegen.Codegen) {
-    group "build"
+	group "build"
 }
 
 sourceSets {
-    integrationTest {
-        java.srcDir "src/integrationTest/java"
-        resources.srcDir "src/integrationTest/resources"
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
-    }
+	integrationTest {
+		java.srcDir "src/integrationTest/java"
+		resources.srcDir "src/integrationTest/resources"
+		compileClasspath += main.output + test.output
+		runtimeClasspath += main.output + test.output
+	}
 }
 
 configurations {
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+	integrationTestImplementation.extendsFrom testImplementation
+	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 processIntegrationTestResources {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 test {
-    useJUnitPlatform()
+	useJUnitPlatform()
 
-    testLogging {
-        events = [ "FAILED", "PASSED", "SKIPPED" ]
-        showExceptions = true
-        exceptionFormat = "FULL"
-        showExceptions = true
-        showCauses = true
-        showStackTraces = true
-    }
+	testLogging {
+		events = [ "FAILED", "PASSED", "SKIPPED" ]
+		showExceptions = true
+		exceptionFormat = "FULL"
+		showExceptions = true
+		showCauses = true
+		showStackTraces = true
+	}
 
-    dependsOn codegen
+	dependsOn codegen
 }
 
 task integrationTest(type: Test, description: "Runs the integration tests", group: "verification") {
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
+	testClassesDirs = sourceSets.integrationTest.output.classesDirs
+	classpath = sourceSets.integrationTest.runtimeClasspath
 
-    useJUnitPlatform()
+	useJUnitPlatform()
 
-    testLogging {
-        events = [ "FAILED", "PASSED", "SKIPPED" ]
-        showExceptions = true
-        exceptionFormat = "FULL"
-        showExceptions = true
-        showCauses = true
-        showStackTraces = true
-    }
+	testLogging {
+		events = [ "FAILED", "PASSED", "SKIPPED" ]
+		showExceptions = true
+		exceptionFormat = "FULL"
+		showExceptions = true
+		showCauses = true
+		showStackTraces = true
+	}
 
-    dependsOn codegen
+	dependsOn codegen
 }
 
 jacocoTestReport {
-    executionData(test, integrationTest)
-    reports {
-        xml.enabled true
-        html.enabled true
-    }
+	executionData(test, integrationTest)
+	reports {
+		xml.enabled true
+		html.enabled true
+	}
 }
 
 java {
-    withJavadocJar()
-    withSourcesJar()
+	withJavadocJar()
+	withSourcesJar()
 }
 
 publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            pom {
-                name = "Dynamo Mapper"
-                description = "An object mapper for AWS DynamoDB using Jackson."
-                url = "https://github.com/autonomouslogic/dynamo-mapper"
-                licenses {
-                    license {
-                        name = "MIT-0"
-                        url = "https://spdx.org/licenses/MIT-0.html"
-                    }
-                }
-                developers {
-                    developer {
-                        id = "kennethjor"
-                        name = "Kenneth Jørgensen"
-                        email = "kenneth@autonomouslogic.com"
-                    }
-                }
-                scm {
-                    connection = "scm:git:git://github.com:autonomouslogic/dynamo-mapper.git"
-                    developerConnection = "scm:git:ssh://github.com:autonomouslogic/sedynamo-mapper.git"
-                    url = "https://github.com/autonomouslogic/dynamo-mapper"
-                }
-            }
-            from(components.java)
-        }
-    }
+	publications {
+		mavenJava(MavenPublication) {
+			pom {
+				name = "Dynamo Mapper"
+				description = "An object mapper for AWS DynamoDB using Jackson."
+				url = "https://github.com/autonomouslogic/dynamo-mapper"
+				licenses {
+					license {
+						name = "MIT-0"
+						url = "https://spdx.org/licenses/MIT-0.html"
+					}
+				}
+				developers {
+					developer {
+						id = "kennethjor"
+						name = "Kenneth Jørgensen"
+						email = "kenneth@autonomouslogic.com"
+					}
+				}
+				scm {
+					connection = "scm:git:git://github.com:autonomouslogic/dynamo-mapper.git"
+					developerConnection = "scm:git:ssh://github.com:autonomouslogic/sedynamo-mapper.git"
+					url = "https://github.com/autonomouslogic/dynamo-mapper"
+				}
+			}
+			from(components.java)
+		}
+	}
 }
 
 signing {
-    sign publishing.publications.mavenJava
+	sign publishing.publications.mavenJava
 }
 
 nexusPublishing {
-    repositories {
-        sonatype()
-    }
+	repositories {
+		sonatype()
+	}
 }
 
 spotless {
-    java {
-        palantirJavaFormat()
-        indentWithTabs()
-        importOrder()
-    }
+	java {
+		palantirJavaFormat()
+		indentWithTabs()
+		importOrder()
+	}
 
-    groovyGradle {
-        indentWithTabs()
-    }
+	groovyGradle {
+		indentWithTabs()
+	}
 }

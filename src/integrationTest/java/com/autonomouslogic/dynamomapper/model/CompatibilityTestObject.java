@@ -1,20 +1,20 @@
 package com.autonomouslogic.dynamomapper.model;
 
+
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
 import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
 
 @DynamoTableName("integration-test-table")
 @DynamoDBTable(tableName = "integration-test-table") // v1

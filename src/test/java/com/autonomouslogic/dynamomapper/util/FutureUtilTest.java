@@ -1,16 +1,15 @@
 package com.autonomouslogic.dynamomapper.util;
 
-import com.autonomouslogic.dynamomapper.function.ThrowingFutureSupplier;
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.util.concurrent.CompletableFuture;
-
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.autonomouslogic.dynamomapper.function.ThrowingFutureSupplier;
+import java.util.concurrent.CompletableFuture;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class FutureUtilTest {
 	ThrowingFutureSupplier<CompletableFuture<String>> supplier;

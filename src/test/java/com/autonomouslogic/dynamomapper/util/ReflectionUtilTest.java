@@ -1,15 +1,14 @@
 package com.autonomouslogic.dynamomapper.util;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.autonomouslogic.dynamomapper.model.MethodTestObject;
 import com.autonomouslogic.dynamomapper.model.ModifiedMethodTestObject;
 import com.autonomouslogic.dynamomapper.model.ModifiedTestObject;
 import com.autonomouslogic.dynamomapper.model.TestObject;
+import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ReflectionUtilTest {
 	ReflectionUtil reflectionUtil = new ReflectionUtil(StdObjectMapper.objectMapper());
@@ -17,32 +16,24 @@ public class ReflectionUtilTest {
 	@Test
 	@SneakyThrows
 	void shouldResolveHashKeyField() {
-		assertEquals(
-			List.of("string"),
-			reflectionUtil.resolveHashKeyFields(TestObject.class));
+		assertEquals(List.of("string"), reflectionUtil.resolveHashKeyFields(TestObject.class));
 	}
 
 	@Test
 	@SneakyThrows
 	void shouldResolveHashKeyFieldFromModifiedJsonProperty() {
-		assertEquals(
-			List.of("hash_key"),
-			reflectionUtil.resolveHashKeyFields(ModifiedTestObject.class));
+		assertEquals(List.of("hash_key"), reflectionUtil.resolveHashKeyFields(ModifiedTestObject.class));
 	}
 
 	@Test
 	@SneakyThrows
 	void shouldResolveHashKeyMethod() {
-		assertEquals(
-			List.of("hashKey"),
-			reflectionUtil.resolveHashKeyFields(MethodTestObject.class));
+		assertEquals(List.of("hashKey"), reflectionUtil.resolveHashKeyFields(MethodTestObject.class));
 	}
 
 	@Test
 	@SneakyThrows
 	void shouldResolveHashKeyMethodFromModifiedJsonProperty() {
-		assertEquals(
-			List.of("hash_key"),
-			reflectionUtil.resolveHashKeyFields(ModifiedMethodTestObject.class));
+		assertEquals(List.of("hash_key"), reflectionUtil.resolveHashKeyFields(ModifiedMethodTestObject.class));
 	}
 }

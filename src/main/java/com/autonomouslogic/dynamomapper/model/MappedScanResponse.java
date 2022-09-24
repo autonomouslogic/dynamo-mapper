@@ -1,9 +1,9 @@
 package com.autonomouslogic.dynamomapper.model;
 
-import lombok.Value;
-import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 
 import java.util.List;
+import lombok.Value;
+import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 
 @Value
 public class MappedScanResponse<T> {

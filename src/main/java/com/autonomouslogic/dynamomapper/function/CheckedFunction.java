@@ -1,5 +1,6 @@
 package com.autonomouslogic.dynamomapper.function;
 
+
 import java.util.function.Function;
 
 public abstract class CheckedFunction<T, R> implements Function<T, R> {
@@ -7,8 +8,7 @@ public abstract class CheckedFunction<T, R> implements Function<T, R> {
 	public final R apply(T t) {
 		try {
 			return checkedApply(t);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

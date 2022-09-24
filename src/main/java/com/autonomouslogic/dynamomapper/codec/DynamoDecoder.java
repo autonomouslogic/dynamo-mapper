@@ -1,5 +1,6 @@
 package com.autonomouslogic.dynamomapper.codec;
 
+
 import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
@@ -13,6 +14,10 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.SdkBytes;
@@ -24,47 +29,49 @@ import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
 @RequiredArgsConstructor
 public class DynamoDecoder {
 	@NonNull
 	private final ObjectMapper objectMapper;
 
-	public <T> MappedGetItemResponse<T> mapGetItemResponse(GetItemResponse response, Class<T> clazz) throws JsonProcessingException {
+	public <T> MappedGetItemResponse<T> mapGetItemResponse(GetItemResponse response, Class<T> clazz)
+			throws JsonProcessingException {
 		var item = response.hasItem() ? decode(response.item(), clazz) : null;
 		return new MappedGetItemResponse<>(response, item);
 	}
 
-	public <T> MappedPutItemResponse<T> mapPutItemResponse(PutItemResponse response, Class<T> clazz) throws JsonProcessingException {
+	public <T> MappedPutItemResponse<T> mapPutItemResponse(PutItemResponse response, Class<T> clazz)
+			throws JsonProcessingException {
 		var item = response.hasAttributes() ? decode(response.attributes(), clazz) : null;
 		return new MappedPutItemResponse<>(response, item);
 	}
 
-	public <T> MappedUpdateItemResponse<T> mapUpdateItemResponse(UpdateItemResponse response, Class<T> clazz) throws JsonProcessingException {
+	public <T> MappedUpdateItemResponse<T> mapUpdateItemResponse(UpdateItemResponse response, Class<T> clazz)
+			throws JsonProcessingException {
 		var item = response.hasAttributes() ? decode(response.attributes(), clazz) : null;
 		return new MappedUpdateItemResponse<>(response, item);
 	}
 
-	public <T> MappedDeleteItemResponse<T> mapDeleteItemResponse(DeleteItemResponse response, Class<T> clazz) throws JsonProcessingException {
+	public <T> MappedDeleteItemResponse<T> mapDeleteItemResponse(DeleteItemResponse response, Class<T> clazz)
+			throws JsonProcessingException {
 		var item = response.hasAttributes() ? decode(response.attributes(), clazz) : null;
 		return new MappedDeleteItemResponse<>(response, item);
 	}
 
-	public <T> MappedScanResponse<T> mapScanResponse(ScanResponse response, Class<T> clazz) throws JsonProcessingException {
+	public <T> MappedScanResponse<T> mapScanResponse(ScanResponse response, Class<T> clazz)
+			throws JsonProcessingException {
 		var decoded = decodeItems(response.items(), clazz);
 		return new MappedScanResponse<>(response, decoded);
 	}
 
-	public <T> MappedQueryResponse<T> mapQueryResponse(QueryResponse response, Class<T> clazz) throws JsonProcessingException {
+	public <T> MappedQueryResponse<T> mapQueryResponse(QueryResponse response, Class<T> clazz)
+			throws JsonProcessingException {
 		var decoded = decodeItems(response.items(), clazz);
 		return new MappedQueryResponse<>(response, decoded);
 	}
 
-	private <T> List<T> decodeItems(List<Map<String, AttributeValue>> items, Class<T> clazz) throws JsonProcessingException {
+	private <T> List<T> decodeItems(List<Map<String, AttributeValue>> items, Class<T> clazz)
+			throws JsonProcessingException {
 		if (items == null) {
 			return null;
 		}

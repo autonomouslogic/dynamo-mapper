@@ -1,5 +1,6 @@
 package com.autonomouslogic.dynamomapper.test;
 
+
 import java.nio.charset.StandardCharsets;
 
 public class Util {
