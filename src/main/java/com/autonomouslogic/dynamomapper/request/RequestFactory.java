@@ -168,13 +168,4 @@ public class RequestFactory {
 	public QueryRequest.Builder acceptQueryRequest(@NonNull QueryRequest.Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
-
-	public void testMethod(String q, String w, String e, String r, String t, String y, String u, String i, String o, String p, String a, String s, String d, String f, String g, String h, String j, String k, String l, String z, String x, String c, String v, String b, String n, String m) {
-		if (q == null) {
-			return;
-		}
-		else {
-			return;
-		}
-	}
 }
