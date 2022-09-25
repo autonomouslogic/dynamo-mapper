@@ -34,6 +34,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: ./gradlew integrationTest --stacktrace
 
+      - name: Code change check
+        run: |
+          ./gradlew spotlessApply
+          if [[ `git status --porcelain` ]]; then echo "Changed code detected"; git diff; exit 1; fi
+
       - name: Code Coverage
         run: ./gradlew jacocoTestReport --stacktrace
 
