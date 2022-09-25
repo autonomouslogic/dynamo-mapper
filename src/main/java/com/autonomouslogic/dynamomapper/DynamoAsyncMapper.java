@@ -1,7 +1,6 @@
 // This is a generated file, do not edit manually.
 package com.autonomouslogic.dynamomapper;
 
-
 import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.function.CheckedFunction;

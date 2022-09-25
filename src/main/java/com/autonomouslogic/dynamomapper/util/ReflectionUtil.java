@@ -1,6 +1,5 @@
 package com.autonomouslogic.dynamomapper.util;
 
-
 import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
 import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
 import com.fasterxml.jackson.databind.JsonMappingException;

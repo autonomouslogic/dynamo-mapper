@@ -1,6 +1,5 @@
 package com.autonomouslogic.dynamomapper.util;
 
-
 import com.autonomouslogic.dynamomapper.function.ThrowingFutureSupplier;
 import java.util.concurrent.CompletableFuture;
 

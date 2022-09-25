@@ -1,6 +1,5 @@
 package com.autonomouslogic.dynamomapper.request;
 
-
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,6 +1,5 @@
 package com.autonomouslogic.dynamomapper;
 
-
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;

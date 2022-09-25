@@ -1,6 +1,5 @@
 package com.autonomouslogic.dynamomapper.model;
 
-
 import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
 import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
 import com.fasterxml.jackson.annotation.JsonInclude;

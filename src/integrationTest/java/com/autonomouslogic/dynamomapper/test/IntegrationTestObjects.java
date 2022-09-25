@@ -1,6 +1,5 @@
 package com.autonomouslogic.dynamomapper.test;
 
-
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
 
 public class IntegrationTestObjects {

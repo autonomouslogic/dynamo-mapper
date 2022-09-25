@@ -151,7 +151,6 @@ spotless {
 	java {
 		palantirJavaFormat()
 		indentWithTabs()
-		importOrder()
 	}
 
 	groovyGradle {

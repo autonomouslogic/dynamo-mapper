@@ -1,6 +1,5 @@
 package com.autonomouslogic.dynamomapper.function;
 
-
 import java.util.function.Consumer;
 
 public class NoopConsumer<T> implements Consumer<T> {

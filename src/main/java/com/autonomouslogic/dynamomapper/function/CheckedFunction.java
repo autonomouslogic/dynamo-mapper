@@ -1,6 +1,5 @@
 package com.autonomouslogic.dynamomapper.function;
 
-
 import java.util.function.Function;
 
 public abstract class CheckedFunction<T, R> implements Function<T, R> {
