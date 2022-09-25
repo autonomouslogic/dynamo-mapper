@@ -12,5 +12,4 @@ import java.lang.annotation.Target;
 @Documented
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DynamoHashKey {
-}
+public @interface DynamoHashKey {}

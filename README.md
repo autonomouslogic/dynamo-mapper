@@ -137,6 +137,10 @@ For instance, it's not possible to have a different schema in the DynamoDB and J
 ## Versioning
 Dynamo Mapper follows [semantic versioning](https://semver.org/).
 
+## Code Style
+Dynamo Mapper follows Palantir with tabs.
+Automatic code formatting can be done by running `./gradlew spotlessApply`.
+
 ## License
 Dynamo Mapper is licensed under the [MIT-0 license](https://spdx.org/licenses/MIT-0.html).
 

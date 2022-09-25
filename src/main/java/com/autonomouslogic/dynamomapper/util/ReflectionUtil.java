@@ -5,13 +5,12 @@ import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
-import lombok.RequiredArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ReflectionUtil {
@@ -41,8 +40,7 @@ public class ReflectionUtil {
 			var properties = new ArrayList<PropertyWriter>();
 			serializer.properties().forEachRemaining(properties::add);
 			return properties;
-		}
-		catch (JsonMappingException e) {
+		} catch (JsonMappingException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -51,7 +49,8 @@ public class ReflectionUtil {
 		return tableNameCache.computeIfAbsent(clazz, ignore -> {
 			var tableName = clazz.getAnnotation(DynamoTableName.class);
 			if (tableName == null) {
-				throw new IllegalArgumentException(String.format("Class %s is not annotated with @DynamoTableName", clazz.getSimpleName()));
+				throw new IllegalArgumentException(
+						String.format("Class %s is not annotated with @DynamoTableName", clazz.getSimpleName()));
 			}
 			return tableName.value();
 		});

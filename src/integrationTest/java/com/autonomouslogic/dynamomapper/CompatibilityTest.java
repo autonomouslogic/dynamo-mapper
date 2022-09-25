@@ -1,11 +1,15 @@
 package com.autonomouslogic.dynamomapper;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.autonomouslogic.dynamomapper.model.CompatibilityTestObject;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
@@ -14,11 +18,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests compatibility between Dynamo Mapper and the v1 and v2 SDKs.
@@ -32,13 +31,12 @@ public class CompatibilityTest {
 
 	@BeforeAll
 	public static void setup() {
-		dynamoMapper = DynamoMapper.builder()
-			.client(IntegrationTestUtil.client())
-			.build();
+		dynamoMapper =
+				DynamoMapper.builder().client(IntegrationTestUtil.client()).build();
 		v1Client = new DynamoDBMapper(IntegrationTestUtil.clientV1());
 		v2Client = DynamoDbEnhancedClient.builder()
-			.dynamoDbClient(IntegrationTestUtil.client())
-			.build();
+				.dynamoDbClient(IntegrationTestUtil.client())
+				.build();
 		v2Schema = TableSchema.fromBean(CompatibilityTestObject.class);
 		v2Table = v2Client.table("integration-test-table", v2Schema);
 	}
@@ -49,7 +47,11 @@ public class CompatibilityTest {
 	void shouldReadFromV1(CompatibilityTestObject obj) {
 		System.out.println(obj);
 		v1Client.save(obj);
-		assertEquals(obj, dynamoMapper.getItem(obj.getPartitionKey(), CompatibilityTestObject.class).item());
+		assertEquals(
+				obj,
+				dynamoMapper
+						.getItem(obj.getPartitionKey(), CompatibilityTestObject.class)
+						.item());
 	}
 
 	@ParameterizedTest
@@ -68,7 +70,11 @@ public class CompatibilityTest {
 	void shouldReadFromV2(CompatibilityTestObject obj) {
 		System.out.println(obj);
 		v2Table.putItem(obj);
-		assertEquals(obj, dynamoMapper.getItem(obj.getPartitionKey(), CompatibilityTestObject.class).item());
+		assertEquals(
+				obj,
+				dynamoMapper
+						.getItem(obj.getPartitionKey(), CompatibilityTestObject.class)
+						.item());
 	}
 
 	@ParameterizedTest

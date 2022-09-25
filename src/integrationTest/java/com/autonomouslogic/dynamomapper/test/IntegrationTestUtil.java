@@ -9,6 +9,11 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
 import com.autonomouslogic.jacksonobjectstream.JacksonObjectStreamFactory;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.SneakyThrows;
 import org.apache.commons.math3.random.ISAACRandom;
 import org.apache.commons.math3.random.RandomGenerator;
@@ -18,12 +23,6 @@ import software.amazon.awssdk.regions.providers.AwsRegionProvider;
 import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class IntegrationTestUtil {
 	public static final RandomGenerator RNG = new ISAACRandom();
@@ -38,40 +37,38 @@ public class IntegrationTestUtil {
 
 	public static DynamoDbClient client() {
 		return DynamoDbClient.builder()
-			.credentialsProvider(credentialsProvider())
-			.region(regionProvider().getRegion())
-			.build();
+				.credentialsProvider(credentialsProvider())
+				.region(regionProvider().getRegion())
+				.build();
 	}
 
 	public static AmazonDynamoDB clientV1() {
 		return AmazonDynamoDBClient.builder()
-			.withCredentials(credentialsProviderV1())
-			.withRegion(regionProvider().getRegion().id())
-			.build();
+				.withCredentials(credentialsProviderV1())
+				.withRegion(regionProvider().getRegion().id())
+				.build();
 	}
 
 	public static DynamoDbAsyncClient asyncClient() {
 		return DynamoDbAsyncClient.builder()
-			.credentialsProvider(credentialsProvider())
-			.region(regionProvider().getRegion())
-			.build();
+				.credentialsProvider(credentialsProvider())
+				.region(regionProvider().getRegion())
+				.build();
 	}
 
 	public static AwsCredentialsProvider credentialsProvider() {
-		return DefaultCredentialsProvider.builder()
-			.profileName(profileName())
-			.build();
+		return DefaultCredentialsProvider.builder().profileName(profileName()).build();
 	}
 
 	public static AWSCredentialsProvider credentialsProviderV1() {
-		return new AWSCredentialsProviderChain(new EnvironmentVariableCredentialsProvider(),
-			new ProfileCredentialsProvider(profileName()));
+		return new AWSCredentialsProviderChain(
+				new EnvironmentVariableCredentialsProvider(), new ProfileCredentialsProvider(profileName()));
 	}
 
 	public static AwsRegionProvider regionProvider() {
 		return DefaultAwsRegionProviderChain.builder()
-			.profileName(profileName())
-			.build();
+				.profileName(profileName())
+				.build();
 	}
 
 	public static String profileName() {
