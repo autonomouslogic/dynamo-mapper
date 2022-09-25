@@ -67,6 +67,16 @@ public class DynamoMapper {
 		return decoder.mapGetItemResponse(client.getItem(reqOrConsumer), clazz);
 	}
 
+	public <T> MappedGetItemResponse<T> getItem(
+			@NonNull Object hashKey, @NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz)
+			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
+					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
+					JsonProcessingException, IOException {
+		var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+		consumer.accept(builder);
+		return getItem(builder.build(), clazz);
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> MappedGetItemResponse<T> getItem(
 			@NonNull T keyObject, @NonNull Consumer<GetItemRequest.Builder> consumer)
