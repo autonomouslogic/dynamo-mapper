@@ -130,7 +130,7 @@ public class RequestFactory {
 	}
 
 	public UpdateItemRequest.Builder acceptUpdateItemRequest(
-			@NonNull UpdateItemRequest.Builder req, @NonNull Class<?> clazz) {
+			UpdateItemRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
 
@@ -142,7 +142,7 @@ public class RequestFactory {
 	}
 
 	public DeleteItemRequest.Builder acceptDeleteItemRequest(
-			@NonNull DeleteItemRequest.Builder req, @NonNull Class<?> clazz) {
+			DeleteItemRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
 
