@@ -1,5 +1,22 @@
 Dynamo Mapper Changelog
 
+## [1.2.22](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.21...1.2.22) (2022-10-03)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#71](https://github.com/autonomouslogic/dynamo-mapper/issues/71)) ([acd597a](https://github.com/autonomouslogic/dynamo-mapper/commit/acd597af32bde2f2208fe13e3124e18e31145a89))
+
+
+### Styles
+
+* Spotless formatting ([#69](https://github.com/autonomouslogic/dynamo-mapper/issues/69)) ([074c86f](https://github.com/autonomouslogic/dynamo-mapper/commit/074c86f68683aca41959105aa55f915995424545))
+
+
+### Continuous Integration
+
+* Abort build of code changes ([#70](https://github.com/autonomouslogic/dynamo-mapper/issues/70)) ([f521a79](https://github.com/autonomouslogic/dynamo-mapper/commit/f521a791c630f9622c3a18a86b21747833993942))
+
 ## [1.2.21](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.20...1.2.21) (2022-09-23)
 
 
