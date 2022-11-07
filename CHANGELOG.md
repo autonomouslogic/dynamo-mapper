@@ -1,5 +1,17 @@
 Dynamo Mapper Changelog
 
+## [1.2.23](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.22...1.2.23) (2022-11-07)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#73](https://github.com/autonomouslogic/dynamo-mapper/issues/73)) ([ab193cc](https://github.com/autonomouslogic/dynamo-mapper/commit/ab193cca454e0870d4ec300fd5053b757eb77458))
+
+
+### Miscellaneous Chores
+
+* **deps:** update amannn/action-semantic-pull-request action to v5 ([#72](https://github.com/autonomouslogic/dynamo-mapper/issues/72)) ([57bd541](https://github.com/autonomouslogic/dynamo-mapper/commit/57bd541ec885b3e384c7553dcebdebffa1ba5ffa))
+
 ## [1.2.22](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.21...1.2.22) (2022-10-03)
 
 
