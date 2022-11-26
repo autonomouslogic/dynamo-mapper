@@ -4,6 +4,7 @@ package com.autonomouslogic.dynamomapper;
 import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.function.CheckedFunction;
+import com.autonomouslogic.dynamomapper.model.MappedBatchGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
@@ -14,10 +15,13 @@ import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.autonomouslogic.dynamomapper.util.FutureUtil;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import lombok.NonNull;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
@@ -108,6 +112,52 @@ public class DynamoAsyncMapper {
 		return FutureUtil.wrapFuture(() -> {
 			var builder = requestFactory.getRequestFromKeyObject(keyObject);
 			return getItem(builder.build(), (Class<T>) keyObject.getClass());
+		});
+	}
+
+	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItem(
+			@NonNull BatchGetItemRequest request, @NonNull Class<T> clazz) {
+		var reqOrConsumer = requestFactory.acceptBatchGetItemRequest(request, clazz);
+		return client.batchGetItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
+			@Override
+			public MappedBatchGetItemResponse<T> checkedApply(BatchGetItemResponse response) throws Exception {
+				return decoder.mapBatchGetItemResponse(response, clazz);
+			}
+		});
+	}
+
+	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItem(
+			@NonNull List<?> hashKey, @NonNull Class<T> clazz) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.getBatchGetItemRequestFromHashKeys(hashKey, clazz);
+			return batchGetItem(builder.build(), clazz);
+		});
+	}
+
+	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItem(
+			@NonNull Consumer<BatchGetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
+		Consumer<BatchGetItemRequest.Builder> reqOrConsumer = (builder) -> {
+			{
+				requestFactory.acceptBatchGetItemRequest(builder, clazz);
+				consumer.accept(builder);
+			}
+		};
+		return client.batchGetItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
+			@Override
+			public MappedBatchGetItemResponse<T> checkedApply(BatchGetItemResponse response) throws Exception {
+				return decoder.mapBatchGetItemResponse(response, clazz);
+			}
+		});
+	}
+
+	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItem(
+			@NonNull List<?> hashKey,
+			@NonNull Consumer<BatchGetItemRequest.Builder> consumer,
+			@NonNull Class<T> clazz) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.getBatchGetItemRequestFromHashKeys(hashKey, clazz);
+			consumer.accept(builder);
+			return batchGetItem(builder.build(), clazz);
 		});
 	}
 

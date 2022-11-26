@@ -8,10 +8,14 @@ import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
+import com.squareup.javapoet.TypeVariableName;
 import lombok.RequiredArgsConstructor;
 import org.gradle.api.logging.Logger;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
@@ -36,6 +40,7 @@ import java.util.stream.Stream;
 
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.CLASS_T;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.field;
+import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedBatchGetItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedDeleteItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedGetItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.TypeHelper.mappedPutItemResponse;
@@ -62,6 +67,7 @@ public class MapperGenerator {
 		generateFields();
 		generateConstructor();
 		generateGetWrappers();
+		generateBatchGetWrappers();
 		generatePutWrappers();
 		generateUpdateWrappers();
 		generateDeleteWrappers();
@@ -114,8 +120,17 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "getItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedGetItemResponse, "mapGetItemResponse", GetItemRequest.class, GetItemResponse.class);
-			generateHashKeyWrapper(delegate, "getRequestFromHashKey");
+			generateHashKeyWrapper(delegate, "getRequestFromHashKey", false);
 			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
+		}
+	}
+
+	protected void generateBatchGetWrappers() {
+		for (Method method : overridableMethods(clientClass(), "batchGetItem")) {
+			var delegate = generateDelegateWrapper(
+				method, mappedBatchGetItemResponse, "mapBatchGetItemResponse", BatchGetItemRequest.class, BatchGetItemResponse.class);
+			generateHashKeyWrapper(delegate, "getBatchGetItemRequestFromHashKeys", true);
+//			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
 		}
 	}
 
@@ -139,7 +154,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "deleteItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedDeleteItemResponse, "mapDeleteItemResponse", DeleteItemRequest.class, DeleteItemResponse.class);
-			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey");
+			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey", false);
 			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject");
 		}
 	}
@@ -212,7 +227,7 @@ public class MapperGenerator {
 			.endControlFlow("}");
 	}
 
-	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName) {
+	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple) {
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.name)
 			.addModifiers(Modifier.PUBLIC)
@@ -221,7 +236,13 @@ public class MapperGenerator {
 		wrapper.addExceptions(method.exceptions);
 		wrapper.addException(IOException.class);
 		// Add parameters.
-		wrapper.addParameter(Object.class, "hashKey");
+		if (!multiple) {
+			wrapper.addParameter(Object.class, "hashKey");
+		}
+		else {
+			var type = TypeHelper.genericWildcard(ClassName.get(List.class));
+			wrapper.addParameter(type, "hashKey");
+		}
 		var params = new ArrayList<>(method.parameters);
 		params.removeIf(p -> p.name.equals(REQUEST));
 		wrapper.addParameters(params);

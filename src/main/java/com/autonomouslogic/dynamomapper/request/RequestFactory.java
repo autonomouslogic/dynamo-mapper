@@ -4,15 +4,19 @@ import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.KeysAndAttributes;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
@@ -29,6 +33,18 @@ public class RequestFactory {
 		return GetItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(clazz))
 				.key(createKeyValue(hashKey, clazz));
+	}
+
+	public <T> BatchGetItemRequest.Builder getBatchGetItemRequestFromHashKeys(
+			@NonNull List<?> hashKeys, @NonNull Class<T> clazz) throws IOException {
+		var tableName = reflectionUtil.resolveTableName(clazz);
+		var keyObjects = new ArrayList<Map<String, AttributeValue>>(hashKeys.size());
+		for (Object hashKey : hashKeys) {
+			keyObjects.add(createKeyValue(hashKey, clazz));
+		}
+		return BatchGetItemRequest.builder()
+				.requestItems(Map.of(
+						tableName, KeysAndAttributes.builder().keys(keyObjects).build()));
 	}
 
 	public <T> GetItemRequest.Builder getRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
@@ -109,6 +125,21 @@ public class RequestFactory {
 
 	public GetItemRequest.Builder acceptGetItemRequest(@NonNull GetItemRequest.Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
+	}
+
+	public BatchGetItemRequest acceptBatchGetItemRequest(@NonNull BatchGetItemRequest req, @NonNull Class<?> clazz) {
+		var items = req.requestItems();
+		var types = items.size();
+		if (types != 1) {
+			throw new IllegalArgumentException(
+					String.format("Exactly one class type expected, %s given: %s", types, items.keySet()));
+		}
+		return req;
+	}
+
+	public BatchGetItemRequest.Builder acceptBatchGetItemRequest(
+			@NonNull BatchGetItemRequest.Builder req, @NonNull Class<?> clazz) {
+		return req;
 	}
 
 	public PutItemRequest acceptPutItemRequest(@NonNull PutItemRequest req, @NonNull Class<?> clazz) {

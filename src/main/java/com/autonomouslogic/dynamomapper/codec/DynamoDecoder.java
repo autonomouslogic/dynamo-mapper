@@ -1,5 +1,6 @@
 package com.autonomouslogic.dynamomapper.codec;
 
+import com.autonomouslogic.dynamomapper.model.MappedBatchGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -21,6 +23,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
@@ -37,6 +40,25 @@ public class DynamoDecoder {
 			throws JsonProcessingException {
 		var item = response.hasItem() ? decode(response.item(), clazz) : null;
 		return new MappedGetItemResponse<>(response, item);
+	}
+
+	public <T> MappedBatchGetItemResponse<T> mapBatchGetItemResponse(BatchGetItemResponse response, Class<T> clazz)
+			throws JsonProcessingException {
+		Map<String, List<T>> decodedResponses = null;
+		if (response.hasResponses()) {
+			decodedResponses = new LinkedHashMap<>();
+			var responses = response.responses();
+			var tables = responses.keySet();
+			for (var table : tables) {
+				var values = responses.get(table);
+				List<T> items = new ArrayList<>(values.size());
+				decodedResponses.put(table, items);
+				for (var value : values) {
+					items.add(decode(value, clazz));
+				}
+			}
+		}
+		return new MappedBatchGetItemResponse<>(response, decodedResponses);
 	}
 
 	public <T> MappedPutItemResponse<T> mapPutItemResponse(PutItemResponse response, Class<T> clazz)

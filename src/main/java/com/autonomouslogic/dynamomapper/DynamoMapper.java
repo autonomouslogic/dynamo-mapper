@@ -3,6 +3,7 @@ package com.autonomouslogic.dynamomapper;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
+import com.autonomouslogic.dynamomapper.model.MappedBatchGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
@@ -14,11 +15,13 @@ import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.List;
 import java.util.function.Consumer;
 import lombok.NonNull;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.ConditionalCheckFailedException;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
@@ -111,6 +114,46 @@ public class DynamoMapper {
 					JsonProcessingException, IOException {
 		var builder = requestFactory.getRequestFromKeyObject(keyObject);
 		return getItem(builder.build(), (Class<T>) keyObject.getClass());
+	}
+
+	public <T> MappedBatchGetItemResponse<T> batchGetItem(@NonNull BatchGetItemRequest request, @NonNull Class<T> clazz)
+			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
+					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
+					JsonProcessingException {
+		var reqOrConsumer = requestFactory.acceptBatchGetItemRequest(request, clazz);
+		return decoder.mapBatchGetItemResponse(client.batchGetItem(reqOrConsumer), clazz);
+	}
+
+	public <T> MappedBatchGetItemResponse<T> batchGetItem(@NonNull List<?> hashKey, @NonNull Class<T> clazz)
+			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
+					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
+					JsonProcessingException, IOException {
+		var builder = requestFactory.getBatchGetItemRequestFromHashKeys(hashKey, clazz);
+		return batchGetItem(builder.build(), clazz);
+	}
+
+	public <T> MappedBatchGetItemResponse<T> batchGetItem(
+			@NonNull Consumer<BatchGetItemRequest.Builder> consumer, @NonNull Class<T> clazz)
+			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
+					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
+					JsonProcessingException {
+		Consumer<BatchGetItemRequest.Builder> reqOrConsumer = (builder) -> {
+			{
+				requestFactory.acceptBatchGetItemRequest(builder, clazz);
+				consumer.accept(builder);
+			}
+		};
+		return decoder.mapBatchGetItemResponse(client.batchGetItem(reqOrConsumer), clazz);
+	}
+
+	public <T> MappedBatchGetItemResponse<T> batchGetItem(
+			@NonNull List<?> hashKey, @NonNull Consumer<BatchGetItemRequest.Builder> consumer, @NonNull Class<T> clazz)
+			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
+					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
+					JsonProcessingException, IOException {
+		var builder = requestFactory.getBatchGetItemRequestFromHashKeys(hashKey, clazz);
+		consumer.accept(builder);
+		return batchGetItem(builder.build(), clazz);
 	}
 
 	public <T> MappedPutItemResponse<T> putItem(

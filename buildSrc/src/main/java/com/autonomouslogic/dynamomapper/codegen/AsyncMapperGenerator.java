@@ -81,7 +81,7 @@ public class AsyncMapperGenerator extends MapperGenerator {
 	}
 
 	@Override
-	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName) {
+	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple) {
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.name)
 			.addModifiers(Modifier.PUBLIC)
@@ -89,7 +89,13 @@ public class AsyncMapperGenerator extends MapperGenerator {
 		wrapper.returns(method.returnType);
 		wrapper.addExceptions(method.exceptions);
 		// Add parameters.
-		wrapper.addParameter(Object.class, "hashKey");
+		if (!multiple) {
+			wrapper.addParameter(Object.class, "hashKey");
+		}
+		else {
+			var type = TypeHelper.genericWildcard(ClassName.get(List.class));
+			wrapper.addParameter(type, "hashKey");
+		}
 		var params = new ArrayList<>(method.parameters);
 		params.removeIf(p -> p.name.equals(REQUEST));
 		wrapper.addParameters(params);
