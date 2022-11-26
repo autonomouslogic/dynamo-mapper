@@ -6,7 +6,11 @@ import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
@@ -76,6 +80,34 @@ public class DynamoAsyncMapperIntegrationTest {
 				.filter(o -> o.str().equals(shared))
 				.collect(Collectors.toList());
 		assertEquals(n, filtered.size());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItems() {
+		String shared = Long.toString(IntegrationTestUtil.RNG.nextLong());
+		int n = 10;
+		var keys = new ArrayList<String>(n);
+		for (int i = 0; i < n; i++) {
+			var obj = IntegrationTestObjects.setKeyAndTtl(
+					IntegrationTestObject.builder().str(shared).build());
+			dynamoAsyncMapper.putItem(obj).join();
+			keys.add(obj.partitionKey());
+		}
+		var batchGetResult = dynamoAsyncMapper
+				.batchGetItem(
+						keys,
+						req -> {
+							var table = req.build().requestItems().keySet();
+							assertEquals(Set.of("integration-test-table"), table);
+						},
+						IntegrationTestObject.class)
+				.join();
+		var fetchedKeys = batchGetResult.items().values().stream()
+				.flatMap(Collection::stream)
+				.map(item -> item.partitionKey())
+				.collect(Collectors.toList());
+		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
 	}
 
 	@Test

@@ -9,6 +9,7 @@ import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -98,7 +99,7 @@ public class DynamoMapperIntegrationTest {
 				.flatMap(Collection::stream)
 				.map(item -> item.partitionKey())
 				.collect(Collectors.toList());
-		assertEquals(keys, fetchedKeys);
+		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
 	}
 
 	@Test
