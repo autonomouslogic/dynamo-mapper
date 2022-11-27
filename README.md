@@ -5,7 +5,8 @@
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/autonomouslogic/dynamo-mapper/Test/main)](https://github.com/autonomouslogic/dynamo-mapper/actions)
 [![GitHub](https://img.shields.io/github/license/autonomouslogic/dynamo-mapper)](https://spdx.org/licenses/MIT-0.html)
 
-A simple mapper for converting to and from DynamoDB AttributeValues and POJOs using Jackson.
+A simple mapper for converting to and from DynamoDB [AttributeValues](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html)
+and POJOs using [Jackson](https://github.com/FasterXML/jackson).
 
 ## In development
 Dynamo Mapper is still in development.
@@ -113,11 +114,11 @@ This idea for this library was originally created to provide the same mapping as
 before the enhanced client was released.
 The v2 SDK now provides this mapping functionality officially, but has a few short-comings.
 For instance, the annotations must be added to methods and not properties.
-This makes Lombok models useless.
-Additionally, Jackson is a widely used and mature library.
-It has a lot of advanced features that I feel will never be implemented in the enhanced client.
+This makes [Lombok](https://projectlombok.org/) models useless.
+Jackson is a widely used and mature library. with advanced features that will never, and shouldn't, be implemented in
+the enhanced client.
 
-However, there are some cons to doing it this way.
+There are some cons to doing it this way.
 For instance, it's not possible to have a different schema in the DynamoDB and JSON versions of an object.
 
 | Feature           | Dynamo Mapper | DynamoDBMapper (v1) | DynamoDb Enhanced Client (v2) |
