@@ -48,9 +48,9 @@ public class DynamoDecoder {
 		if (response.hasResponses()) {
 			decodedResponses = new LinkedHashMap<>();
 			var responses = response.responses();
-			var tables = responses.keySet();
-			for (var table : tables) {
-				var values = responses.get(table);
+			for (var entry : responses.entrySet()) {
+				var table = entry.getKey();
+				var values = entry.getValue();
 				List<T> items = new ArrayList<>(values.size());
 				decodedResponses.put(table, items);
 				for (var value : values) {

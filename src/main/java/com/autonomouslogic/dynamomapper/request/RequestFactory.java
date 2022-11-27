@@ -123,7 +123,7 @@ public class RequestFactory {
 		return req;
 	}
 
-	public GetItemRequest.Builder acceptGetItemRequest(@NonNull GetItemRequest.Builder req, @NonNull Class<?> clazz) {
+	public GetItemRequest.Builder acceptGetItemRequest(GetItemRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
 
@@ -138,7 +138,7 @@ public class RequestFactory {
 	}
 
 	public BatchGetItemRequest.Builder acceptBatchGetItemRequest(
-			@NonNull BatchGetItemRequest.Builder req, @NonNull Class<?> clazz) {
+			BatchGetItemRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
 		return req;
 	}
 
@@ -149,7 +149,7 @@ public class RequestFactory {
 		return req;
 	}
 
-	public PutItemRequest.Builder acceptPutItemRequest(@NonNull PutItemRequest.Builder req, @NonNull Class<?> clazz) {
+	public PutItemRequest.Builder acceptPutItemRequest(PutItemRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
 
@@ -184,7 +184,7 @@ public class RequestFactory {
 		return req;
 	}
 
-	public ScanRequest.Builder acceptScanRequest(@NonNull ScanRequest.Builder req, @NonNull Class<?> clazz) {
+	public ScanRequest.Builder acceptScanRequest(ScanRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
 
@@ -195,7 +195,7 @@ public class RequestFactory {
 		return req;
 	}
 
-	public QueryRequest.Builder acceptQueryRequest(@NonNull QueryRequest.Builder req, @NonNull Class<?> clazz) {
+	public QueryRequest.Builder acceptQueryRequest(QueryRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
 }
