@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import lombok.NonNull;
+import org.reactivestreams.Publisher;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
@@ -64,7 +65,7 @@ public class DynamoAsyncMapper {
 		};
 		return client.getItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
+			public MappedGetItemResponse checkedApply(GetItemResponse response) throws Exception {
 				return decoder.mapGetItemResponse(response, clazz);
 			}
 		});
@@ -94,7 +95,7 @@ public class DynamoAsyncMapper {
 		var reqOrConsumer = requestFactory.acceptGetItemRequest(request, clazz);
 		return client.getItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedGetItemResponse<T> checkedApply(GetItemResponse response) throws Exception {
+			public MappedGetItemResponse checkedApply(GetItemResponse response) throws Exception {
 				return decoder.mapGetItemResponse(response, clazz);
 			}
 		});
@@ -120,7 +121,7 @@ public class DynamoAsyncMapper {
 		var reqOrConsumer = requestFactory.acceptBatchGetItemRequest(request, clazz);
 		return client.batchGetItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedBatchGetItemResponse<T> checkedApply(BatchGetItemResponse response) throws Exception {
+			public MappedBatchGetItemResponse checkedApply(BatchGetItemResponse response) throws Exception {
 				return decoder.mapBatchGetItemResponse(response, clazz);
 			}
 		});
@@ -144,7 +145,7 @@ public class DynamoAsyncMapper {
 		};
 		return client.batchGetItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedBatchGetItemResponse<T> checkedApply(BatchGetItemResponse response) throws Exception {
+			public MappedBatchGetItemResponse checkedApply(BatchGetItemResponse response) throws Exception {
 				return decoder.mapBatchGetItemResponse(response, clazz);
 			}
 		});
@@ -171,7 +172,7 @@ public class DynamoAsyncMapper {
 		};
 		return client.putItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
+			public MappedPutItemResponse checkedApply(PutItemResponse response) throws Exception {
 				return decoder.mapPutItemResponse(response, clazz);
 			}
 		});
@@ -192,7 +193,7 @@ public class DynamoAsyncMapper {
 		var reqOrConsumer = requestFactory.acceptPutItemRequest(request, clazz);
 		return client.putItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedPutItemResponse<T> checkedApply(PutItemResponse response) throws Exception {
+			public MappedPutItemResponse checkedApply(PutItemResponse response) throws Exception {
 				return decoder.mapPutItemResponse(response, clazz);
 			}
 		});
@@ -216,7 +217,7 @@ public class DynamoAsyncMapper {
 		};
 		return client.updateItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedUpdateItemResponse<T> checkedApply(UpdateItemResponse response) throws Exception {
+			public MappedUpdateItemResponse checkedApply(UpdateItemResponse response) throws Exception {
 				return decoder.mapUpdateItemResponse(response, clazz);
 			}
 		});
@@ -237,7 +238,7 @@ public class DynamoAsyncMapper {
 		var reqOrConsumer = requestFactory.acceptUpdateItemRequest(request, clazz);
 		return client.updateItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedUpdateItemResponse<T> checkedApply(UpdateItemResponse response) throws Exception {
+			public MappedUpdateItemResponse checkedApply(UpdateItemResponse response) throws Exception {
 				return decoder.mapUpdateItemResponse(response, clazz);
 			}
 		});
@@ -261,7 +262,7 @@ public class DynamoAsyncMapper {
 		};
 		return client.deleteItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
+			public MappedDeleteItemResponse checkedApply(DeleteItemResponse response) throws Exception {
 				return decoder.mapDeleteItemResponse(response, clazz);
 			}
 		});
@@ -291,7 +292,7 @@ public class DynamoAsyncMapper {
 		var reqOrConsumer = requestFactory.acceptDeleteItemRequest(request, clazz);
 		return client.deleteItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedDeleteItemResponse<T> checkedApply(DeleteItemResponse response) throws Exception {
+			public MappedDeleteItemResponse checkedApply(DeleteItemResponse response) throws Exception {
 				return decoder.mapDeleteItemResponse(response, clazz);
 			}
 		});
@@ -323,7 +324,7 @@ public class DynamoAsyncMapper {
 		};
 		return client.scan(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedScanResponse<T> checkedApply(ScanResponse response) throws Exception {
+			public MappedScanResponse checkedApply(ScanResponse response) throws Exception {
 				return decoder.mapScanResponse(response, clazz);
 			}
 		});
@@ -333,7 +334,7 @@ public class DynamoAsyncMapper {
 		var reqOrConsumer = requestFactory.acceptScanRequest(request, clazz);
 		return client.scan(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedScanResponse<T> checkedApply(ScanResponse response) throws Exception {
+			public MappedScanResponse checkedApply(ScanResponse response) throws Exception {
 				return decoder.mapScanResponse(response, clazz);
 			}
 		});
@@ -349,7 +350,7 @@ public class DynamoAsyncMapper {
 		};
 		return client.query(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedQueryResponse<T> checkedApply(QueryResponse response) throws Exception {
+			public MappedQueryResponse checkedApply(QueryResponse response) throws Exception {
 				return decoder.mapQueryResponse(response, clazz);
 			}
 		});
@@ -359,7 +360,7 @@ public class DynamoAsyncMapper {
 		var reqOrConsumer = requestFactory.acceptQueryRequest(request, clazz);
 		return client.query(reqOrConsumer).thenApply(new CheckedFunction<>() {
 			@Override
-			public MappedQueryResponse<T> checkedApply(QueryResponse response) throws Exception {
+			public MappedQueryResponse checkedApply(QueryResponse response) throws Exception {
 				return decoder.mapQueryResponse(response, clazz);
 			}
 		});
@@ -367,5 +368,32 @@ public class DynamoAsyncMapper {
 
 	public static DynamoAsyncMapperBuilder builder() {
 		return new DynamoAsyncMapperBuilder();
+	}
+
+	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginator(
+			@NonNull BatchGetItemRequest request, @NonNull Class<T> clazz) {
+		var reqOrConsumer = requestFactory.acceptBatchGetItemRequest(request, clazz);
+		return client.batchGetItemPaginator(reqOrConsumer).map(new CheckedFunction<>() {
+			@Override
+			public MappedBatchGetItemResponse<T> checkedApply(BatchGetItemResponse response) throws Exception {
+				return decoder.mapBatchGetItemResponse(response, clazz);
+			}
+		});
+	}
+
+	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginator(
+			@NonNull Consumer<BatchGetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
+		Consumer<BatchGetItemRequest.Builder> reqOrConsumer = (builder) -> {
+			{
+				requestFactory.acceptBatchGetItemRequest(builder, clazz);
+				consumer.accept(builder);
+			}
+		};
+		return client.batchGetItemPaginator(reqOrConsumer).map(new CheckedFunction<>() {
+			@Override
+			public MappedBatchGetItemResponse<T> checkedApply(BatchGetItemResponse response) throws Exception {
+				return decoder.mapBatchGetItemResponse(response, clazz);
+			}
+		});
 	}
 }

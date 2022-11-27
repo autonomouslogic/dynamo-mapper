@@ -8,6 +8,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
 import lombok.NonNull;
+import org.reactivestreams.Publisher;
 
 import javax.lang.model.element.Modifier;
 import java.lang.reflect.Method;
