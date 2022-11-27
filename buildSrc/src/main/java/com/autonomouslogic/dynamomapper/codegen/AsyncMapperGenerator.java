@@ -56,8 +56,9 @@ public class AsyncMapperGenerator extends MapperGenerator {
 
 	@Override
 	protected MethodSpec generateDelegateWrapper(Method method, ClassName returnType, String decoderMethod, Class<?> requestClass, Class<?> responseClass) {
-		var realReturnType = TypeHelper.futureGenericCapture(returnType);
-		return internalGenerateDelegateWrapper(method, realReturnType, returnType, decoderMethod, requestClass, responseClass, "thenApply");
+		var innerReturnType = ParameterizedTypeName.get(returnType, TypeHelper.T);
+		var outerReturnType = TypeHelper.futureGenericCapture(returnType);
+		return internalGenerateDelegateWrapper(method, outerReturnType, innerReturnType, decoderMethod, requestClass, responseClass, "thenApply");
 	}
 
 	protected MethodSpec generateDelegatePaginatorWrapper(Method method, ClassName returnType, String decoderMethod, Class<?> requestClass, Class<?> responseClass) {
