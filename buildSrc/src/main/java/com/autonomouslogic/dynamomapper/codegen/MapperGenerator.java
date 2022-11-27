@@ -120,7 +120,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "getItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedGetItemResponse, "mapGetItemResponse", GetItemRequest.class, GetItemResponse.class);
-			generateHashKeyWrapper(delegate, "getRequestFromHashKey", false);
+			generateHashKeyWrapper(delegate, "getRequestFromHashKey", false, true);
 			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
 		}
 	}
@@ -129,7 +129,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "batchGetItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedBatchGetItemResponse, "mapBatchGetItemResponse", BatchGetItemRequest.class, BatchGetItemResponse.class);
-			generateHashKeyWrapper(delegate, "getBatchGetItemRequestFromHashKeys", true);
+			generateHashKeyWrapper(delegate, "getBatchGetItemRequestFromHashKeys", true, true);
 //			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
 		}
 	}
@@ -154,7 +154,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "deleteItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedDeleteItemResponse, "mapDeleteItemResponse", DeleteItemRequest.class, DeleteItemResponse.class);
-			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey", false);
+			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey", false, true);
 			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject");
 		}
 	}
@@ -227,7 +227,7 @@ public class MapperGenerator {
 			.endControlFlow("}");
 	}
 
-	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple) {
+	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.name)
 			.addModifiers(Modifier.PUBLIC)

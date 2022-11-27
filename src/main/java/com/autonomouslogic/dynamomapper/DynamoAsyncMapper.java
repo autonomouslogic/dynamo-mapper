@@ -15,6 +15,7 @@ import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.autonomouslogic.dynamomapper.util.FutureUtil;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -382,6 +383,12 @@ public class DynamoAsyncMapper {
 	}
 
 	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginator(
+			@NonNull List<?> hashKey, @NonNull Class<T> clazz) throws IOException {
+		var builder = requestFactory.getBatchGetItemRequestFromHashKeys(hashKey, clazz);
+		return batchGetItemPaginator(builder.build(), clazz);
+	}
+
+	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginator(
 			@NonNull Consumer<BatchGetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
 		Consumer<BatchGetItemRequest.Builder> reqOrConsumer = (builder) -> {
 			{
@@ -395,5 +402,13 @@ public class DynamoAsyncMapper {
 				return decoder.mapBatchGetItemResponse(response, clazz);
 			}
 		});
+	}
+
+	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginator(
+			@NonNull List<?> hashKey, @NonNull Consumer<BatchGetItemRequest.Builder> consumer, @NonNull Class<T> clazz)
+			throws IOException {
+		var builder = requestFactory.getBatchGetItemRequestFromHashKeys(hashKey, clazz);
+		consumer.accept(builder);
+		return batchGetItemPaginator(builder.build(), clazz);
 	}
 }

@@ -14,6 +14,7 @@ import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
 
 import javax.lang.model.element.Modifier;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class AsyncMapperGenerator extends MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "batchGetItemPaginator")) {
 			var delegate = generateDelegatePaginatorWrapper(
 				method, mappedBatchGetItemResponse, "mapBatchGetItemResponse", BatchGetItemRequest.class, BatchGetItemResponse.class);
-//			generateHashKeyPaginatorWrapper(delegate, "getBatchGetItemRequestFromHashKeys");
+			generateHashKeyWrapper(delegate, "getBatchGetItemRequestFromHashKeys", true, false);
 //			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
 		}
 	}
@@ -114,13 +115,16 @@ public class AsyncMapperGenerator extends MapperGenerator {
 	}
 
 	@Override
-	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple) {
+	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.name)
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
 		wrapper.addExceptions(method.exceptions);
+		if (!futureWrap) {
+			wrapper.addException(IOException.class);
+		}
 		// Add parameters.
 		if (!multiple) {
 			wrapper.addParameter(Object.class, "hashKey");
@@ -133,19 +137,28 @@ public class AsyncMapperGenerator extends MapperGenerator {
 		params.removeIf(p -> p.name.equals(REQUEST));
 		wrapper.addParameters(params);
 		// Write body.
-		var code = CodeBlock.builder();
-		code.add(CodeBlock.of(
-			"return $T.wrapFuture(() -> {\n" +
-			"\tvar builder = requestFactory.$L(hashKey, clazz);\n",
-			TypeHelper.futureUtil, factoryMethodName
-		));
+		var requestFactoryCode = CodeBlock.builder();
+		requestFactoryCode.add("var builder = requestFactory.$L(hashKey, clazz);\n", factoryMethodName);
 		var firstParamTypeName = method.parameters.get(0).type;
 		if (firstParamTypeName instanceof ParameterizedTypeName) {
-			code.addStatement("\tconsumer.accept(builder)");
+			requestFactoryCode.addStatement("\tconsumer.accept(builder)");
 		}
-		code.add(CodeBlock.of(
-			"\treturn $L(builder.build(), clazz);\n" +
-			"});", method.name));
+		requestFactoryCode.add(CodeBlock.of(
+			"\treturn $L(builder.build(), clazz);\n", method.name));
+
+		var code = CodeBlock.builder();
+		if (futureWrap) {
+			code.add(CodeBlock.of(
+				"return $T.wrapFuture(() -> {\n" +
+				"\t$L\n" +
+				"});",
+				TypeHelper.futureUtil, requestFactoryCode.build()
+			));
+		}
+		else {
+			code.add(requestFactoryCode.build());
+		}
+
 		wrapper.addCode(code.build());
 
 		TypeHelper.nonNullParameters(wrapper);
