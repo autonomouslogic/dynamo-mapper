@@ -121,7 +121,7 @@ public class MapperGenerator {
 			var delegate = generateDelegateWrapper(
 				method, mappedGetItemResponse, "mapGetItemResponse", GetItemRequest.class, GetItemResponse.class);
 			generateHashKeyWrapper(delegate, "getRequestFromHashKey", false, true);
-			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
+			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject", false);
 		}
 	}
 
@@ -129,8 +129,8 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "batchGetItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedBatchGetItemResponse, "mapBatchGetItemResponse", BatchGetItemRequest.class, BatchGetItemResponse.class);
-			generateHashKeyWrapper(delegate, "getBatchGetItemRequestFromHashKeys", true, true);
-//			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
+			generateHashKeyWrapper(delegate, "batchGetItemRequestFromHashKeys", true, true);
+			generateKeyObjectWrapper(delegate, "batchGetItemRequestFromKeyObjects", true);
 		}
 	}
 
@@ -138,7 +138,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "putItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedPutItemResponse, "mapPutItemResponse", PutItemRequest.class, PutItemResponse.class);
-			generateKeyObjectWrapper(delegate, "putRequestFromObject");
+			generateKeyObjectWrapper(delegate, "putRequestFromObject", false);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "updateItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedUpdateItemResponse, "mapUpdateItemResponse", UpdateItemRequest.class, UpdateItemResponse.class);
-			generateKeyObjectWrapper(delegate, "updateRequestFromObject");
+			generateKeyObjectWrapper(delegate, "updateRequestFromObject", false);
 		}
 	}
 
@@ -155,7 +155,7 @@ public class MapperGenerator {
 			var delegate = generateDelegateWrapper(
 				method, mappedDeleteItemResponse, "mapDeleteItemResponse", DeleteItemRequest.class, DeleteItemResponse.class);
 			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey", false, true);
-			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject");
+			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject", false);
 		}
 	}
 
@@ -228,8 +228,12 @@ public class MapperGenerator {
 	}
 
 	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
+		String methodName = method.name + "FromHashKey";
+		if (multiple) {
+			methodName += "s";
+		}
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(method.name)
+		var wrapper = MethodSpec.methodBuilder(methodName)
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
@@ -258,9 +262,13 @@ public class MapperGenerator {
 		mapper.addMethod(wrapper.build());
 	}
 
-	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName) {
+	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName, boolean multiple) {
+		String methodName = method.name + "FromKeyObject";
+		if (multiple) {
+			methodName += "s";
+		}
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(method.name)
+		var wrapper = MethodSpec.methodBuilder(methodName)
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
@@ -270,7 +278,15 @@ public class MapperGenerator {
 			.addMember("value", "\"unchecked\"")
 			.build());
 		// Add parameters.
-		wrapper.addParameter(TypeHelper.T, "keyObject");
+		if (!multiple) {
+			wrapper.addParameter(TypeHelper.T, "keyObject");
+		}
+		else {
+			var type = ParameterizedTypeName.get(ClassName.get(List.class), TypeHelper.T);
+			wrapper.addParameter(type, "keyObject");
+			wrapper.addParameter(CLASS_T, "clazz");
+		}
+
 		var params = new ArrayList<>(method.parameters);
 		params.removeIf(p -> p.name.equals(REQUEST));
 		params.removeIf(p -> p.name.equals("clazz"));
@@ -281,7 +297,12 @@ public class MapperGenerator {
 		if (firstParamTypeName instanceof ParameterizedTypeName) {
 			wrapper.addStatement("consumer.accept(builder)");
 		}
-		wrapper.addStatement("return $L(builder.build(), ($T) keyObject.getClass())", method.name, CLASS_T);
+		if (!multiple) {
+			wrapper.addStatement("return $L(builder.build(), ($T) keyObject.getClass())", method.name, CLASS_T);
+		}
+		else {
+			wrapper.addStatement("return $L(builder.build(), clazz)", method.name);
+		}
 
 		TypeHelper.nonNullParameters(wrapper);
 		mapper.addMethod(wrapper.build());

@@ -51,7 +51,7 @@ public class AsyncMapperGenerator extends MapperGenerator {
 			var delegate = generateDelegatePaginatorWrapper(
 				method, mappedBatchGetItemResponse, "mapBatchGetItemResponse", BatchGetItemRequest.class, BatchGetItemResponse.class);
 			generateHashKeyWrapper(delegate, "getBatchGetItemRequestFromHashKeys", true, false);
-//			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
+			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject", true);
 		}
 	}
 
@@ -116,8 +116,12 @@ public class AsyncMapperGenerator extends MapperGenerator {
 
 	@Override
 	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
+		String methodName = method.name + "FromHashKey";
+		if (multiple) {
+			methodName += "s";
+		}
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(method.name)
+		var wrapper = MethodSpec.methodBuilder(methodName)
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
@@ -166,9 +170,13 @@ public class AsyncMapperGenerator extends MapperGenerator {
 	}
 
 	@Override
-	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName) {
+	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName, boolean multiple) {
+		String methodName = method.name + "FromKeyObject";
+		if (multiple) {
+			methodName += "s";
+		}
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(method.name)
+		var wrapper = MethodSpec.methodBuilder(methodName)
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);

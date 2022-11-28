@@ -35,7 +35,7 @@ public class RequestFactory {
 				.key(createKeyValue(hashKey, clazz));
 	}
 
-	public <T> BatchGetItemRequest.Builder getBatchGetItemRequestFromHashKeys(
+	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromHashKeys(
 			@NonNull List<?> hashKeys, @NonNull Class<T> clazz) throws IOException {
 		var tableName = reflectionUtil.resolveTableName(clazz);
 		var keyObjects = new ArrayList<Map<String, AttributeValue>>(hashKeys.size());
@@ -45,6 +45,28 @@ public class RequestFactory {
 		return BatchGetItemRequest.builder()
 				.requestItems(Map.of(
 						tableName, KeysAndAttributes.builder().keys(keyObjects).build()));
+	}
+
+	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromKeyObjects(@NonNull List<T> keyObjects)
+			throws IOException {
+
+		Class clazz = null;
+		for (var k : keyObjects) {
+			if (clazz == null) {
+				clazz = k.getClass();
+			} else if (clazz != k.getClass()) {
+				throw new IllegalArgumentException(String.format(
+						"Key objects must be the same class, expected %s, but %s seen", clazz, k.getClass()));
+			}
+		}
+		var tableName = reflectionUtil.resolveTableName(clazz);
+		var keys = new ArrayList<Map<String, AttributeValue>>(keyObjects.size());
+		for (Object hashKey : keyObjects) {
+			keys.add(createKeyValue(hashKey, clazz));
+		}
+		return BatchGetItemRequest.builder()
+				.requestItems(
+						Map.of(tableName, KeysAndAttributes.builder().keys(keys).build()));
 	}
 
 	public <T> GetItemRequest.Builder getRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
