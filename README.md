@@ -75,12 +75,12 @@ public class ModelObject {
 ### Getting items
 Using the synchronous API:
 ```java
-var item = dynamoMapper.getItem("partition-key-value", ModelObject.class).item();
+var item = dynamoMapper.getItemFromHashKey("partition-key-value", ModelObject.class).item();
 ```
 
 Using the asynchronous API:
 ```java
-dynamoMapper.getItem("partition-key-value", ModelObject.class).thenAccept(response -> {
+dynamoMapper.getItemFromHashKey("partition-key-value", ModelObject.class).thenAccept(response -> {
 	var item = response.item();
 });
 ```
@@ -89,13 +89,13 @@ dynamoMapper.getItem("partition-key-value", ModelObject.class).thenAccept(respon
 Using the synchronous API:
 ```java
 var item = new ModelObject();
-var response = dynamoMapper.putItem(item);
+var response = dynamoMapper.putItemFromKeyObject(item);
 ```
 
 Using the asynchronous API:
 ```java
 var item = new ModelObject();
-dynamoMapper.putItem(item).thenAccept(response -> {
+dynamoMapper.putItemFromKeyObject(item).thenAccept(response -> {
 	// etc.
 });
 ```
