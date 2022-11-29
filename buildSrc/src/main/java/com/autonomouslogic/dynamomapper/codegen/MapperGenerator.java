@@ -228,12 +228,8 @@ public class MapperGenerator {
 	}
 
 	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
-		String methodName = method.name + "FromHashKey";
-		if (multiple) {
-			methodName += "s";
-		}
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(methodName)
+		var wrapper = MethodSpec.methodBuilder(createMethodName(method, "FromHashKey", multiple))
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
@@ -263,12 +259,8 @@ public class MapperGenerator {
 	}
 
 	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName, boolean multiple) {
-		String methodName = method.name + "FromKeyObject";
-		if (multiple) {
-			methodName += "s";
-		}
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(methodName)
+		var wrapper = MethodSpec.methodBuilder(createMethodName(method, "FromKeyObject", multiple))
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
@@ -324,5 +316,13 @@ public class MapperGenerator {
 			requestVar = CONSUMER;
 		}
 		return requestVar;
+	}
+
+	private String createMethodName(MethodSpec method, String suffix, boolean plural) {
+		String methodName = method.name + suffix;
+		if (plural) {
+			methodName += "s";
+		}
+		return methodName;
 	}
 }
