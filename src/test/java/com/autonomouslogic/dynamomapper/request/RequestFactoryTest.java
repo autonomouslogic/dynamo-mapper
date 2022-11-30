@@ -19,14 +19,14 @@ public class RequestFactoryTest {
 
 	@Test
 	@SneakyThrows
-	void shouldCreateGetItemRequestsFromHashKey() {
-		var request = factory.getRequestFromHashKey("key1", TestObject.class).build();
+	void shouldCreateGetItemRequestFromPrimaryKey() {
+		var request = factory.getRequestFromPrimaryKey("key1", TestObject.class).build();
 		assertEquals(Map.of("string", AttributeValue.builder().s("key1").build()), request.key());
 	}
 
 	@Test
 	@SneakyThrows
-	void shouldCreateGetItemRequestsFromKeyObjects() {
+	void shouldCreateGetItemRequestFromKeyObject() {
 		var request = factory.getRequestFromKeyObject(new TestObject().setString("key1"))
 				.build();
 		assertEquals(Map.of("string", AttributeValue.builder().s("key1").build()), request.key());

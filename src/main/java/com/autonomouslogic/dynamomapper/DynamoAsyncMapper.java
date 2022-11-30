@@ -67,9 +67,9 @@ public class DynamoAsyncMapper {
 	}
 
 	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
-			@NonNull Object hashKey, @NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
+			@NonNull Object primaryKey, @NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+			var builder = requestFactory.getRequestFromPrimaryKey(primaryKey, clazz);
 			consumer.accept(builder);
 			return getItem(builder.build(), clazz);
 		});
@@ -96,9 +96,10 @@ public class DynamoAsyncMapper {
 		});
 	}
 
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull Object hashKey, @NonNull Class<T> clazz) {
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
+			@NonNull Object primaryKey, @NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+			var builder = requestFactory.getRequestFromPrimaryKey(primaryKey, clazz);
 			return getItem(builder.build(), clazz);
 		});
 	}
@@ -218,9 +219,11 @@ public class DynamoAsyncMapper {
 	}
 
 	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
-			@NonNull Object hashKey, @NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
+			@NonNull Object primaryKey,
+			@NonNull Consumer<DeleteItemRequest.Builder> consumer,
+			@NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
+			var builder = requestFactory.deleteRequestFromPrimaryKey(primaryKey, clazz);
 			consumer.accept(builder);
 			return deleteItem(builder.build(), clazz);
 		});
@@ -248,9 +251,9 @@ public class DynamoAsyncMapper {
 	}
 
 	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
-			@NonNull Object hashKey, @NonNull Class<T> clazz) {
+			@NonNull Object primaryKey, @NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
+			var builder = requestFactory.deleteRequestFromPrimaryKey(primaryKey, clazz);
 			return deleteItem(builder.build(), clazz);
 		});
 	}

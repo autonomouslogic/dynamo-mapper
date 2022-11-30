@@ -3,7 +3,7 @@ package com.autonomouslogic.dynamomapper.model;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
+import com.autonomouslogic.dynamomapper.annotations.DynamoPrimaryKey;
 import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
@@ -22,7 +22,7 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbParti
 @EqualsAndHashCode
 @ToString
 public class CompatibilityTestObject {
-	@DynamoHashKey
+	@DynamoPrimaryKey
 	@JsonProperty
 	@DynamoDBHashKey // v1
 	String partitionKey;

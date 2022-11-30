@@ -114,7 +114,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "getItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedGetItemResponse, "mapGetItemResponse", GetItemRequest.class, GetItemResponse.class);
-			generateHashKeyWrapper(delegate, "getRequestFromHashKey");
+			generatePrimaryKeyWrapper(delegate, "getRequestFromPrimaryKey");
 			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject");
 		}
 	}
@@ -139,7 +139,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "deleteItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedDeleteItemResponse, "mapDeleteItemResponse", DeleteItemRequest.class, DeleteItemResponse.class);
-			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey");
+			generatePrimaryKeyWrapper(delegate, "deleteRequestFromPrimaryKey");
 			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject");
 		}
 	}
@@ -212,7 +212,7 @@ public class MapperGenerator {
 			.endControlFlow("}");
 	}
 
-	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName) {
+	protected void generatePrimaryKeyWrapper(MethodSpec method, String factoryMethodName) {
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.name)
 			.addModifiers(Modifier.PUBLIC)
