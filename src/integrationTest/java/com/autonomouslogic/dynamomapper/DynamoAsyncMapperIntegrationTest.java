@@ -38,21 +38,21 @@ public class DynamoAsyncMapperIntegrationTest {
 		obj = IntegrationTestObjects.setKeyAndTtl(obj);
 		System.out.println(obj);
 		// Put.
-		dynamoAsyncMapper.putItem(obj).join();
+		dynamoAsyncMapper.putItemFromKeyObject(obj).join();
 		// Get.
 		var getResponse = dynamoAsyncMapper
-				.getItem(obj.partitionKey(), IntegrationTestObject.class)
+				.getItemFromPrimaryKey(obj.partitionKey(), IntegrationTestObject.class)
 				.join();
 		assertEquals(obj, getResponse.item());
 		// Update.
 		var obj2 = obj.toBuilder().str("new-val").build();
 		var updateResponse = dynamoAsyncMapper
-				.updateItem(obj2, req -> req.returnValues(ReturnValue.ALL_OLD))
+				.updateItemFromKeyObject(obj2, req -> req.returnValues(ReturnValue.ALL_OLD))
 				.join();
 		assertEquals(obj, updateResponse.item());
 		// Delete.
 		var deleteResponse = dynamoAsyncMapper
-				.deleteItem(
+				.deleteItemFromPrimaryKey(
 						obj.partitionKey(), req -> req.returnValues(ReturnValue.ALL_OLD), IntegrationTestObject.class)
 				.join();
 		assertEquals(obj2, deleteResponse.item());
@@ -66,7 +66,7 @@ public class DynamoAsyncMapperIntegrationTest {
 		for (int i = 0; i < n; i++) {
 			var obj = IntegrationTestObjects.setKeyAndTtl(
 					IntegrationTestObject.builder().str(shared).build());
-			dynamoAsyncMapper.putItem(obj).join();
+			dynamoAsyncMapper.putItemFromKeyObject(obj).join();
 		}
 		var scanResult = dynamoAsyncMapper
 				.scan(
@@ -91,11 +91,11 @@ public class DynamoAsyncMapperIntegrationTest {
 		for (int i = 0; i < n; i++) {
 			var obj = IntegrationTestObjects.setKeyAndTtl(
 					IntegrationTestObject.builder().str(shared).build());
-			dynamoAsyncMapper.putItem(obj).join();
+			dynamoAsyncMapper.putItemFromKeyObject(obj).join();
 			keys.add(obj.partitionKey());
 		}
 		var batchGetResult = dynamoAsyncMapper
-				.batchGetItem(
+				.batchGetItemFromPrimaryKeys(
 						keys,
 						req -> {
 							var table = req.build().requestItems().keySet();
@@ -115,7 +115,7 @@ public class DynamoAsyncMapperIntegrationTest {
 	void shouldQuery() {
 		var obj = IntegrationTestObjects.setKeyAndTtl(
 				IntegrationTestObject.builder().str("str-1234").build());
-		dynamoAsyncMapper.putItem(obj).join();
+		dynamoAsyncMapper.putItemFromKeyObject(obj).join();
 		var queryResult = dynamoAsyncMapper
 				.query(
 						req -> {

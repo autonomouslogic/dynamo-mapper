@@ -50,7 +50,7 @@ public class CompatibilityTest {
 		assertEquals(
 				obj,
 				dynamoMapper
-						.getItem(obj.getPartitionKey(), CompatibilityTestObject.class)
+						.getItemFromPrimaryKey(obj.getPartitionKey(), CompatibilityTestObject.class)
 						.item());
 	}
 
@@ -59,7 +59,7 @@ public class CompatibilityTest {
 	@SneakyThrows
 	void shouldWriteToV1(CompatibilityTestObject obj) {
 		System.out.println(obj);
-		dynamoMapper.putItem(obj);
+		dynamoMapper.putItemFromKeyObject(obj);
 		assertEquals(obj, v1Client.load(CompatibilityTestObject.class, obj.getPartitionKey()));
 	}
 
@@ -73,7 +73,7 @@ public class CompatibilityTest {
 		assertEquals(
 				obj,
 				dynamoMapper
-						.getItem(obj.getPartitionKey(), CompatibilityTestObject.class)
+						.getItemFromPrimaryKey(obj.getPartitionKey(), CompatibilityTestObject.class)
 						.item());
 	}
 
@@ -83,7 +83,7 @@ public class CompatibilityTest {
 	@SneakyThrows
 	void shouldWriteToV2(CompatibilityTestObject obj) {
 		System.out.println(obj);
-		dynamoMapper.putItem(obj);
+		dynamoMapper.putItemFromKeyObject(obj);
 		assertEquals(obj, v2Table.getItem(obj));
 	}
 

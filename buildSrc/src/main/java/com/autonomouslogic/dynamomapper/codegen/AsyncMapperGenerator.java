@@ -50,8 +50,8 @@ public class AsyncMapperGenerator extends MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "batchGetItemPaginator")) {
 			var delegate = generateDelegatePaginatorWrapper(
 				method, mappedBatchGetItemResponse, "mapBatchGetItemResponse", BatchGetItemRequest.class, BatchGetItemResponse.class);
-			generateHashKeyWrapper(delegate, "getBatchGetItemRequestFromHashKeys", true, false);
-			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject", true);
+			generatePrimaryKeyWrapper(delegate, "batchGetItemRequestFromPrimaryKeys", true, false);
+			generateKeyObjectWrapper(delegate, "batchGetItemRequestFromKeyObjects", true, false);
 		}
 	}
 
@@ -115,13 +115,9 @@ public class AsyncMapperGenerator extends MapperGenerator {
 	}
 
 	@Override
-	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
-		String methodName = method.name + "FromHashKey";
-		if (multiple) {
-			methodName += "s";
-		}
+	protected void generatePrimaryKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(methodName)
+		var wrapper = MethodSpec.methodBuilder(createMethodName(method, "FromPrimaryKey", multiple))
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
@@ -131,18 +127,18 @@ public class AsyncMapperGenerator extends MapperGenerator {
 		}
 		// Add parameters.
 		if (!multiple) {
-			wrapper.addParameter(Object.class, "hashKey");
+			wrapper.addParameter(Object.class, "primaryKey");
 		}
 		else {
 			var type = TypeHelper.genericWildcard(ClassName.get(List.class));
-			wrapper.addParameter(type, "hashKey");
+			wrapper.addParameter(type, "primaryKey");
 		}
 		var params = new ArrayList<>(method.parameters);
 		params.removeIf(p -> p.name.equals(REQUEST));
 		wrapper.addParameters(params);
 		// Write body.
 		var requestFactoryCode = CodeBlock.builder();
-		requestFactoryCode.add("var builder = requestFactory.$L(hashKey, clazz);\n", factoryMethodName);
+		requestFactoryCode.add("var builder = requestFactory.$L(primaryKey, clazz);\n", factoryMethodName);
 		var firstParamTypeName = method.parameters.get(0).type;
 		if (firstParamTypeName instanceof ParameterizedTypeName) {
 			requestFactoryCode.addStatement("\tconsumer.accept(builder)");
@@ -170,40 +166,53 @@ public class AsyncMapperGenerator extends MapperGenerator {
 	}
 
 	@Override
-	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName, boolean multiple) {
-		String methodName = method.name + "FromKeyObject";
-		if (multiple) {
-			methodName += "s";
-		}
+	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(methodName)
+		var wrapper = MethodSpec.methodBuilder(createMethodName(method, "FromKeyObject", multiple))
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
 		wrapper.addExceptions(method.exceptions);
+		if (!futureWrap) {
+			wrapper.addException(IOException.class);
+		}
 		wrapper.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
 			.addMember("value", "\"unchecked\"")
 			.build());
 		// Add parameters.
-		wrapper.addParameter(TypeHelper.T, "keyObject");
+		if (!multiple) {
+			wrapper.addParameter(Object.class, "keyObject");
+		}
+		else {
+			var type = TypeHelper.genericWildcard(ClassName.get(List.class));
+			wrapper.addParameter(type, "keyObject");
+		}
 		var params = new ArrayList<>(method.parameters);
 		params.removeIf(p -> p.name.equals(REQUEST));
 		params.removeIf(p -> p.name.equals("clazz"));
 		wrapper.addParameters(params);
 		// Write body.
-		var code = CodeBlock.builder();
-		code.add(CodeBlock.of(
-			"return $T.wrapFuture(() -> {\n" +
-				"\tvar builder = requestFactory.$L(keyObject);\n",
-			TypeHelper.futureUtil, factoryMethodName
-		));
+		var requestFactoryCode = CodeBlock.builder();
 		var firstParamTypeName = method.parameters.get(0).type;
+		requestFactoryCode.add("var builder = requestFactory.$L(keyObject);\n", factoryMethodName);
 		if (firstParamTypeName instanceof ParameterizedTypeName) {
-			code.addStatement("\tconsumer.accept(builder)");
+			requestFactoryCode.addStatement("\tconsumer.accept(builder)");
 		}
-		code.add(CodeBlock.of(
-			"\treturn $L(builder.build(), (Class<T>) keyObject.getClass());\n" +
-				"});", method.name));
+		requestFactoryCode.add(CodeBlock.of(
+			"return $L(builder.build(), (Class<T>) keyObject.getClass());\n", method.name));
+
+		var code = CodeBlock.builder();
+		if (futureWrap) {
+			code.add(CodeBlock.of(
+				"return $T.wrapFuture(() -> {\n" +
+				"\t$L\n" +
+				"});",
+				requestFactoryCode.build()
+			));
+		}
+		else {
+			code.add(requestFactoryCode.build());
+		}
 		wrapper.addCode(code.build());
 
 		TypeHelper.nonNullParameters(wrapper);

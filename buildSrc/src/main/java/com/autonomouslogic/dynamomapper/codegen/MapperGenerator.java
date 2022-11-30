@@ -120,8 +120,8 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "getItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedGetItemResponse, "mapGetItemResponse", GetItemRequest.class, GetItemResponse.class);
-			generateHashKeyWrapper(delegate, "getRequestFromHashKey", false, true);
-			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject", false);
+			generatePrimaryKeyWrapper(delegate, "getRequestFromPrimaryKey", false, false);
+			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject", false, false);
 		}
 	}
 
@@ -129,8 +129,8 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "batchGetItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedBatchGetItemResponse, "mapBatchGetItemResponse", BatchGetItemRequest.class, BatchGetItemResponse.class);
-			generateHashKeyWrapper(delegate, "batchGetItemRequestFromHashKeys", true, true);
-			generateKeyObjectWrapper(delegate, "batchGetItemRequestFromKeyObjects", true);
+			generatePrimaryKeyWrapper(delegate, "batchGetItemRequestFromPrimaryKeys", true, true);
+			generateKeyObjectWrapper(delegate, "batchGetItemRequestFromKeyObjects", true, false);
 		}
 	}
 
@@ -138,7 +138,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "putItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedPutItemResponse, "mapPutItemResponse", PutItemRequest.class, PutItemResponse.class);
-			generateKeyObjectWrapper(delegate, "putRequestFromObject", false);
+			generateKeyObjectWrapper(delegate, "putRequestFromObject", false, false);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "updateItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedUpdateItemResponse, "mapUpdateItemResponse", UpdateItemRequest.class, UpdateItemResponse.class);
-			generateKeyObjectWrapper(delegate, "updateRequestFromObject", false);
+			generateKeyObjectWrapper(delegate, "updateRequestFromObject", false, false);
 		}
 	}
 
@@ -154,8 +154,8 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "deleteItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedDeleteItemResponse, "mapDeleteItemResponse", DeleteItemRequest.class, DeleteItemResponse.class);
-			generateHashKeyWrapper(delegate, "deleteRequestFromHashKey", false, true);
-			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject", false);
+			generatePrimaryKeyWrapper(delegate, "deleteRequestFromPrimaryKey", false, true);
+			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject", false, false);
 		}
 	}
 
@@ -227,9 +227,9 @@ public class MapperGenerator {
 			.endControlFlow("}");
 	}
 
-	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
+	protected void generatePrimaryKeyWrapper(MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(createMethodName(method, "FromHashKey", multiple))
+		var wrapper = MethodSpec.methodBuilder(createMethodName(method, "FromPrimaryKey", multiple))
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
@@ -258,7 +258,7 @@ public class MapperGenerator {
 		mapper.addMethod(wrapper.build());
 	}
 
-	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName, boolean multiple) {
+	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(createMethodName(method, "FromKeyObject", multiple))
 			.addModifiers(Modifier.PUBLIC)
@@ -318,7 +318,7 @@ public class MapperGenerator {
 		return requestVar;
 	}
 
-	private String createMethodName(MethodSpec method, String suffix, boolean plural) {
+	protected String createMethodName(MethodSpec method, String suffix, boolean plural) {
 		String methodName = method.name + suffix;
 		if (plural) {
 			methodName += "s";

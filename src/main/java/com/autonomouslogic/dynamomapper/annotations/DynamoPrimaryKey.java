@@ -7,9 +7,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specifies which property is the hash key of an object.
+ * Specifies which property is the key of an object.
  */
 @Documented
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DynamoHashKey {}
+public @interface DynamoPrimaryKey {}

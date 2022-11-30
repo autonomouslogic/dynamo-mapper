@@ -40,16 +40,16 @@ public class DynamoMapperIntegrationTest {
 		obj = IntegrationTestObjects.setKeyAndTtl(obj);
 		System.out.println(obj);
 		// Put.
-		dynamoMapper.putItem(obj);
+		dynamoMapper.putItemFromKeyObject(obj);
 		// Get.
-		var getResponse = dynamoMapper.getItem(obj.partitionKey(), IntegrationTestObject.class);
+		var getResponse = dynamoMapper.getItemFromPrimaryKey(obj.partitionKey(), IntegrationTestObject.class);
 		assertEquals(obj, getResponse.item());
 		// Update.
 		var obj2 = obj.toBuilder().str("new-val").build();
-		var updateResponse = dynamoMapper.updateItem(obj2, req -> req.returnValues(ReturnValue.ALL_OLD));
+		var updateResponse = dynamoMapper.updateItemFromKeyObject(obj2, req -> req.returnValues(ReturnValue.ALL_OLD));
 		assertEquals(obj, updateResponse.item());
 		// Delete.
-		var deleteResponse = dynamoMapper.deleteItem(
+		var deleteResponse = dynamoMapper.deleteItemFromPrimaryKey(
 				obj.partitionKey(), req -> req.returnValues(ReturnValue.ALL_OLD), IntegrationTestObject.class);
 		assertEquals(obj2, deleteResponse.item());
 	}
@@ -62,7 +62,7 @@ public class DynamoMapperIntegrationTest {
 		for (int i = 0; i < n; i++) {
 			var obj = IntegrationTestObjects.setKeyAndTtl(
 					IntegrationTestObject.builder().str(shared).build());
-			dynamoMapper.putItem(obj);
+			dynamoMapper.putItemFromKeyObject(obj);
 		}
 		var scanResult = dynamoMapper.scan(
 				req -> {
@@ -85,10 +85,10 @@ public class DynamoMapperIntegrationTest {
 		for (int i = 0; i < n; i++) {
 			var obj = IntegrationTestObjects.setKeyAndTtl(
 					IntegrationTestObject.builder().str(shared).build());
-			dynamoMapper.putItem(obj);
+			dynamoMapper.putItemFromKeyObject(obj);
 			keys.add(obj.partitionKey());
 		}
-		var batchGetResult = dynamoMapper.batchGetItem(
+		var batchGetResult = dynamoMapper.batchGetItemFromPrimaryKeys(
 				keys,
 				req -> {
 					var table = req.build().requestItems().keySet();
@@ -107,7 +107,7 @@ public class DynamoMapperIntegrationTest {
 	void shouldQuery() {
 		var obj = IntegrationTestObjects.setKeyAndTtl(
 				IntegrationTestObject.builder().str("str-1234").build());
-		dynamoMapper.putItem(obj);
+		dynamoMapper.putItemFromKeyObject(obj);
 		var queryResult = dynamoMapper.query(
 				req -> {
 					helper.prepQueryTest(obj, req);

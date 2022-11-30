@@ -28,14 +28,14 @@ public class RequestFactory {
 	private final ObjectMapper objectMapper;
 	private final ReflectionUtil reflectionUtil;
 
-	public <T> GetItemRequest.Builder getRequestFromHashKey(@NonNull Object hashKey, @NonNull Class<T> clazz)
+	public <T> GetItemRequest.Builder getRequestFromPrimaryKey(@NonNull Object primaryKey, @NonNull Class<T> clazz)
 			throws IOException {
 		return GetItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(clazz))
-				.key(createKeyValue(hashKey, clazz));
+				.key(createKeyValue(primaryKey, clazz));
 	}
 
-	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromHashKeys(
+	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromPrimaryKeys(
 			@NonNull List<?> hashKeys, @NonNull Class<T> clazz) throws IOException {
 		var tableName = reflectionUtil.resolveTableName(clazz);
 		var keyObjects = new ArrayList<Map<String, AttributeValue>>(hashKeys.size());
@@ -101,11 +101,11 @@ public class RequestFactory {
 				.attributeUpdates(updates);
 	}
 
-	public <T> DeleteItemRequest.Builder deleteRequestFromHashKey(@NonNull Object hashKey, @NonNull Class<T> clazz)
-			throws IOException {
+	public <T> DeleteItemRequest.Builder deleteRequestFromPrimaryKey(
+			@NonNull Object primaryKey, @NonNull Class<T> clazz) throws IOException {
 		return DeleteItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(clazz))
-				.key(createKeyValue(hashKey, clazz));
+				.key(createKeyValue(primaryKey, clazz));
 	}
 
 	public DeleteItemRequest.Builder deleteRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
@@ -114,25 +114,25 @@ public class RequestFactory {
 				.key(createKeyValue(keyObject));
 	}
 
-	private <T> Map<String, AttributeValue> createKeyValue(@NonNull Object hashKey, @NonNull Class<T> clazz)
+	private <T> Map<String, AttributeValue> createKeyValue(@NonNull Object primaryKey, @NonNull Class<T> clazz)
 			throws IOException {
-		var hashKeys = reflectionUtil.resolveHashKeyFields(clazz);
-		if (hashKeys.isEmpty()) {
+		var primaryKeys = reflectionUtil.resolvePrimaryKeyFields(clazz);
+		if (primaryKeys.isEmpty()) {
 			throw new IllegalArgumentException(String.format("No hash key defined on %s", clazz.getSimpleName()));
 		}
-		if (hashKeys.size() > 1) {
+		if (primaryKeys.size() > 1) {
 			throw new IllegalArgumentException(
 					String.format("Multiple hash keys defined on %s", clazz.getSimpleName()));
 		}
-		var hashKeyValue = encoder.encodeValue(objectMapper.valueToTree(hashKey));
-		return Map.of(hashKeys.get(0), hashKeyValue);
+		var primaryKeyValue = encoder.encodeValue(objectMapper.valueToTree(primaryKey));
+		return Map.of(primaryKeys.get(0), primaryKeyValue);
 	}
 
 	private <T> Map<String, AttributeValue> createKeyValue(@NonNull T keyObject) throws IOException {
 		var encoded = encoder.encode(keyObject);
-		var hashKeys = reflectionUtil.resolveHashKeyFields(keyObject.getClass());
+		var primaryKeys = reflectionUtil.resolvePrimaryKeyFields(keyObject.getClass());
 		var keyValues = new HashMap<String, AttributeValue>();
-		for (String field : hashKeys) {
+		for (String field : primaryKeys) {
 			keyValues.put(field, encoded.get(field));
 		}
 		return keyValues;

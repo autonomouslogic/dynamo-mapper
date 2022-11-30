@@ -62,7 +62,7 @@ Only a few extra annotations are required.
 @DynamoTableName("table-name")
 public class ModelObject {
 	@JsonProperty
-	@DynamoHashKey
+	@DynamoPrimaryKey
 	private String partitionKey;
 	
 	@JsonProperty
