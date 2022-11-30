@@ -214,7 +214,7 @@ public class MapperGenerator {
 
 	protected void generatePrimaryKeyWrapper(MethodSpec method, String factoryMethodName) {
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(createMethodName(method, "FromHashKey"))
+		var wrapper = MethodSpec.methodBuilder(createMethodName(method, "FromPrimaryKey"))
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);

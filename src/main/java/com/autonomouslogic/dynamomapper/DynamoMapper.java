@@ -67,7 +67,7 @@ public class DynamoMapper {
 		return decoder.mapGetItemResponse(client.getItem(reqOrConsumer), clazz);
 	}
 
-	public <T> MappedGetItemResponse<T> getItemFromHashKey(
+	public <T> MappedGetItemResponse<T> getItemFromPrimaryKey(
 			@NonNull Object hashKey, @NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz)
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
@@ -96,7 +96,7 @@ public class DynamoMapper {
 		return decoder.mapGetItemResponse(client.getItem(reqOrConsumer), clazz);
 	}
 
-	public <T> MappedGetItemResponse<T> getItemFromHashKey(@NonNull Object hashKey, @NonNull Class<T> clazz)
+	public <T> MappedGetItemResponse<T> getItemFromPrimaryKey(@NonNull Object hashKey, @NonNull Class<T> clazz)
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
 					JsonProcessingException, IOException {
@@ -220,7 +220,7 @@ public class DynamoMapper {
 		return decoder.mapDeleteItemResponse(client.deleteItem(reqOrConsumer), clazz);
 	}
 
-	public <T> MappedDeleteItemResponse<T> deleteItemFromHashKey(
+	public <T> MappedDeleteItemResponse<T> deleteItemFromPrimaryKey(
 			@NonNull Object hashKey, @NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
@@ -252,7 +252,7 @@ public class DynamoMapper {
 		return decoder.mapDeleteItemResponse(client.deleteItem(reqOrConsumer), clazz);
 	}
 
-	public <T> MappedDeleteItemResponse<T> deleteItemFromHashKey(@NonNull Object hashKey, @NonNull Class<T> clazz)
+	public <T> MappedDeleteItemResponse<T> deleteItemFromPrimaryKey(@NonNull Object hashKey, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
