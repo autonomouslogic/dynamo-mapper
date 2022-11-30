@@ -72,7 +72,7 @@ public class DynamoMapper {
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
 					JsonProcessingException, IOException {
-		var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+		var builder = requestFactory.getRequestFromPrimaryKey(hashKey, clazz);
 		consumer.accept(builder);
 		return getItem(builder.build(), clazz);
 	}
@@ -100,7 +100,7 @@ public class DynamoMapper {
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
 					JsonProcessingException, IOException {
-		var builder = requestFactory.getRequestFromHashKey(hashKey, clazz);
+		var builder = requestFactory.getRequestFromPrimaryKey(hashKey, clazz);
 		return getItem(builder.build(), clazz);
 	}
 
@@ -226,7 +226,7 @@ public class DynamoMapper {
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
-		var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
+		var builder = requestFactory.deleteRequestFromPrimaryKey(hashKey, clazz);
 		consumer.accept(builder);
 		return deleteItem(builder.build(), clazz);
 	}
@@ -257,7 +257,7 @@ public class DynamoMapper {
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
-		var builder = requestFactory.deleteRequestFromHashKey(hashKey, clazz);
+		var builder = requestFactory.deleteRequestFromPrimaryKey(hashKey, clazz);
 		return deleteItem(builder.build(), clazz);
 	}
 

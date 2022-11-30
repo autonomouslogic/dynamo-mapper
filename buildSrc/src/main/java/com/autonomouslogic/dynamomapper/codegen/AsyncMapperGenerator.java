@@ -81,7 +81,7 @@ public class AsyncMapperGenerator extends MapperGenerator {
 	}
 
 	@Override
-	protected void generateHashKeyWrapper(MethodSpec method, String factoryMethodName) {
+	protected void generatePrimaryKeyWrapper(MethodSpec method, String factoryMethodName) {
 		// Create signature.
 		var wrapper = MethodSpec.methodBuilder(method.name)
 			.addModifiers(Modifier.PUBLIC)
@@ -89,7 +89,7 @@ public class AsyncMapperGenerator extends MapperGenerator {
 		wrapper.returns(method.returnType);
 		wrapper.addExceptions(method.exceptions);
 		// Add parameters.
-		wrapper.addParameter(Object.class, "hashKey");
+		wrapper.addParameter(Object.class, "primaryKey");
 		var params = new ArrayList<>(method.parameters);
 		params.removeIf(p -> p.name.equals(REQUEST));
 		wrapper.addParameters(params);
@@ -97,7 +97,7 @@ public class AsyncMapperGenerator extends MapperGenerator {
 		var code = CodeBlock.builder();
 		code.add(CodeBlock.of(
 			"return $T.wrapFuture(() -> {\n" +
-			"\tvar builder = requestFactory.$L(hashKey, clazz);\n",
+			"\tvar builder = requestFactory.$L(primaryKey, clazz);\n",
 			TypeHelper.futureUtil, factoryMethodName
 		));
 		var firstParamTypeName = method.parameters.get(0).type;
