@@ -28,11 +28,17 @@ public class RequestFactory {
 	private final ObjectMapper objectMapper;
 	private final ReflectionUtil reflectionUtil;
 
-	public <T> GetItemRequest.Builder getRequestFromPrimaryKey(@NonNull Object primaryKey, @NonNull Class<T> clazz)
+	public <T> GetItemRequest.Builder getItemRequestFromPrimaryKey(@NonNull Object primaryKey, @NonNull Class<T> clazz)
 			throws IOException {
 		return GetItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(clazz))
 				.key(createKeyValue(primaryKey, clazz));
+	}
+
+	public <T> GetItemRequest.Builder getItemRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
+		return GetItemRequest.builder()
+				.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
+				.key(createKeyValue(keyObject));
 	}
 
 	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromPrimaryKeys(
@@ -50,7 +56,7 @@ public class RequestFactory {
 	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromKeyObjects(@NonNull List<T> keyObjects)
 			throws IOException {
 
-		Class clazz = null;
+		Class<?> clazz = null;
 		for (var k : keyObjects) {
 			if (clazz == null) {
 				clazz = k.getClass();
@@ -62,27 +68,22 @@ public class RequestFactory {
 		var tableName = reflectionUtil.resolveTableName(clazz);
 		var keys = new ArrayList<Map<String, AttributeValue>>(keyObjects.size());
 		for (Object primaryKey : keyObjects) {
-			keys.add(createKeyValue(primaryKey, clazz));
+			var keyValue = createKeyValue(primaryKey);
+			keys.add(keyValue);
 		}
 		return BatchGetItemRequest.builder()
 				.requestItems(
 						Map.of(tableName, KeysAndAttributes.builder().keys(keys).build()));
 	}
 
-	public <T> GetItemRequest.Builder getRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
-		return GetItemRequest.builder()
-				.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
-				.key(createKeyValue(keyObject));
-	}
-
-	public PutItemRequest.Builder putRequestFromObject(@NonNull Object obj) throws IOException {
+	public PutItemRequest.Builder putItemRequestFromKeyObject(@NonNull Object obj) throws IOException {
 		var encoded = encoder.encode(obj);
 		return PutItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(obj.getClass()))
 				.item(encoded);
 	}
 
-	public UpdateItemRequest.Builder updateRequestFromObject(@NonNull Object obj) throws IOException {
+	public UpdateItemRequest.Builder updateItemRequestFromKeyObject(@NonNull Object obj) throws IOException {
 		var encoded = encoder.encode(obj);
 		var key = createKeyValue(obj);
 		for (String k : key.keySet()) {
@@ -101,14 +102,14 @@ public class RequestFactory {
 				.attributeUpdates(updates);
 	}
 
-	public <T> DeleteItemRequest.Builder deleteRequestFromPrimaryKey(
+	public <T> DeleteItemRequest.Builder deleteItemRequestFromPrimaryKey(
 			@NonNull Object primaryKey, @NonNull Class<T> clazz) throws IOException {
 		return DeleteItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(clazz))
 				.key(createKeyValue(primaryKey, clazz));
 	}
 
-	public DeleteItemRequest.Builder deleteRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
+	public DeleteItemRequest.Builder deleteItemRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
 		return DeleteItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
 				.key(createKeyValue(keyObject));
@@ -124,7 +125,8 @@ public class RequestFactory {
 			throw new IllegalArgumentException(
 					String.format("Multiple primary keys defined on %s", clazz.getSimpleName()));
 		}
-		var primaryKeyValue = encoder.encodeValue(objectMapper.valueToTree(primaryKey));
+		var json = objectMapper.valueToTree(primaryKey);
+		var primaryKeyValue = encoder.encodeValue(json);
 		return Map.of(primaryKeys.get(0), primaryKeyValue);
 	}
 
