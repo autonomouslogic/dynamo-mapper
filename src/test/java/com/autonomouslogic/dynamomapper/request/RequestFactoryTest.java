@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
 
@@ -62,22 +63,27 @@ public class RequestFactoryTest {
 	@Test
 	@SneakyThrows
 	void shouldCreatePutItemRequestFromKeyObject() {
-		var request = factory.putItemRequestFromKeyObject(new TestObject().setString("key1")) // @todo add more
+		var request = factory.putItemRequestFromKeyObject(
+						new TestObject().setString("key1").setNumber(27))
 				.build();
-		var expected = Map.of("string", AttributeValue.builder().s("key1").build());
+		var expected = Map.ofEntries(
+				Map.entry("string", AttributeValue.builder().s("key1").build()),
+				Map.entry("number", AttributeValue.builder().n("27").build()));
 		assertEquals(expected, request.item());
 	}
 
 	@Test
 	@SneakyThrows
 	void shouldCreateUpdateItemRequestFromKeyObject() {
-		var request = factory.updateItemRequestFromKeyObject(new TestObject().setString("key1")) // @todo add more
+		var request = factory.updateItemRequestFromKeyObject(
+						new TestObject().setString("key1").setNumber(27))
 				.build();
 		var expected = Map.of("string", AttributeValue.builder().s("key1").build());
 		var updates = Map.of(
-				"string",
+				"number",
 				AttributeValueUpdate.builder()
-						.value(AttributeValue.builder().s("key1").build())
+						.value(AttributeValue.builder().n("27").build())
+						.action(AttributeAction.PUT)
 						.build());
 		assertEquals(expected, request.key());
 		assertEquals(updates, request.attributeUpdates());
