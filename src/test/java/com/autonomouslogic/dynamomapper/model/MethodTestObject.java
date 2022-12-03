@@ -1,21 +1,21 @@
 package com.autonomouslogic.dynamomapper.model;
 
-import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
+import com.autonomouslogic.dynamomapper.annotations.DynamoPrimaryKey;
 import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @DynamoTableName("test")
 public class MethodTestObject {
-	private String hashKey;
+	private String primaryKey;
 
-	@DynamoHashKey
+	@DynamoPrimaryKey
 	@JsonProperty
-	public String getHashKey() {
-		return hashKey;
+	public String getPrimaryKey() {
+		return primaryKey;
 	}
 
-	public MethodTestObject setHashKey(String hashKey) {
-		this.hashKey = hashKey;
+	public MethodTestObject setPrimaryKey(String primaryKey) {
+		this.primaryKey = primaryKey;
 		return this;
 	}
 }

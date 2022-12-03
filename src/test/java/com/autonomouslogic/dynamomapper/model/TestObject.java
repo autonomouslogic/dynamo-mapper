@@ -1,6 +1,6 @@
 package com.autonomouslogic.dynamomapper.model;
 
-import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
+import com.autonomouslogic.dynamomapper.annotations.DynamoPrimaryKey;
 import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -45,7 +45,7 @@ public class TestObject {
 	protected String nul;
 
 	@JsonProperty
-	@DynamoHashKey
+	@DynamoPrimaryKey
 	protected String string;
 
 	@JsonProperty

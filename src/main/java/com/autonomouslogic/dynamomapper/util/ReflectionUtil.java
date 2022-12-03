@@ -1,6 +1,6 @@
 package com.autonomouslogic.dynamomapper.util;
 
-import com.autonomouslogic.dynamomapper.annotations.DynamoHashKey;
+import com.autonomouslogic.dynamomapper.annotations.DynamoPrimaryKey;
 import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,22 +14,22 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ReflectionUtil {
-	private static final Map<Class<?>, List<String>> hashKeyCache = new ConcurrentHashMap<>();
+	private static final Map<Class<?>, List<String>> primaryKeyCache = new ConcurrentHashMap<>();
 	private static final Map<Class<?>, String> tableNameCache = new ConcurrentHashMap<>();
 	private final ObjectMapper objectMapper;
 
-	public List<String> resolveHashKeyFields(Class clazz) {
-		return hashKeyCache.computeIfAbsent(clazz, ignore -> {
+	public List<String> resolvePrimaryKeyFields(Class clazz) {
+		return primaryKeyCache.computeIfAbsent(clazz, ignore -> {
 			var properties = getProperties(clazz);
-			var hashKeyFields = new ArrayList<String>();
+			var primaryKeyFields = new ArrayList<String>();
 			for (PropertyWriter property : properties) {
 				var member = property.getMember();
-				var hashKey = member.getAnnotation(DynamoHashKey.class);
-				if (hashKey != null) {
-					hashKeyFields.add(property.getName());
+				var primaryKey = member.getAnnotation(DynamoPrimaryKey.class);
+				if (primaryKey != null) {
+					primaryKeyFields.add(property.getName());
 				}
 			}
-			return Collections.unmodifiableList(hashKeyFields);
+			return Collections.unmodifiableList(primaryKeyFields);
 		});
 	}
 

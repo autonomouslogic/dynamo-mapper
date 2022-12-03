@@ -15,25 +15,25 @@ public class ReflectionUtilTest {
 
 	@Test
 	@SneakyThrows
-	void shouldResolveHashKeyField() {
-		assertEquals(List.of("string"), reflectionUtil.resolveHashKeyFields(TestObject.class));
+	void shouldResolvePrimaryKeyField() {
+		assertEquals(List.of("string"), reflectionUtil.resolvePrimaryKeyFields(TestObject.class));
 	}
 
 	@Test
 	@SneakyThrows
-	void shouldResolveHashKeyFieldFromModifiedJsonProperty() {
-		assertEquals(List.of("hash_key"), reflectionUtil.resolveHashKeyFields(ModifiedTestObject.class));
+	void shouldResolvePrimaryKeyFieldFromModifiedJsonProperty() {
+		assertEquals(List.of("primary_key"), reflectionUtil.resolvePrimaryKeyFields(ModifiedTestObject.class));
 	}
 
 	@Test
 	@SneakyThrows
-	void shouldResolveHashKeyMethod() {
-		assertEquals(List.of("hashKey"), reflectionUtil.resolveHashKeyFields(MethodTestObject.class));
+	void shouldResolvePrimaryKeyMethod() {
+		assertEquals(List.of("primaryKey"), reflectionUtil.resolvePrimaryKeyFields(MethodTestObject.class));
 	}
 
 	@Test
 	@SneakyThrows
-	void shouldResolveHashKeyMethodFromModifiedJsonProperty() {
-		assertEquals(List.of("hash_key"), reflectionUtil.resolveHashKeyFields(ModifiedMethodTestObject.class));
+	void shouldResolvePrimaryKeyMethodFromModifiedJsonProperty() {
+		assertEquals(List.of("primary_key"), reflectionUtil.resolvePrimaryKeyFields(ModifiedMethodTestObject.class));
 	}
 }
