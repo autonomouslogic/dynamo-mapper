@@ -214,7 +214,7 @@ public class MapperGenerator {
 
 	protected void generatePrimaryKeyWrapper(MethodSpec method, String factoryMethodName) {
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(method.name)
+		var wrapper = MethodSpec.methodBuilder(createMethodName(method, "FromPrimaryKey"))
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
@@ -239,7 +239,7 @@ public class MapperGenerator {
 
 	protected void generateKeyObjectWrapper(MethodSpec method, String factoryMethodName) {
 		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(method.name)
+		var wrapper = MethodSpec.methodBuilder(createMethodName(method, "FromKeyObject"))
 			.addModifiers(Modifier.PUBLIC)
 			.addTypeVariable(TypeHelper.T);
 		wrapper.returns(method.returnType);
@@ -282,5 +282,10 @@ public class MapperGenerator {
 			requestVar = CONSUMER;
 		}
 		return requestVar;
+	}
+
+	private String createMethodName(MethodSpec method, String suffix) {
+		String methodName = method.name + suffix;
+		return methodName;
 	}
 }

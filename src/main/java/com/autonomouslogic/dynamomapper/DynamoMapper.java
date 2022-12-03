@@ -67,7 +67,7 @@ public class DynamoMapper {
 		return decoder.mapGetItemResponse(client.getItem(reqOrConsumer), clazz);
 	}
 
-	public <T> MappedGetItemResponse<T> getItem(
+	public <T> MappedGetItemResponse<T> getItemFromPrimaryKey(
 			@NonNull Object hashKey, @NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz)
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
@@ -78,7 +78,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedGetItemResponse<T> getItem(
+	public <T> MappedGetItemResponse<T> getItemFromKeyObject(
 			@NonNull T keyObject, @NonNull Consumer<GetItemRequest.Builder> consumer)
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
@@ -96,7 +96,7 @@ public class DynamoMapper {
 		return decoder.mapGetItemResponse(client.getItem(reqOrConsumer), clazz);
 	}
 
-	public <T> MappedGetItemResponse<T> getItem(@NonNull Object hashKey, @NonNull Class<T> clazz)
+	public <T> MappedGetItemResponse<T> getItemFromPrimaryKey(@NonNull Object hashKey, @NonNull Class<T> clazz)
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
 					JsonProcessingException, IOException {
@@ -105,7 +105,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedGetItemResponse<T> getItem(@NonNull T keyObject)
+	public <T> MappedGetItemResponse<T> getItemFromKeyObject(@NonNull T keyObject)
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
 					JsonProcessingException, IOException {
@@ -129,7 +129,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedPutItemResponse<T> putItem(
+	public <T> MappedPutItemResponse<T> putItemFromKeyObject(
 			@NonNull T keyObject, @NonNull Consumer<PutItemRequest.Builder> consumer)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
@@ -150,7 +150,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedPutItemResponse<T> putItem(@NonNull T keyObject)
+	public <T> MappedPutItemResponse<T> putItemFromKeyObject(@NonNull T keyObject)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
@@ -175,7 +175,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedUpdateItemResponse<T> updateItem(
+	public <T> MappedUpdateItemResponse<T> updateItemFromKeyObject(
 			@NonNull T keyObject, @NonNull Consumer<UpdateItemRequest.Builder> consumer)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
@@ -196,7 +196,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedUpdateItemResponse<T> updateItem(@NonNull T keyObject)
+	public <T> MappedUpdateItemResponse<T> updateItemFromKeyObject(@NonNull T keyObject)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
@@ -220,7 +220,7 @@ public class DynamoMapper {
 		return decoder.mapDeleteItemResponse(client.deleteItem(reqOrConsumer), clazz);
 	}
 
-	public <T> MappedDeleteItemResponse<T> deleteItem(
+	public <T> MappedDeleteItemResponse<T> deleteItemFromPrimaryKey(
 			@NonNull Object hashKey, @NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
@@ -232,7 +232,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedDeleteItemResponse<T> deleteItem(
+	public <T> MappedDeleteItemResponse<T> deleteItemFromKeyObject(
 			@NonNull T keyObject, @NonNull Consumer<DeleteItemRequest.Builder> consumer)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
@@ -252,7 +252,7 @@ public class DynamoMapper {
 		return decoder.mapDeleteItemResponse(client.deleteItem(reqOrConsumer), clazz);
 	}
 
-	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull Object hashKey, @NonNull Class<T> clazz)
+	public <T> MappedDeleteItemResponse<T> deleteItemFromPrimaryKey(@NonNull Object hashKey, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
@@ -262,7 +262,7 @@ public class DynamoMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull T keyObject)
+	public <T> MappedDeleteItemResponse<T> deleteItemFromKeyObject(@NonNull T keyObject)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
