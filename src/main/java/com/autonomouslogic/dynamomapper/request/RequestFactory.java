@@ -36,11 +36,11 @@ public class RequestFactory {
 	}
 
 	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromPrimaryKeys(
-			@NonNull List<?> hashKeys, @NonNull Class<T> clazz) throws IOException {
+			@NonNull List<?> primaryKeys, @NonNull Class<T> clazz) throws IOException {
 		var tableName = reflectionUtil.resolveTableName(clazz);
-		var keyObjects = new ArrayList<Map<String, AttributeValue>>(hashKeys.size());
-		for (Object hashKey : hashKeys) {
-			keyObjects.add(createKeyValue(hashKey, clazz));
+		var keyObjects = new ArrayList<Map<String, AttributeValue>>(primaryKeys.size());
+		for (Object primaryKey : primaryKeys) {
+			keyObjects.add(createKeyValue(primaryKey, clazz));
 		}
 		return BatchGetItemRequest.builder()
 				.requestItems(Map.of(
@@ -61,8 +61,8 @@ public class RequestFactory {
 		}
 		var tableName = reflectionUtil.resolveTableName(clazz);
 		var keys = new ArrayList<Map<String, AttributeValue>>(keyObjects.size());
-		for (Object hashKey : keyObjects) {
-			keys.add(createKeyValue(hashKey, clazz));
+		for (Object primaryKey : keyObjects) {
+			keys.add(createKeyValue(primaryKey, clazz));
 		}
 		return BatchGetItemRequest.builder()
 				.requestItems(
@@ -118,11 +118,11 @@ public class RequestFactory {
 			throws IOException {
 		var primaryKeys = reflectionUtil.resolvePrimaryKeyFields(clazz);
 		if (primaryKeys.isEmpty()) {
-			throw new IllegalArgumentException(String.format("No hash key defined on %s", clazz.getSimpleName()));
+			throw new IllegalArgumentException(String.format("No primary key defined on %s", clazz.getSimpleName()));
 		}
 		if (primaryKeys.size() > 1) {
 			throw new IllegalArgumentException(
-					String.format("Multiple hash keys defined on %s", clazz.getSimpleName()));
+					String.format("Multiple primary keys defined on %s", clazz.getSimpleName()));
 		}
 		var primaryKeyValue = encoder.encodeValue(objectMapper.valueToTree(primaryKey));
 		return Map.of(primaryKeys.get(0), primaryKeyValue);

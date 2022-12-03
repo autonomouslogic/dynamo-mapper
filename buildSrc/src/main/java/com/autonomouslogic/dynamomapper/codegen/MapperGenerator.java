@@ -237,17 +237,17 @@ public class MapperGenerator {
 		wrapper.addException(IOException.class);
 		// Add parameters.
 		if (!multiple) {
-			wrapper.addParameter(Object.class, "hashKey");
+			wrapper.addParameter(Object.class, "primaryKey");
 		}
 		else {
 			var type = TypeHelper.genericWildcard(ClassName.get(List.class));
-			wrapper.addParameter(type, "hashKey");
+			wrapper.addParameter(type, "primaryKey");
 		}
 		var params = new ArrayList<>(method.parameters);
 		params.removeIf(p -> p.name.equals(REQUEST));
 		wrapper.addParameters(params);
 		// Write body.
-		wrapper.addStatement("var builder = requestFactory.$L(hashKey, clazz)", factoryMethodName);
+		wrapper.addStatement("var builder = requestFactory.$L(primaryKey, clazz)", factoryMethodName);
 		var firstParamTypeName = method.parameters.get(0).type;
 		if (firstParamTypeName instanceof ParameterizedTypeName) {
 			wrapper.addStatement("consumer.accept(builder)");
