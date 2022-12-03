@@ -56,7 +56,7 @@ public class RequestFactory {
 	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromKeyObjects(@NonNull List<T> keyObjects)
 			throws IOException {
 
-		Class clazz = null;
+		Class<?> clazz = null;
 		for (var k : keyObjects) {
 			if (clazz == null) {
 				clazz = k.getClass();
@@ -68,7 +68,8 @@ public class RequestFactory {
 		var tableName = reflectionUtil.resolveTableName(clazz);
 		var keys = new ArrayList<Map<String, AttributeValue>>(keyObjects.size());
 		for (Object primaryKey : keyObjects) {
-			keys.add(createKeyValue(primaryKey, clazz));
+			var keyValue = createKeyValue(primaryKey);
+			keys.add(keyValue);
 		}
 		return BatchGetItemRequest.builder()
 				.requestItems(
@@ -124,7 +125,8 @@ public class RequestFactory {
 			throw new IllegalArgumentException(
 					String.format("Multiple primary keys defined on %s", clazz.getSimpleName()));
 		}
-		var primaryKeyValue = encoder.encodeValue(objectMapper.valueToTree(primaryKey));
+		var json = objectMapper.valueToTree(primaryKey);
+		var primaryKeyValue = encoder.encodeValue(json);
 		return Map.of(primaryKeys.get(0), primaryKeyValue);
 	}
 
