@@ -24,11 +24,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Spotless
-        run: |
-          echo "Run './gradlew spotlessApply' to auto-format"
-          ./gradlew spotlessCheck
-
       - name: Generate
         run: |
           ./gradlew codegen
