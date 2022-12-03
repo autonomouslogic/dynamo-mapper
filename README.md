@@ -63,7 +63,7 @@ Only a few extra annotations are required.
 public class ModelObject {
 	@JsonProperty
 	@DynamoPrimaryKey
-	private String partitionKey;
+	private String primaryKey;
 	
 	@JsonProperty
 	private String otherValue;
@@ -75,12 +75,12 @@ public class ModelObject {
 ### Getting items
 Using the synchronous API:
 ```java
-var item = dynamoMapper.getItemFromHashKey("partition-key-value", ModelObject.class).item();
+var item = dynamoMapper.getItemFromPrimaryKey("key-value", ModelObject.class).item();
 ```
 
 Using the asynchronous API:
 ```java
-dynamoMapper.getItemFromHashKey("partition-key-value", ModelObject.class).thenAccept(response -> {
+dynamoMapper.getItemFromPrimaryKey("key-value", ModelObject.class).thenAccept(response -> {
 	var item = response.item();
 });
 ```
@@ -88,13 +88,13 @@ dynamoMapper.getItemFromHashKey("partition-key-value", ModelObject.class).thenAc
 ### Putting items
 Using the synchronous API:
 ```java
-var item = new ModelObject();
+var item = new ModelObject().setPrimaryKey("key-value");
 var response = dynamoMapper.putItemFromKeyObject(item);
 ```
 
 Using the asynchronous API:
 ```java
-var item = new ModelObject();
+var item = new ModelObject().setPrimaryKey("key-value");
 dynamoMapper.putItemFromKeyObject(item).thenAccept(response -> {
 	// etc.
 });

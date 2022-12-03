@@ -4,15 +4,19 @@ import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.KeysAndAttributes;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
@@ -29,6 +33,40 @@ public class RequestFactory {
 		return GetItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(clazz))
 				.key(createKeyValue(primaryKey, clazz));
+	}
+
+	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromPrimaryKeys(
+			@NonNull List<?> primaryKeys, @NonNull Class<T> clazz) throws IOException {
+		var tableName = reflectionUtil.resolveTableName(clazz);
+		var keyObjects = new ArrayList<Map<String, AttributeValue>>(primaryKeys.size());
+		for (Object primaryKey : primaryKeys) {
+			keyObjects.add(createKeyValue(primaryKey, clazz));
+		}
+		return BatchGetItemRequest.builder()
+				.requestItems(Map.of(
+						tableName, KeysAndAttributes.builder().keys(keyObjects).build()));
+	}
+
+	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromKeyObjects(@NonNull List<T> keyObjects)
+			throws IOException {
+
+		Class clazz = null;
+		for (var k : keyObjects) {
+			if (clazz == null) {
+				clazz = k.getClass();
+			} else if (clazz != k.getClass()) {
+				throw new IllegalArgumentException(String.format(
+						"Key objects must be the same class, expected %s, but %s seen", clazz, k.getClass()));
+			}
+		}
+		var tableName = reflectionUtil.resolveTableName(clazz);
+		var keys = new ArrayList<Map<String, AttributeValue>>(keyObjects.size());
+		for (Object primaryKey : keyObjects) {
+			keys.add(createKeyValue(primaryKey, clazz));
+		}
+		return BatchGetItemRequest.builder()
+				.requestItems(
+						Map.of(tableName, KeysAndAttributes.builder().keys(keys).build()));
 	}
 
 	public <T> GetItemRequest.Builder getRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
@@ -80,11 +118,11 @@ public class RequestFactory {
 			throws IOException {
 		var primaryKeys = reflectionUtil.resolvePrimaryKeyFields(clazz);
 		if (primaryKeys.isEmpty()) {
-			throw new IllegalArgumentException(String.format("No hash key defined on %s", clazz.getSimpleName()));
+			throw new IllegalArgumentException(String.format("No primary key defined on %s", clazz.getSimpleName()));
 		}
 		if (primaryKeys.size() > 1) {
 			throw new IllegalArgumentException(
-					String.format("Multiple hash keys defined on %s", clazz.getSimpleName()));
+					String.format("Multiple primary keys defined on %s", clazz.getSimpleName()));
 		}
 		var primaryKeyValue = encoder.encodeValue(objectMapper.valueToTree(primaryKey));
 		return Map.of(primaryKeys.get(0), primaryKeyValue);
@@ -107,8 +145,23 @@ public class RequestFactory {
 		return req;
 	}
 
-	public GetItemRequest.Builder acceptGetItemRequest(@NonNull GetItemRequest.Builder req, @NonNull Class<?> clazz) {
+	public GetItemRequest.Builder acceptGetItemRequest(GetItemRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
+	}
+
+	public BatchGetItemRequest acceptBatchGetItemRequest(@NonNull BatchGetItemRequest req, @NonNull Class<?> clazz) {
+		var items = req.requestItems();
+		var types = items.size();
+		if (types != 1) {
+			throw new IllegalArgumentException(
+					String.format("Exactly one class type expected, %s given: %s", types, items.keySet()));
+		}
+		return req;
+	}
+
+	public BatchGetItemRequest.Builder acceptBatchGetItemRequest(
+			BatchGetItemRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
+		return req;
 	}
 
 	public PutItemRequest acceptPutItemRequest(@NonNull PutItemRequest req, @NonNull Class<?> clazz) {
@@ -118,7 +171,7 @@ public class RequestFactory {
 		return req;
 	}
 
-	public PutItemRequest.Builder acceptPutItemRequest(@NonNull PutItemRequest.Builder req, @NonNull Class<?> clazz) {
+	public PutItemRequest.Builder acceptPutItemRequest(PutItemRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
 
@@ -153,7 +206,7 @@ public class RequestFactory {
 		return req;
 	}
 
-	public ScanRequest.Builder acceptScanRequest(@NonNull ScanRequest.Builder req, @NonNull Class<?> clazz) {
+	public ScanRequest.Builder acceptScanRequest(ScanRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
 
@@ -164,7 +217,7 @@ public class RequestFactory {
 		return req;
 	}
 
-	public QueryRequest.Builder acceptQueryRequest(@NonNull QueryRequest.Builder req, @NonNull Class<?> clazz) {
+	public QueryRequest.Builder acceptQueryRequest(QueryRequest.@NonNull Builder req, @NonNull Class<?> clazz) {
 		return req.tableName(reflectionUtil.resolveTableName(clazz));
 	}
 }

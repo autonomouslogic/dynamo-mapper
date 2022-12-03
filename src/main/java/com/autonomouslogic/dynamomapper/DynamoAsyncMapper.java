@@ -4,6 +4,7 @@ package com.autonomouslogic.dynamomapper;
 import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.function.CheckedFunction;
+import com.autonomouslogic.dynamomapper.model.MappedBatchGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
@@ -14,10 +15,15 @@ import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.autonomouslogic.dynamomapper.util.FutureUtil;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import lombok.NonNull;
+import org.reactivestreams.Publisher;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
@@ -66,23 +72,20 @@ public class DynamoAsyncMapper {
 		});
 	}
 
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
-			@NonNull Object primaryKey, @NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.getRequestFromPrimaryKey(primaryKey, clazz);
-			consumer.accept(builder);
-			return getItem(builder.build(), clazz);
-		});
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItemFromPrimaryKey(
+			@NonNull Object primaryKey, @NonNull Consumer<GetItemRequest.Builder> consumer, @NonNull Class<T> clazz)
+			throws IOException {
+		var builder = requestFactory.getRequestFromPrimaryKey(primaryKey, clazz);
+		consumer.accept(builder);
+		return getItem(builder.build(), clazz);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
-			@NonNull T keyObject, @NonNull Consumer<GetItemRequest.Builder> consumer) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.getRequestFromKeyObject(keyObject);
-			consumer.accept(builder);
-			return getItem(builder.build(), (Class<T>) keyObject.getClass());
-		});
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItemFromKeyObject(
+			@NonNull Object keyObject, @NonNull Consumer<GetItemRequest.Builder> consumer) throws IOException {
+		var builder = requestFactory.getRequestFromKeyObject(keyObject);
+		consumer.accept(builder);
+		return getItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
 	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
@@ -96,20 +99,78 @@ public class DynamoAsyncMapper {
 		});
 	}
 
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
-			@NonNull Object primaryKey, @NonNull Class<T> clazz) {
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItemFromPrimaryKey(
+			@NonNull Object primaryKey, @NonNull Class<T> clazz) throws IOException {
+		var builder = requestFactory.getRequestFromPrimaryKey(primaryKey, clazz);
+		return getItem(builder.build(), clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedGetItemResponse<T>> getItemFromKeyObject(@NonNull Object keyObject)
+			throws IOException {
+		var builder = requestFactory.getRequestFromKeyObject(keyObject);
+		return getItem(builder.build(), (Class<T>) keyObject.getClass());
+	}
+
+	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItem(
+			@NonNull BatchGetItemRequest request, @NonNull Class<T> clazz) {
+		var reqOrConsumer = requestFactory.acceptBatchGetItemRequest(request, clazz);
+		return client.batchGetItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
+			@Override
+			public MappedBatchGetItemResponse<T> checkedApply(BatchGetItemResponse response) throws Exception {
+				return decoder.mapBatchGetItemResponse(response, clazz);
+			}
+		});
+	}
+
+	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItemFromPrimaryKeys(
+			@NonNull List<?> primaryKey, @NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.getRequestFromPrimaryKey(primaryKey, clazz);
-			return getItem(builder.build(), clazz);
+			var builder = requestFactory.batchGetItemRequestFromPrimaryKeys(primaryKey, clazz);
+			return batchGetItem(builder.build(), clazz);
 		});
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(@NonNull T keyObject) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.getRequestFromKeyObject(keyObject);
-			return getItem(builder.build(), (Class<T>) keyObject.getClass());
+	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItemFromKeyObjects(@NonNull List<?> keyObject)
+			throws IOException {
+		var builder = requestFactory.batchGetItemRequestFromKeyObjects(keyObject);
+		return batchGetItem(builder.build(), (Class<T>) keyObject.getClass());
+	}
+
+	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItem(
+			@NonNull Consumer<BatchGetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
+		Consumer<BatchGetItemRequest.Builder> reqOrConsumer = (builder) -> {
+			{
+				requestFactory.acceptBatchGetItemRequest(builder, clazz);
+				consumer.accept(builder);
+			}
+		};
+		return client.batchGetItem(reqOrConsumer).thenApply(new CheckedFunction<>() {
+			@Override
+			public MappedBatchGetItemResponse<T> checkedApply(BatchGetItemResponse response) throws Exception {
+				return decoder.mapBatchGetItemResponse(response, clazz);
+			}
 		});
+	}
+
+	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItemFromPrimaryKeys(
+			@NonNull List<?> primaryKey,
+			@NonNull Consumer<BatchGetItemRequest.Builder> consumer,
+			@NonNull Class<T> clazz) {
+		return FutureUtil.wrapFuture(() -> {
+			var builder = requestFactory.batchGetItemRequestFromPrimaryKeys(primaryKey, clazz);
+			consumer.accept(builder);
+			return batchGetItem(builder.build(), clazz);
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItemFromKeyObjects(
+			@NonNull List<?> keyObject, @NonNull Consumer<BatchGetItemRequest.Builder> consumer) throws IOException {
+		var builder = requestFactory.batchGetItemRequestFromKeyObjects(keyObject);
+		consumer.accept(builder);
+		return batchGetItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
 	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(
@@ -129,13 +190,11 @@ public class DynamoAsyncMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(
-			@NonNull T keyObject, @NonNull Consumer<PutItemRequest.Builder> consumer) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.putRequestFromObject(keyObject);
-			consumer.accept(builder);
-			return putItem(builder.build(), (Class<T>) keyObject.getClass());
-		});
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItemFromKeyObject(
+			@NonNull Object keyObject, @NonNull Consumer<PutItemRequest.Builder> consumer) throws IOException {
+		var builder = requestFactory.putRequestFromObject(keyObject);
+		consumer.accept(builder);
+		return putItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
 	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(
@@ -150,11 +209,10 @@ public class DynamoAsyncMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(@NonNull T keyObject) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.putRequestFromObject(keyObject);
-			return putItem(builder.build(), (Class<T>) keyObject.getClass());
-		});
+	public <T> CompletableFuture<MappedPutItemResponse<T>> putItemFromKeyObject(@NonNull Object keyObject)
+			throws IOException {
+		var builder = requestFactory.putRequestFromObject(keyObject);
+		return putItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
 	public <T> CompletableFuture<MappedUpdateItemResponse<T>> updateItem(
@@ -174,13 +232,11 @@ public class DynamoAsyncMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedUpdateItemResponse<T>> updateItem(
-			@NonNull T keyObject, @NonNull Consumer<UpdateItemRequest.Builder> consumer) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.updateRequestFromObject(keyObject);
-			consumer.accept(builder);
-			return updateItem(builder.build(), (Class<T>) keyObject.getClass());
-		});
+	public <T> CompletableFuture<MappedUpdateItemResponse<T>> updateItemFromKeyObject(
+			@NonNull Object keyObject, @NonNull Consumer<UpdateItemRequest.Builder> consumer) throws IOException {
+		var builder = requestFactory.updateRequestFromObject(keyObject);
+		consumer.accept(builder);
+		return updateItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
 	public <T> CompletableFuture<MappedUpdateItemResponse<T>> updateItem(
@@ -195,11 +251,10 @@ public class DynamoAsyncMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedUpdateItemResponse<T>> updateItem(@NonNull T keyObject) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.updateRequestFromObject(keyObject);
-			return updateItem(builder.build(), (Class<T>) keyObject.getClass());
-		});
+	public <T> CompletableFuture<MappedUpdateItemResponse<T>> updateItemFromKeyObject(@NonNull Object keyObject)
+			throws IOException {
+		var builder = requestFactory.updateRequestFromObject(keyObject);
+		return updateItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
 	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
@@ -218,7 +273,7 @@ public class DynamoAsyncMapper {
 		});
 	}
 
-	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItemFromPrimaryKey(
 			@NonNull Object primaryKey,
 			@NonNull Consumer<DeleteItemRequest.Builder> consumer,
 			@NonNull Class<T> clazz) {
@@ -230,13 +285,11 @@ public class DynamoAsyncMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
-			@NonNull T keyObject, @NonNull Consumer<DeleteItemRequest.Builder> consumer) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
-			consumer.accept(builder);
-			return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
-		});
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItemFromKeyObject(
+			@NonNull Object keyObject, @NonNull Consumer<DeleteItemRequest.Builder> consumer) throws IOException {
+		var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+		consumer.accept(builder);
+		return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
 	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
@@ -250,7 +303,7 @@ public class DynamoAsyncMapper {
 		});
 	}
 
-	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItemFromPrimaryKey(
 			@NonNull Object primaryKey, @NonNull Class<T> clazz) {
 		return FutureUtil.wrapFuture(() -> {
 			var builder = requestFactory.deleteRequestFromPrimaryKey(primaryKey, clazz);
@@ -259,11 +312,10 @@ public class DynamoAsyncMapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItem(@NonNull T keyObject) {
-		return FutureUtil.wrapFuture(() -> {
-			var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
-			return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
-		});
+	public <T> CompletableFuture<MappedDeleteItemResponse<T>> deleteItemFromKeyObject(@NonNull Object keyObject)
+			throws IOException {
+		var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+		return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
 	public <T> CompletableFuture<MappedScanResponse<T>> scan(
@@ -320,5 +372,63 @@ public class DynamoAsyncMapper {
 
 	public static DynamoAsyncMapperBuilder builder() {
 		return new DynamoAsyncMapperBuilder();
+	}
+
+	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginator(
+			@NonNull BatchGetItemRequest request, @NonNull Class<T> clazz) {
+		var reqOrConsumer = requestFactory.acceptBatchGetItemRequest(request, clazz);
+		return client.batchGetItemPaginator(reqOrConsumer).map(new CheckedFunction<>() {
+			@Override
+			public MappedBatchGetItemResponse<T> checkedApply(BatchGetItemResponse response) throws Exception {
+				return decoder.mapBatchGetItemResponse(response, clazz);
+			}
+		});
+	}
+
+	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginatorFromPrimaryKeys(
+			@NonNull List<?> primaryKey, @NonNull Class<T> clazz) throws IOException {
+		var builder = requestFactory.batchGetItemRequestFromPrimaryKeys(primaryKey, clazz);
+		return batchGetItemPaginator(builder.build(), clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginatorFromKeyObjects(@NonNull List<?> keyObject)
+			throws IOException {
+		var builder = requestFactory.batchGetItemRequestFromKeyObjects(keyObject);
+		return batchGetItemPaginator(builder.build(), (Class<T>) keyObject.getClass());
+	}
+
+	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginator(
+			@NonNull Consumer<BatchGetItemRequest.Builder> consumer, @NonNull Class<T> clazz) {
+		Consumer<BatchGetItemRequest.Builder> reqOrConsumer = (builder) -> {
+			{
+				requestFactory.acceptBatchGetItemRequest(builder, clazz);
+				consumer.accept(builder);
+			}
+		};
+		return client.batchGetItemPaginator(reqOrConsumer).map(new CheckedFunction<>() {
+			@Override
+			public MappedBatchGetItemResponse<T> checkedApply(BatchGetItemResponse response) throws Exception {
+				return decoder.mapBatchGetItemResponse(response, clazz);
+			}
+		});
+	}
+
+	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginatorFromPrimaryKeys(
+			@NonNull List<?> primaryKey,
+			@NonNull Consumer<BatchGetItemRequest.Builder> consumer,
+			@NonNull Class<T> clazz)
+			throws IOException {
+		var builder = requestFactory.batchGetItemRequestFromPrimaryKeys(primaryKey, clazz);
+		consumer.accept(builder);
+		return batchGetItemPaginator(builder.build(), clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginatorFromKeyObjects(
+			@NonNull List<?> keyObject, @NonNull Consumer<BatchGetItemRequest.Builder> consumer) throws IOException {
+		var builder = requestFactory.batchGetItemRequestFromKeyObjects(keyObject);
+		consumer.accept(builder);
+		return batchGetItemPaginator(builder.build(), (Class<T>) keyObject.getClass());
 	}
 }

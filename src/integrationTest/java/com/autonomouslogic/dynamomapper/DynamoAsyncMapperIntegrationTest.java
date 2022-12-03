@@ -6,7 +6,11 @@ import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
@@ -34,21 +38,21 @@ public class DynamoAsyncMapperIntegrationTest {
 		obj = IntegrationTestObjects.setKeyAndTtl(obj);
 		System.out.println(obj);
 		// Put.
-		dynamoAsyncMapper.putItem(obj).join();
+		dynamoAsyncMapper.putItemFromKeyObject(obj).join();
 		// Get.
 		var getResponse = dynamoAsyncMapper
-				.getItem(obj.partitionKey(), IntegrationTestObject.class)
+				.getItemFromPrimaryKey(obj.partitionKey(), IntegrationTestObject.class)
 				.join();
 		assertEquals(obj, getResponse.item());
 		// Update.
 		var obj2 = obj.toBuilder().str("new-val").build();
 		var updateResponse = dynamoAsyncMapper
-				.updateItem(obj2, req -> req.returnValues(ReturnValue.ALL_OLD))
+				.updateItemFromKeyObject(obj2, req -> req.returnValues(ReturnValue.ALL_OLD))
 				.join();
 		assertEquals(obj, updateResponse.item());
 		// Delete.
 		var deleteResponse = dynamoAsyncMapper
-				.deleteItem(
+				.deleteItemFromPrimaryKey(
 						obj.partitionKey(), req -> req.returnValues(ReturnValue.ALL_OLD), IntegrationTestObject.class)
 				.join();
 		assertEquals(obj2, deleteResponse.item());
@@ -62,7 +66,7 @@ public class DynamoAsyncMapperIntegrationTest {
 		for (int i = 0; i < n; i++) {
 			var obj = IntegrationTestObjects.setKeyAndTtl(
 					IntegrationTestObject.builder().str(shared).build());
-			dynamoAsyncMapper.putItem(obj).join();
+			dynamoAsyncMapper.putItemFromKeyObject(obj).join();
 		}
 		var scanResult = dynamoAsyncMapper
 				.scan(
@@ -80,10 +84,38 @@ public class DynamoAsyncMapperIntegrationTest {
 
 	@Test
 	@SneakyThrows
+	void shouldBatchGetItems() {
+		String shared = Long.toString(IntegrationTestUtil.RNG.nextLong());
+		int n = 10;
+		var keys = new ArrayList<String>(n);
+		for (int i = 0; i < n; i++) {
+			var obj = IntegrationTestObjects.setKeyAndTtl(
+					IntegrationTestObject.builder().str(shared).build());
+			dynamoAsyncMapper.putItemFromKeyObject(obj).join();
+			keys.add(obj.partitionKey());
+		}
+		var batchGetResult = dynamoAsyncMapper
+				.batchGetItemFromPrimaryKeys(
+						keys,
+						req -> {
+							var table = req.build().requestItems().keySet();
+							assertEquals(Set.of("integration-test-table"), table);
+						},
+						IntegrationTestObject.class)
+				.join();
+		var fetchedKeys = batchGetResult.items().values().stream()
+				.flatMap(Collection::stream)
+				.map(item -> item.partitionKey())
+				.collect(Collectors.toList());
+		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
+	}
+
+	@Test
+	@SneakyThrows
 	void shouldQuery() {
 		var obj = IntegrationTestObjects.setKeyAndTtl(
 				IntegrationTestObject.builder().str("str-1234").build());
-		dynamoAsyncMapper.putItem(obj).join();
+		dynamoAsyncMapper.putItemFromKeyObject(obj).join();
 		var queryResult = dynamoAsyncMapper
 				.query(
 						req -> {
