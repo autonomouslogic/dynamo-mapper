@@ -120,8 +120,8 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "getItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedGetItemResponse, "mapGetItemResponse", GetItemRequest.class, GetItemResponse.class);
-			generatePrimaryKeyWrapper(delegate, "getRequestFromPrimaryKey", false, false);
-			generateKeyObjectWrapper(delegate, "getRequestFromKeyObject", false, false);
+			generatePrimaryKeyWrapper(delegate, "getItemRequestFromPrimaryKey", false, false);
+			generateKeyObjectWrapper(delegate, "getItemRequestFromKeyObject", false, false);
 		}
 	}
 
@@ -138,7 +138,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "putItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedPutItemResponse, "mapPutItemResponse", PutItemRequest.class, PutItemResponse.class);
-			generateKeyObjectWrapper(delegate, "putRequestFromObject", false, false);
+			generateKeyObjectWrapper(delegate, "putItemRequestFromKeyObject", false, false);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "updateItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedUpdateItemResponse, "mapUpdateItemResponse", UpdateItemRequest.class, UpdateItemResponse.class);
-			generateKeyObjectWrapper(delegate, "updateRequestFromObject", false, false);
+			generateKeyObjectWrapper(delegate, "updateItemRequestFromKeyObject", false, false);
 		}
 	}
 
@@ -154,8 +154,8 @@ public class MapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "deleteItem")) {
 			var delegate = generateDelegateWrapper(
 				method, mappedDeleteItemResponse, "mapDeleteItemResponse", DeleteItemRequest.class, DeleteItemResponse.class);
-			generatePrimaryKeyWrapper(delegate, "deleteRequestFromPrimaryKey", false, true);
-			generateKeyObjectWrapper(delegate, "deleteRequestFromKeyObject", false, false);
+			generatePrimaryKeyWrapper(delegate, "deleteItemRequestFromPrimaryKey", false, true);
+			generateKeyObjectWrapper(delegate, "deleteItemRequestFromKeyObject", false, false);
 		}
 	}
 

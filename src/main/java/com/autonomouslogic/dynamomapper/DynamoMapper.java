@@ -75,7 +75,7 @@ public class DynamoMapper {
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
 					JsonProcessingException, IOException {
-		var builder = requestFactory.getRequestFromPrimaryKey(primaryKey, clazz);
+		var builder = requestFactory.getItemRequestFromPrimaryKey(primaryKey, clazz);
 		consumer.accept(builder);
 		return getItem(builder.build(), clazz);
 	}
@@ -86,7 +86,7 @@ public class DynamoMapper {
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
 					JsonProcessingException, IOException {
-		var builder = requestFactory.getRequestFromKeyObject(keyObject);
+		var builder = requestFactory.getItemRequestFromKeyObject(keyObject);
 		consumer.accept(builder);
 		return getItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
@@ -103,7 +103,7 @@ public class DynamoMapper {
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
 					JsonProcessingException, IOException {
-		var builder = requestFactory.getRequestFromPrimaryKey(primaryKey, clazz);
+		var builder = requestFactory.getItemRequestFromPrimaryKey(primaryKey, clazz);
 		return getItem(builder.build(), clazz);
 	}
 
@@ -112,7 +112,7 @@ public class DynamoMapper {
 			throws ProvisionedThroughputExceededException, ResourceNotFoundException, RequestLimitExceededException,
 					InternalServerErrorException, AwsServiceException, SdkClientException, DynamoDbException,
 					JsonProcessingException, IOException {
-		var builder = requestFactory.getRequestFromKeyObject(keyObject);
+		var builder = requestFactory.getItemRequestFromKeyObject(keyObject);
 		return getItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
@@ -204,7 +204,7 @@ public class DynamoMapper {
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
-		var builder = requestFactory.putRequestFromObject(keyObject);
+		var builder = requestFactory.putItemRequestFromKeyObject(keyObject);
 		consumer.accept(builder);
 		return putItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
@@ -224,7 +224,7 @@ public class DynamoMapper {
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
-		var builder = requestFactory.putRequestFromObject(keyObject);
+		var builder = requestFactory.putItemRequestFromKeyObject(keyObject);
 		return putItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
@@ -250,7 +250,7 @@ public class DynamoMapper {
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
-		var builder = requestFactory.updateRequestFromObject(keyObject);
+		var builder = requestFactory.updateItemRequestFromKeyObject(keyObject);
 		consumer.accept(builder);
 		return updateItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
@@ -270,7 +270,7 @@ public class DynamoMapper {
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
-		var builder = requestFactory.updateRequestFromObject(keyObject);
+		var builder = requestFactory.updateItemRequestFromKeyObject(keyObject);
 		return updateItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 
@@ -295,7 +295,7 @@ public class DynamoMapper {
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
-		var builder = requestFactory.deleteRequestFromPrimaryKey(primaryKey, clazz);
+		var builder = requestFactory.deleteItemRequestFromPrimaryKey(primaryKey, clazz);
 		consumer.accept(builder);
 		return deleteItem(builder.build(), clazz);
 	}
@@ -307,7 +307,7 @@ public class DynamoMapper {
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
-		var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+		var builder = requestFactory.deleteItemRequestFromKeyObject(keyObject);
 		consumer.accept(builder);
 		return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
@@ -326,7 +326,7 @@ public class DynamoMapper {
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
-		var builder = requestFactory.deleteRequestFromPrimaryKey(primaryKey, clazz);
+		var builder = requestFactory.deleteItemRequestFromPrimaryKey(primaryKey, clazz);
 		return deleteItem(builder.build(), clazz);
 	}
 
@@ -336,7 +336,7 @@ public class DynamoMapper {
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
 					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
 					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
-		var builder = requestFactory.deleteRequestFromKeyObject(keyObject);
+		var builder = requestFactory.deleteItemRequestFromKeyObject(keyObject);
 		return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
 

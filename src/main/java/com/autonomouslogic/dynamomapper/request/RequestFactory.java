@@ -28,11 +28,17 @@ public class RequestFactory {
 	private final ObjectMapper objectMapper;
 	private final ReflectionUtil reflectionUtil;
 
-	public <T> GetItemRequest.Builder getRequestFromPrimaryKey(@NonNull Object primaryKey, @NonNull Class<T> clazz)
+	public <T> GetItemRequest.Builder getItemRequestFromPrimaryKey(@NonNull Object primaryKey, @NonNull Class<T> clazz)
 			throws IOException {
 		return GetItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(clazz))
 				.key(createKeyValue(primaryKey, clazz));
+	}
+
+	public <T> GetItemRequest.Builder getItemRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
+		return GetItemRequest.builder()
+				.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
+				.key(createKeyValue(keyObject));
 	}
 
 	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromPrimaryKeys(
@@ -69,20 +75,14 @@ public class RequestFactory {
 						Map.of(tableName, KeysAndAttributes.builder().keys(keys).build()));
 	}
 
-	public <T> GetItemRequest.Builder getRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
-		return GetItemRequest.builder()
-				.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
-				.key(createKeyValue(keyObject));
-	}
-
-	public PutItemRequest.Builder putRequestFromObject(@NonNull Object obj) throws IOException {
+	public PutItemRequest.Builder putItemRequestFromKeyObject(@NonNull Object obj) throws IOException {
 		var encoded = encoder.encode(obj);
 		return PutItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(obj.getClass()))
 				.item(encoded);
 	}
 
-	public UpdateItemRequest.Builder updateRequestFromObject(@NonNull Object obj) throws IOException {
+	public UpdateItemRequest.Builder updateItemRequestFromKeyObject(@NonNull Object obj) throws IOException {
 		var encoded = encoder.encode(obj);
 		var key = createKeyValue(obj);
 		for (String k : key.keySet()) {
@@ -101,14 +101,14 @@ public class RequestFactory {
 				.attributeUpdates(updates);
 	}
 
-	public <T> DeleteItemRequest.Builder deleteRequestFromPrimaryKey(
+	public <T> DeleteItemRequest.Builder deleteItemRequestFromPrimaryKey(
 			@NonNull Object primaryKey, @NonNull Class<T> clazz) throws IOException {
 		return DeleteItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(clazz))
 				.key(createKeyValue(primaryKey, clazz));
 	}
 
-	public DeleteItemRequest.Builder deleteRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
+	public DeleteItemRequest.Builder deleteItemRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
 		return DeleteItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
 				.key(createKeyValue(keyObject));
