@@ -23,24 +23,32 @@ import org.gradle.api.tasks.TaskAction;
 public class Codegen extends DefaultTask {
 
 	private Logger log;
-	private Path srcDir;
 
 	@TaskAction
 	@SneakyThrows
 	public void run() {
 		log = getLogger();
-		srcDir = getProject()
+		var mainDir = getProject()
 				.getProjectDir()
 				.toPath()
 				.resolve("src")
 				.resolve("main")
 				.resolve("java");
+		var integrationTestDir = getProject()
+				.getProjectDir()
+				.toPath()
+				.resolve("src")
+				.resolve("integrationTest")
+				.resolve("java");
 		// Init.
 		var syncMapper = TypeSpec.classBuilder("DynamoMapper").addModifiers(Modifier.PUBLIC);
 		var asyncMapper = TypeSpec.classBuilder("DynamoAsyncMapper").addModifiers(Modifier.PUBLIC);
+		var syncMapperTest = TypeSpec.classBuilder("DynamoMapperIntegrationTest");
+		var asyncMapperTest = TypeSpec.classBuilder("DynamoAsyncMapperIntegrationTest");
 		// Generate.
 		new SyncMapperGenerator(
 						syncMapper,
+						syncMapperTest,
 						log,
 						SyncDelegateWrapperGenerator::new,
 						SyncPrimaryKeyWrapperGenerator::new,
@@ -48,6 +56,7 @@ public class Codegen extends DefaultTask {
 				.generate();
 		new AsyncSyncMapperGenerator(
 						asyncMapper,
+						asyncMapperTest,
 						log,
 						AsyncDelegateWrapperGenerator::new,
 						AsyncPrimaryKeyWrapperGenerator::new,
@@ -55,14 +64,16 @@ public class Codegen extends DefaultTask {
 						PaginatorDelegateWrapperGenerator::new)
 				.generate();
 		// Write.
-		writeType(TypeHelper.PACKAGE_NAME, syncMapper.build());
-		writeType(TypeHelper.PACKAGE_NAME, asyncMapper.build());
+		writeType(mainDir, TypeHelper.PACKAGE_NAME, syncMapper.build());
+		writeType(mainDir, TypeHelper.PACKAGE_NAME, asyncMapper.build());
+		writeType(integrationTestDir, TypeHelper.PACKAGE_NAME, syncMapperTest.build());
+		writeType(integrationTestDir, TypeHelper.PACKAGE_NAME, asyncMapperTest.build());
 	}
 
 	@SneakyThrows
-	private void writeType(String packageName, TypeSpec type) {
+	private void writeType(Path dir, String packageName, TypeSpec type) {
 		var javaFile = JavaFile.builder(packageName, type).indent("\t").build();
-		var file = pathForClass(packageName, type.name);
+		var file = pathForClass(dir, packageName, type.name);
 		log.info(String.format("Writing to %s", file));
 		try (var out = new FileWriter(file.toFile())) {
 			out.write("// This is a generated file, do not edit manually.\n");
@@ -70,9 +81,9 @@ public class Codegen extends DefaultTask {
 		}
 	}
 
-	private Path pathForClass(String packageName, String className) {
+	private Path pathForClass(Path dir, String packageName, String className) {
 		var packageParts = packageName.split("\\.");
-		var file = Path.of(srcDir.toString(), packageParts);
+		var file = Path.of(dir.toString(), packageParts);
 		file = file.resolve(className + ".java");
 		return file;
 	}

@@ -47,6 +47,7 @@ public class SyncMapperGenerator {
 	public static final String CONSUMER = "consumer";
 
 	protected final TypeSpec.Builder mapper;
+	protected final TypeSpec.Builder mapperTest;
 	protected final Logger log;
 	protected final Supplier<DelegateWrapperGenerator> delegateWrapperGeneratorSupplier;
 	protected final Supplier<PrimaryKeyWrapperGenerator> primaryKeyWrapperGeneratorSupplier;

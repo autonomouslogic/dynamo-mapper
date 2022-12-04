@@ -22,6 +22,7 @@ public class AsyncSyncMapperGenerator extends SyncMapperGenerator {
 
 	public AsyncSyncMapperGenerator(
 			TypeSpec.Builder mapper,
+			TypeSpec.Builder mapperTest,
 			Logger log,
 			Supplier<DelegateWrapperGenerator> delegateWrapperGeneratorSupplier,
 			Supplier<PrimaryKeyWrapperGenerator> primaryKeyWrapperGeneratorSupplier,
@@ -29,6 +30,7 @@ public class AsyncSyncMapperGenerator extends SyncMapperGenerator {
 			Supplier<PaginatorDelegateWrapperGenerator> paginatorDelegateWrapperGeneratorSupplier) {
 		super(
 				mapper,
+				mapperTest,
 				log,
 				delegateWrapperGeneratorSupplier,
 				primaryKeyWrapperGeneratorSupplier,

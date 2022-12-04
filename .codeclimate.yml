@@ -6,3 +6,5 @@ checks:
 exclude_patterns:
   - "src/main/java/com/autonomouslogic/dynamomapper/DynamoMapper.java"
   - "src/main/java/com/autonomouslogic/dynamomapper/DynamoAsyncMapper.java"
+  - "src/integrationTest/java/com/autonomouslogic/dynamomapper/DynamoMapperIntegrationTest.java"
+  - "src/integrationTest/java/com/autonomouslogic/dynamomapper/DynamoAsyncMapperIntegrationTest.java"
