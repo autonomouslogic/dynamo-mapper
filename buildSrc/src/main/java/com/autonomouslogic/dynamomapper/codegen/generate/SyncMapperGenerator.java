@@ -1,6 +1,5 @@
 package com.autonomouslogic.dynamomapper.codegen.generate;
 
-import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.CLASS_T;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.field;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedBatchGetItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedDeleteItemResponse;
@@ -11,11 +10,10 @@ import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedSca
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedUpdateItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.overridableMethods;
 
+import com.autonomouslogic.dynamomapper.codegen.generate.delegate.DelegateWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.keyobject.KeyObjectWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.primarykey.PrimaryKeyWrapperGenerator;
-import com.autonomouslogic.dynamomapper.codegen.util.MethodNameFactory;
 import com.autonomouslogic.dynamomapper.codegen.util.TypeHelper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -23,11 +21,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.lang.model.element.Modifier;
 import lombok.RequiredArgsConstructor;
 import org.gradle.api.logging.Logger;
@@ -54,7 +48,7 @@ public class SyncMapperGenerator {
 
 	protected final TypeSpec.Builder mapper;
 	protected final Logger log;
-	protected final MethodNameFactory methodNameFactory = new MethodNameFactory();
+	protected final Supplier<DelegateWrapperGenerator> delegateWrapperGeneratorSupplier;
 	protected final Supplier<PrimaryKeyWrapperGenerator> primaryKeyWrapperGeneratorSupplier;
 	protected final Supplier<KeyObjectWrapperGenerator> keyObjectWrapperGeneratorSupplier;
 
@@ -119,8 +113,15 @@ public class SyncMapperGenerator {
 
 	protected void generateGetWrappers() {
 		for (Method method : overridableMethods(clientClass(), "getItem")) {
-			var delegate = generateDelegateWrapper(
-					method, mappedGetItemResponse, "mapGetItemResponse", GetItemRequest.class, GetItemResponse.class);
+			var delegate = delegateWrapperGeneratorSupplier
+					.get()
+					.method(method)
+					.returnType(mappedGetItemResponse)
+					.decoderMethod("mapGetItemResponse")
+					.requestClass(GetItemRequest.class)
+					.responseClass(GetItemResponse.class)
+					.generate();
+			mapper.addMethod(delegate);
 			mapper.addMethod(primaryKeyWrapperGeneratorSupplier
 					.get()
 					.method(delegate)
@@ -136,13 +137,15 @@ public class SyncMapperGenerator {
 
 	protected void generateBatchGetWrappers() {
 		for (Method method : overridableMethods(clientClass(), "batchGetItem")) {
-			var delegate = generateDelegateWrapper(
-					method,
-					mappedBatchGetItemResponse,
-					"mapBatchGetItemResponse",
-					BatchGetItemRequest.class,
-					BatchGetItemResponse.class);
-
+			var delegate = delegateWrapperGeneratorSupplier
+					.get()
+					.method(method)
+					.returnType(mappedBatchGetItemResponse)
+					.decoderMethod("mapBatchGetItemResponse")
+					.requestClass(BatchGetItemRequest.class)
+					.responseClass(BatchGetItemResponse.class)
+					.generate();
+			mapper.addMethod(delegate);
 			mapper.addMethod(primaryKeyWrapperGeneratorSupplier
 					.get()
 					.method(delegate)
@@ -161,8 +164,15 @@ public class SyncMapperGenerator {
 
 	protected void generatePutWrappers() {
 		for (Method method : overridableMethods(clientClass(), "putItem")) {
-			var delegate = generateDelegateWrapper(
-					method, mappedPutItemResponse, "mapPutItemResponse", PutItemRequest.class, PutItemResponse.class);
+			var delegate = delegateWrapperGeneratorSupplier
+					.get()
+					.method(method)
+					.returnType(mappedPutItemResponse)
+					.decoderMethod("mapPutItemResponse")
+					.requestClass(PutItemRequest.class)
+					.responseClass(PutItemResponse.class)
+					.generate();
+			mapper.addMethod(delegate);
 			mapper.addMethod(keyObjectWrapperGeneratorSupplier
 					.get()
 					.method(delegate)
@@ -173,12 +183,15 @@ public class SyncMapperGenerator {
 
 	protected void generateUpdateWrappers() {
 		for (Method method : overridableMethods(clientClass(), "updateItem")) {
-			var delegate = generateDelegateWrapper(
-					method,
-					mappedUpdateItemResponse,
-					"mapUpdateItemResponse",
-					UpdateItemRequest.class,
-					UpdateItemResponse.class);
+			var delegate = delegateWrapperGeneratorSupplier
+					.get()
+					.method(method)
+					.returnType(mappedUpdateItemResponse)
+					.decoderMethod("mapUpdateItemResponse")
+					.requestClass(UpdateItemRequest.class)
+					.responseClass(UpdateItemResponse.class)
+					.generate();
+			mapper.addMethod(delegate);
 			mapper.addMethod(keyObjectWrapperGeneratorSupplier
 					.get()
 					.method(delegate)
@@ -189,12 +202,15 @@ public class SyncMapperGenerator {
 
 	protected void generateDeleteWrappers() {
 		for (Method method : overridableMethods(clientClass(), "deleteItem")) {
-			var delegate = generateDelegateWrapper(
-					method,
-					mappedDeleteItemResponse,
-					"mapDeleteItemResponse",
-					DeleteItemRequest.class,
-					DeleteItemResponse.class);
+			var delegate = delegateWrapperGeneratorSupplier
+					.get()
+					.method(method)
+					.returnType(mappedDeleteItemResponse)
+					.decoderMethod("mapDeleteItemResponse")
+					.requestClass(DeleteItemRequest.class)
+					.responseClass(DeleteItemResponse.class)
+					.generate();
+			mapper.addMethod(delegate);
 			mapper.addMethod(primaryKeyWrapperGeneratorSupplier
 					.get()
 					.method(delegate)
@@ -211,65 +227,30 @@ public class SyncMapperGenerator {
 
 	protected void generateScanWrappers() {
 		for (Method method : overridableMethods(clientClass(), "scan")) {
-			var delegate = generateDelegateWrapper(
-					method, mappedScanResponse, "mapScanResponse", ScanRequest.class, ScanResponse.class);
+			var delegate = delegateWrapperGeneratorSupplier
+					.get()
+					.method(method)
+					.returnType(mappedScanResponse)
+					.decoderMethod("mapScanResponse")
+					.requestClass(ScanRequest.class)
+					.responseClass(ScanResponse.class)
+					.generate();
+			mapper.addMethod(delegate);
 		}
 	}
 
 	protected void generateQueryWrappers() {
 		for (Method method : overridableMethods(clientClass(), "query")) {
-			var delegate = generateDelegateWrapper(
-					method, mappedQueryResponse, "mapQueryResponse", QueryRequest.class, QueryResponse.class);
+			var delegate = delegateWrapperGeneratorSupplier
+					.get()
+					.method(method)
+					.returnType(mappedQueryResponse)
+					.decoderMethod("mapQueryResponse")
+					.requestClass(QueryRequest.class)
+					.responseClass(QueryResponse.class)
+					.generate();
+			mapper.addMethod(delegate);
 		}
-	}
-
-	protected MethodSpec generateDelegateWrapper(
-			Method method, ClassName returnType, String decoderMethod, Class<?> requestClass, Class<?> responseClass) {
-		var requestVar = detectRequestOrConsumer(method);
-		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(method.getName())
-				.addModifiers(Modifier.PUBLIC)
-				.addTypeVariable(TypeHelper.T);
-		wrapper.returns(TypeHelper.genericCapture(returnType));
-		wrapper.addExceptions(
-				Stream.of(method.getExceptionTypes()).map(e -> ClassName.get(e)).collect(Collectors.toList()));
-		wrapper.addException(JsonProcessingException.class);
-		// Add parameters.
-		var delegateParams = List.of(method.getGenericParameterTypes());
-		if (delegateParams.size() != 1) {
-			throw new IllegalArgumentException(String.format(
-					"Delegate param generation only supports 1 param, %s seen for %s",
-					delegateParams.size(), method.getName()));
-		}
-		wrapper.addParameter(delegateParams.get(0), requestVar);
-		wrapper.addParameter(CLASS_T, "clazz");
-		// Write body.
-		if (requestVar.equals(REQUEST)) {
-			generateRequestObjectWrapper(wrapper, requestClass, requestVar);
-		} else if (requestVar.equals(CONSUMER)) {
-			generateRequestConsumerWrapper(wrapper, requestClass, requestVar);
-		} else {
-			throw new RuntimeException();
-		}
-		wrapper.addStatement("return decoder.$L(client.$L(reqOrConsumer), clazz)", decoderMethod, method.getName());
-
-		TypeHelper.nonNullParameters(wrapper);
-		var built = wrapper.build();
-		mapper.addMethod(built);
-		return built;
-	}
-
-	protected void generateRequestObjectWrapper(MethodSpec.Builder wrapper, Class<?> requestClass, String requestVar) {
-		wrapper.addStatement(
-				"var reqOrConsumer = requestFactory.accept$L($L, clazz)", requestClass.getSimpleName(), requestVar);
-	}
-
-	protected void generateRequestConsumerWrapper(
-			MethodSpec.Builder wrapper, Class<?> requestClass, String requestVar) {
-		wrapper.beginControlFlow("Consumer<$T.Builder> reqOrConsumer = (builder) -> {", requestClass)
-				.addStatement("requestFactory.accept$L(builder, clazz)", requestClass.getSimpleName())
-				.addStatement("$L.accept(builder)", requestVar)
-				.endControlFlow("}");
 	}
 
 	protected void generateBuilder() {
@@ -279,14 +260,5 @@ public class SyncMapperGenerator {
 				.returns(builderClass())
 				.addStatement("return new $T()", builderClass())
 				.build());
-	}
-
-	protected String detectRequestOrConsumer(Method method) {
-		var requestVar = REQUEST;
-		var firstParamTypeName = method.getParameterTypes()[0];
-		if (firstParamTypeName.equals(Consumer.class)) {
-			requestVar = CONSUMER;
-		}
-		return requestVar;
 	}
 }
