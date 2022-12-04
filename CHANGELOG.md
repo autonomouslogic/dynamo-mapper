@@ -1,5 +1,34 @@
 Dynamo Mapper Changelog
 
+## [2.0.0](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.23...2.0.0) (2022-12-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* Renamed primary key and key object methods. (#75)
+* Renamed @DynamoHashKey to @DynamoPrimaryKey. (#77)
+
+### Features
+
+* Batch gets ([#74](https://github.com/autonomouslogic/dynamo-mapper/issues/74)) ([7451d11](https://github.com/autonomouslogic/dynamo-mapper/commit/7451d113603f4116e81744dea62f46e826520686))
+* Renamed @DynamoHashKey to @DynamoPrimaryKey. ([#77](https://github.com/autonomouslogic/dynamo-mapper/issues/77)) ([b6208c3](https://github.com/autonomouslogic/dynamo-mapper/commit/b6208c35763955584ad7394c7c68a969b8777656))
+* Renamed primary key and key object methods. ([#75](https://github.com/autonomouslogic/dynamo-mapper/issues/75)) ([23880c0](https://github.com/autonomouslogic/dynamo-mapper/commit/23880c0b915bbe16574704d0296ab4e66cb78bb0))
+
+
+### Bug Fixes
+
+* Fixed batch get items from key objects. Added more testing. ([#79](https://github.com/autonomouslogic/dynamo-mapper/issues/79)) ([5ea7468](https://github.com/autonomouslogic/dynamo-mapper/commit/5ea746849e976dc22ccffada1bb358a00210f842))
+
+
+### Documentation
+
+* Readme. ([608bfb4](https://github.com/autonomouslogic/dynamo-mapper/commit/608bfb4e40b047cd725b65759708f2031ac21960))
+
+
+### Continuous Integration
+
+* Separated out codegen check ([#78](https://github.com/autonomouslogic/dynamo-mapper/issues/78)) ([3cb38a0](https://github.com/autonomouslogic/dynamo-mapper/commit/3cb38a0e8817451bd8ad4ddd1bf681bf7ca189df))
+
 ## [1.2.23](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.22...1.2.23) (2022-11-07)
 
 
