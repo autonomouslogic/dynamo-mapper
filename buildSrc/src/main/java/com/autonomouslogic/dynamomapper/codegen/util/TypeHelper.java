@@ -1,4 +1,7 @@
-package com.autonomouslogic.dynamomapper.codegen;
+package com.autonomouslogic.dynamomapper.codegen.util;
+
+import static java.lang.reflect.Modifier.isPublic;
+import static java.lang.reflect.Modifier.isStatic;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -7,17 +10,13 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
-import lombok.NonNull;
-
-import javax.lang.model.element.Modifier;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.lang.reflect.Modifier.isPublic;
-import static java.lang.reflect.Modifier.isStatic;
+import javax.lang.model.element.Modifier;
+import lombok.NonNull;
 
 public class TypeHelper {
 	public static final String PACKAGE_NAME = "com.autonomouslogic.dynamomapper";
@@ -53,24 +52,22 @@ public class TypeHelper {
 
 	public static FieldSpec field(Class clazz, String value) {
 		return FieldSpec.builder(clazz, value)
-			.addModifiers(Modifier.PRIVATE)
-			.addModifiers(Modifier.FINAL)
-			.build();
+				.addModifiers(Modifier.PRIVATE)
+				.addModifiers(Modifier.FINAL)
+				.build();
 	}
 
 	public static FieldSpec field(ClassName className, String value) {
-		return FieldSpec.builder(className, value)
-			.addModifiers(Modifier.FINAL)
-			.build();
+		return FieldSpec.builder(className, value).addModifiers(Modifier.FINAL).build();
 	}
 
 	public static List<Method> overridableMethods(Class<?> clazz, String methodName) {
 		return Stream.of(clazz.getMethods())
-			.filter(m -> m.getName().equals(methodName))
-			.filter(m -> !isStatic(m.getModifiers()))
-			.filter(m -> isPublic(m.getModifiers()))
-			.sorted(new MethodOrdering())
-			.collect(Collectors.toList());
+				.filter(m -> m.getName().equals(methodName))
+				.filter(m -> !isStatic(m.getModifiers()))
+				.filter(m -> isPublic(m.getModifiers()))
+				.sorted(new MethodOrdering())
+				.collect(Collectors.toList());
 	}
 
 	public static ParameterizedTypeName genericWildcard(ClassName type) {
@@ -89,8 +86,7 @@ public class TypeHelper {
 		var params = builder.parameters;
 		for (int i = 0; i < params.size(); i++) {
 			var method = params.get(i).toBuilder();
-			var isNonNull = method.annotations.stream()
-				.anyMatch(a -> a.type.equals(ClassName.get(NonNull.class)));
+			var isNonNull = method.annotations.stream().anyMatch(a -> a.type.equals(ClassName.get(NonNull.class)));
 			if (!isNonNull) {
 				method.addAnnotation(NonNull.class);
 				params.set(i, (method.build()));
