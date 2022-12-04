@@ -150,6 +150,7 @@ nexusPublishing {
 
 spotless {
 	java {
+		target "src/**/*.java", "buildSrc/**/*.java"
 		palantirJavaFormat()
 		indentWithTabs()
 	}
