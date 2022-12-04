@@ -11,21 +11,18 @@ import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedSca
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedUpdateItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.overridableMethods;
 
+import com.autonomouslogic.dynamomapper.codegen.generate.keyobject.KeyObjectWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.primarykey.PrimaryKeyWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.util.MethodNameFactory;
 import com.autonomouslogic.dynamomapper.codegen.util.TypeHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -59,6 +56,7 @@ public class SyncMapperGenerator {
 	protected final Logger log;
 	protected final MethodNameFactory methodNameFactory = new MethodNameFactory();
 	protected final Supplier<PrimaryKeyWrapperGenerator> primaryKeyWrapperGeneratorSupplier;
+	protected final Supplier<KeyObjectWrapperGenerator> keyObjectWrapperGeneratorSupplier;
 
 	protected FieldSpec clientField;
 	protected FieldSpec encoderField;
@@ -128,7 +126,11 @@ public class SyncMapperGenerator {
 					.method(delegate)
 					.factoryMethodName("getItemRequestFromPrimaryKey")
 					.generate());
-			generateKeyObjectWrapper(delegate, "getItemRequestFromKeyObject", false, false);
+			mapper.addMethod(keyObjectWrapperGeneratorSupplier
+					.get()
+					.method(delegate)
+					.factoryMethodName("getItemRequestFromKeyObject")
+					.generate());
 		}
 	}
 
@@ -148,7 +150,12 @@ public class SyncMapperGenerator {
 					.multiple(true)
 					.futureWrap(true)
 					.generate());
-			generateKeyObjectWrapper(delegate, "batchGetItemRequestFromKeyObjects", true, false);
+			mapper.addMethod(keyObjectWrapperGeneratorSupplier
+					.get()
+					.method(delegate)
+					.factoryMethodName("batchGetItemRequestFromKeyObjects")
+					.multiple(true)
+					.generate());
 		}
 	}
 
@@ -156,7 +163,11 @@ public class SyncMapperGenerator {
 		for (Method method : overridableMethods(clientClass(), "putItem")) {
 			var delegate = generateDelegateWrapper(
 					method, mappedPutItemResponse, "mapPutItemResponse", PutItemRequest.class, PutItemResponse.class);
-			generateKeyObjectWrapper(delegate, "putItemRequestFromKeyObject", false, false);
+			mapper.addMethod(keyObjectWrapperGeneratorSupplier
+					.get()
+					.method(delegate)
+					.factoryMethodName("putItemRequestFromKeyObject")
+					.generate());
 		}
 	}
 
@@ -168,7 +179,11 @@ public class SyncMapperGenerator {
 					"mapUpdateItemResponse",
 					UpdateItemRequest.class,
 					UpdateItemResponse.class);
-			generateKeyObjectWrapper(delegate, "updateItemRequestFromKeyObject", false, false);
+			mapper.addMethod(keyObjectWrapperGeneratorSupplier
+					.get()
+					.method(delegate)
+					.factoryMethodName("updateItemRequestFromKeyObject")
+					.generate());
 		}
 	}
 
@@ -186,7 +201,11 @@ public class SyncMapperGenerator {
 					.factoryMethodName("deleteItemRequestFromPrimaryKey")
 					.futureWrap(true)
 					.generate());
-			generateKeyObjectWrapper(delegate, "deleteItemRequestFromKeyObject", false, false);
+			mapper.addMethod(keyObjectWrapperGeneratorSupplier
+					.get()
+					.method(delegate)
+					.factoryMethodName("deleteItemRequestFromKeyObject")
+					.generate());
 		}
 	}
 
@@ -251,47 +270,6 @@ public class SyncMapperGenerator {
 				.addStatement("requestFactory.accept$L(builder, clazz)", requestClass.getSimpleName())
 				.addStatement("$L.accept(builder)", requestVar)
 				.endControlFlow("}");
-	}
-
-	protected void generateKeyObjectWrapper(
-			MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
-		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(methodNameFactory.create(method, "FromKeyObject", multiple))
-				.addModifiers(Modifier.PUBLIC)
-				.addTypeVariable(TypeHelper.T);
-		wrapper.returns(method.returnType);
-		wrapper.addExceptions(method.exceptions);
-		wrapper.addException(IOException.class);
-		wrapper.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
-				.addMember("value", "\"unchecked\"")
-				.build());
-		// Add parameters.
-		if (!multiple) {
-			wrapper.addParameter(TypeHelper.T, "keyObject");
-		} else {
-			var type = ParameterizedTypeName.get(ClassName.get(List.class), TypeHelper.T);
-			wrapper.addParameter(type, "keyObject");
-			wrapper.addParameter(CLASS_T, "clazz");
-		}
-
-		var params = new ArrayList<>(method.parameters);
-		params.removeIf(p -> p.name.equals(REQUEST));
-		params.removeIf(p -> p.name.equals("clazz"));
-		wrapper.addParameters(params);
-		// Write body.
-		wrapper.addStatement("var builder = requestFactory.$L(keyObject)", factoryMethodName);
-		var firstParamTypeName = method.parameters.get(0).type;
-		if (firstParamTypeName instanceof ParameterizedTypeName) {
-			wrapper.addStatement("consumer.accept(builder)");
-		}
-		if (!multiple) {
-			wrapper.addStatement("return $L(builder.build(), ($T) keyObject.getClass())", method.name, CLASS_T);
-		} else {
-			wrapper.addStatement("return $L(builder.build(), clazz)", method.name);
-		}
-
-		TypeHelper.nonNullParameters(wrapper);
-		mapper.addMethod(wrapper.build());
 	}
 
 	protected void generateBuilder() {

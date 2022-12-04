@@ -2,6 +2,8 @@ package com.autonomouslogic.dynamomapper.codegen;
 
 import com.autonomouslogic.dynamomapper.codegen.generate.AsyncSyncMapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.SyncMapperGenerator;
+import com.autonomouslogic.dynamomapper.codegen.generate.keyobject.AsyncKeyObjectWrapperGenerator;
+import com.autonomouslogic.dynamomapper.codegen.generate.keyobject.SyncKeyObjectWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.primarykey.AsyncPrimaryKeyWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.primarykey.SyncPrimaryKeyWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.util.TypeHelper;
@@ -36,8 +38,11 @@ public class Codegen extends DefaultTask {
 		mapper = TypeSpec.classBuilder("DynamoMapper").addModifiers(Modifier.PUBLIC);
 		asyncMapper = TypeSpec.classBuilder("DynamoAsyncMapper").addModifiers(Modifier.PUBLIC);
 		// Generate.
-		new SyncMapperGenerator(mapper, log, SyncPrimaryKeyWrapperGenerator::new).generate();
-		new AsyncSyncMapperGenerator(asyncMapper, log, AsyncPrimaryKeyWrapperGenerator::new).generate();
+		new SyncMapperGenerator(mapper, log, SyncPrimaryKeyWrapperGenerator::new, SyncKeyObjectWrapperGenerator::new)
+				.generate();
+		new AsyncSyncMapperGenerator(
+						asyncMapper, log, AsyncPrimaryKeyWrapperGenerator::new, AsyncKeyObjectWrapperGenerator::new)
+				.generate();
 		// Write.
 		writeType(TypeHelper.PACKAGE_NAME, mapper.build());
 		writeType(TypeHelper.PACKAGE_NAME, asyncMapper.build());

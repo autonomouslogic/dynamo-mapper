@@ -4,18 +4,16 @@ import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.CLASS_T;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedBatchGetItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.overridableMethods;
 
+import com.autonomouslogic.dynamomapper.codegen.generate.keyobject.KeyObjectWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.primarykey.PrimaryKeyWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.util.TypeHelper;
-import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -31,8 +29,9 @@ public class AsyncSyncMapperGenerator extends SyncMapperGenerator {
 	public AsyncSyncMapperGenerator(
 			TypeSpec.Builder mapper,
 			Logger log,
-			Supplier<PrimaryKeyWrapperGenerator> primaryKeyWrapperGeneratorSupplier) {
-		super(mapper, log, primaryKeyWrapperGeneratorSupplier);
+			Supplier<PrimaryKeyWrapperGenerator> primaryKeyWrapperGeneratorSupplier,
+			Supplier<KeyObjectWrapperGenerator> keyObjectWrapperGeneratorSupplier) {
+		super(mapper, log, primaryKeyWrapperGeneratorSupplier, keyObjectWrapperGeneratorSupplier);
 	}
 
 	@Override
@@ -66,7 +65,12 @@ public class AsyncSyncMapperGenerator extends SyncMapperGenerator {
 					.factoryMethodName("batchGetItemRequestFromPrimaryKeys")
 					.multiple(true)
 					.generate());
-			generateKeyObjectWrapper(delegate, "batchGetItemRequestFromKeyObjects", true, false);
+			mapper.addMethod(keyObjectWrapperGeneratorSupplier
+					.get()
+					.method(delegate)
+					.factoryMethodName("batchGetItemRequestFromKeyObjects")
+					.multiple(true)
+					.generate());
 		}
 	}
 
@@ -139,53 +143,5 @@ public class AsyncSyncMapperGenerator extends SyncMapperGenerator {
 		var built = wrapper.build();
 		mapper.addMethod(built);
 		return built;
-	}
-
-	@Override
-	protected void generateKeyObjectWrapper(
-			MethodSpec method, String factoryMethodName, boolean multiple, boolean futureWrap) {
-		// Create signature.
-		var wrapper = MethodSpec.methodBuilder(methodNameFactory.create(method, "FromKeyObject", multiple))
-				.addModifiers(Modifier.PUBLIC)
-				.addTypeVariable(TypeHelper.T);
-		wrapper.returns(method.returnType);
-		wrapper.addExceptions(method.exceptions);
-		if (!futureWrap) {
-			wrapper.addException(IOException.class);
-		}
-		wrapper.addAnnotation(AnnotationSpec.builder(SuppressWarnings.class)
-				.addMember("value", "\"unchecked\"")
-				.build());
-		// Add parameters.
-		if (!multiple) {
-			wrapper.addParameter(Object.class, "keyObject");
-		} else {
-			var type = TypeHelper.genericWildcard(ClassName.get(List.class));
-			wrapper.addParameter(type, "keyObject");
-		}
-		var params = new ArrayList<>(method.parameters);
-		params.removeIf(p -> p.name.equals(REQUEST));
-		params.removeIf(p -> p.name.equals("clazz"));
-		wrapper.addParameters(params);
-		// Write body.
-		var requestFactoryCode = CodeBlock.builder();
-		var firstParamTypeName = method.parameters.get(0).type;
-		requestFactoryCode.add("var builder = requestFactory.$L(keyObject);\n", factoryMethodName);
-		if (firstParamTypeName instanceof ParameterizedTypeName) {
-			requestFactoryCode.addStatement("\tconsumer.accept(builder)");
-		}
-		requestFactoryCode.add(
-				CodeBlock.of("return $L(builder.build(), (Class<T>) keyObject.getClass());\n", method.name));
-
-		var code = CodeBlock.builder();
-		if (futureWrap) {
-			code.add(CodeBlock.of("return $T.wrapFuture(() -> {\n" + "\t$L\n" + "});", requestFactoryCode.build()));
-		} else {
-			code.add(requestFactoryCode.build());
-		}
-		wrapper.addCode(code.build());
-
-		TypeHelper.nonNullParameters(wrapper);
-		mapper.addMethod(wrapper.build());
 	}
 }
