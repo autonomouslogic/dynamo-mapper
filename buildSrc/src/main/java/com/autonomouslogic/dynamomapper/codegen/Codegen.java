@@ -24,8 +24,6 @@ public class Codegen extends DefaultTask {
 
 	private Logger log;
 	private Path srcDir;
-	private TypeSpec.Builder mapper;
-	private TypeSpec.Builder asyncMapper;
 
 	@TaskAction
 	@SneakyThrows
@@ -38,11 +36,11 @@ public class Codegen extends DefaultTask {
 				.resolve("main")
 				.resolve("java");
 		// Init.
-		mapper = TypeSpec.classBuilder("DynamoMapper").addModifiers(Modifier.PUBLIC);
-		asyncMapper = TypeSpec.classBuilder("DynamoAsyncMapper").addModifiers(Modifier.PUBLIC);
+		var syncMapper = TypeSpec.classBuilder("DynamoMapper").addModifiers(Modifier.PUBLIC);
+		var asyncMapper = TypeSpec.classBuilder("DynamoAsyncMapper").addModifiers(Modifier.PUBLIC);
 		// Generate.
 		new SyncMapperGenerator(
-						mapper,
+						syncMapper,
 						log,
 						SyncDelegateWrapperGenerator::new,
 						SyncPrimaryKeyWrapperGenerator::new,
@@ -57,7 +55,7 @@ public class Codegen extends DefaultTask {
 						PaginatorDelegateWrapperGenerator::new)
 				.generate();
 		// Write.
-		writeType(TypeHelper.PACKAGE_NAME, mapper.build());
+		writeType(TypeHelper.PACKAGE_NAME, syncMapper.build());
 		writeType(TypeHelper.PACKAGE_NAME, asyncMapper.build());
 	}
 
