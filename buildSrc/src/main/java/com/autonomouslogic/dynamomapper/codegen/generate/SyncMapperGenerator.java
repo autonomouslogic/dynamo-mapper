@@ -114,14 +114,14 @@ public class SyncMapperGenerator {
 
 	protected void generateGetWrappers() {
 		for (Method method : overridableMethods(clientClass(), "getItem")) {
-			var delegate = delegateWrapperGeneratorSupplier
+			var delegateGenerator = delegateWrapperGeneratorSupplier
 					.get()
 					.method(method)
 					.returnType(mappedGetItemResponse)
 					.decoderMethod("mapGetItemResponse")
 					.requestClass(GetItemRequest.class)
-					.responseClass(GetItemResponse.class)
-					.generate();
+					.responseClass(GetItemResponse.class);
+			var delegate = delegateGenerator.generate();
 			mapper.addMethod(delegate);
 			mapper.addMethod(primaryKeyWrapperGeneratorSupplier
 					.get()
@@ -133,19 +133,21 @@ public class SyncMapperGenerator {
 					.method(delegate)
 					.factoryMethodName("getItemRequestFromKeyObject")
 					.generate());
+
+			mapperTest.addMethod(delegateGenerator.generateTest());
 		}
 	}
 
 	protected void generateBatchGetWrappers() {
 		for (Method method : overridableMethods(clientClass(), "batchGetItem")) {
-			var delegate = delegateWrapperGeneratorSupplier
+			var delegateGenerator = delegateWrapperGeneratorSupplier
 					.get()
 					.method(method)
 					.returnType(mappedBatchGetItemResponse)
 					.decoderMethod("mapBatchGetItemResponse")
 					.requestClass(BatchGetItemRequest.class)
-					.responseClass(BatchGetItemResponse.class)
-					.generate();
+					.responseClass(BatchGetItemResponse.class);
+			var delegate = delegateGenerator.generate();
 			mapper.addMethod(delegate);
 			mapper.addMethod(primaryKeyWrapperGeneratorSupplier
 					.get()
@@ -160,57 +162,63 @@ public class SyncMapperGenerator {
 					.factoryMethodName("batchGetItemRequestFromKeyObjects")
 					.multiple(true)
 					.generate());
+
+			mapperTest.addMethod(delegateGenerator.generateTest());
 		}
 	}
 
 	protected void generatePutWrappers() {
 		for (Method method : overridableMethods(clientClass(), "putItem")) {
-			var delegate = delegateWrapperGeneratorSupplier
+			var delegateGenerator = delegateWrapperGeneratorSupplier
 					.get()
 					.method(method)
 					.returnType(mappedPutItemResponse)
 					.decoderMethod("mapPutItemResponse")
 					.requestClass(PutItemRequest.class)
-					.responseClass(PutItemResponse.class)
-					.generate();
+					.responseClass(PutItemResponse.class);
+			var delegate = delegateGenerator.generate();
 			mapper.addMethod(delegate);
 			mapper.addMethod(keyObjectWrapperGeneratorSupplier
 					.get()
 					.method(delegate)
 					.factoryMethodName("putItemRequestFromKeyObject")
 					.generate());
+
+			mapperTest.addMethod(delegateGenerator.generateTest());
 		}
 	}
 
 	protected void generateUpdateWrappers() {
 		for (Method method : overridableMethods(clientClass(), "updateItem")) {
-			var delegate = delegateWrapperGeneratorSupplier
+			var delegateGenerator = delegateWrapperGeneratorSupplier
 					.get()
 					.method(method)
 					.returnType(mappedUpdateItemResponse)
 					.decoderMethod("mapUpdateItemResponse")
 					.requestClass(UpdateItemRequest.class)
-					.responseClass(UpdateItemResponse.class)
-					.generate();
+					.responseClass(UpdateItemResponse.class);
+			var delegate = delegateGenerator.generate();
 			mapper.addMethod(delegate);
 			mapper.addMethod(keyObjectWrapperGeneratorSupplier
 					.get()
 					.method(delegate)
 					.factoryMethodName("updateItemRequestFromKeyObject")
 					.generate());
+
+			mapperTest.addMethod(delegateGenerator.generateTest());
 		}
 	}
 
 	protected void generateDeleteWrappers() {
 		for (Method method : overridableMethods(clientClass(), "deleteItem")) {
-			var delegate = delegateWrapperGeneratorSupplier
+			var delegateGenerator = delegateWrapperGeneratorSupplier
 					.get()
 					.method(method)
 					.returnType(mappedDeleteItemResponse)
 					.decoderMethod("mapDeleteItemResponse")
 					.requestClass(DeleteItemRequest.class)
-					.responseClass(DeleteItemResponse.class)
-					.generate();
+					.responseClass(DeleteItemResponse.class);
+			var delegate = delegateGenerator.generate();
 			mapper.addMethod(delegate);
 			mapper.addMethod(primaryKeyWrapperGeneratorSupplier
 					.get()
@@ -223,34 +231,40 @@ public class SyncMapperGenerator {
 					.method(delegate)
 					.factoryMethodName("deleteItemRequestFromKeyObject")
 					.generate());
+
+			mapperTest.addMethod(delegateGenerator.generateTest());
 		}
 	}
 
 	protected void generateScanWrappers() {
 		for (Method method : overridableMethods(clientClass(), "scan")) {
-			var delegate = delegateWrapperGeneratorSupplier
+			var delegateGenerator = delegateWrapperGeneratorSupplier
 					.get()
 					.method(method)
 					.returnType(mappedScanResponse)
 					.decoderMethod("mapScanResponse")
 					.requestClass(ScanRequest.class)
-					.responseClass(ScanResponse.class)
-					.generate();
+					.responseClass(ScanResponse.class);
+			var delegate = delegateGenerator.generate();
 			mapper.addMethod(delegate);
+
+			mapperTest.addMethod(delegateGenerator.generateTest());
 		}
 	}
 
 	protected void generateQueryWrappers() {
 		for (Method method : overridableMethods(clientClass(), "query")) {
-			var delegate = delegateWrapperGeneratorSupplier
+			var delegateGenerator = delegateWrapperGeneratorSupplier
 					.get()
 					.method(method)
 					.returnType(mappedQueryResponse)
 					.decoderMethod("mapQueryResponse")
 					.requestClass(QueryRequest.class)
-					.responseClass(QueryResponse.class)
-					.generate();
+					.responseClass(QueryResponse.class);
+			var delegate = delegateGenerator.generate();
 			mapper.addMethod(delegate);
+
+			mapperTest.addMethod(delegateGenerator.generateTest());
 		}
 	}
 

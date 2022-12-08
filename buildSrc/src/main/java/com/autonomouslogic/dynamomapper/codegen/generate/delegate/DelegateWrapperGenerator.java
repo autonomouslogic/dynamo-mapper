@@ -2,6 +2,7 @@ package com.autonomouslogic.dynamomapper.codegen.generate.delegate;
 
 import com.autonomouslogic.dynamomapper.codegen.generate.MethodGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.SyncMapperGenerator;
+import com.autonomouslogic.dynamomapper.codegen.util.TestGenerationHelper;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import java.lang.reflect.Method;
@@ -13,6 +14,8 @@ import lombok.NonNull;
 @NoArgsConstructor
 @Data
 public abstract class DelegateWrapperGenerator implements MethodGenerator {
+	private final TestGenerationHelper testGenerationHelper = new TestGenerationHelper();
+
 	@NonNull
 	protected Method method;
 
@@ -47,5 +50,11 @@ public abstract class DelegateWrapperGenerator implements MethodGenerator {
 				.addStatement("requestFactory.accept$L(builder, clazz)", requestClass.getSimpleName())
 				.addStatement("$L.accept(builder)", requestVar)
 				.endControlFlow("}");
+	}
+
+	public MethodSpec generateTest() {
+		var builder = MethodSpec.methodBuilder(testGenerationHelper.testMethodName(method));
+		testGenerationHelper.standardParameterizedTestMethod(builder);
+		return builder.build();
 	}
 }
