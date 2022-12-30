@@ -1,6 +1,7 @@
 package com.autonomouslogic.dynamomapper.codegen.generate;
 
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedBatchGetItemResponse;
+import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mapperType;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.overridableMethods;
 
 import com.autonomouslogic.dynamomapper.codegen.generate.delegate.DelegateWrapperGenerator;
@@ -49,6 +50,10 @@ public class AsyncSyncMapperGenerator extends SyncMapperGenerator {
 		return DynamoDbAsyncClient.class;
 	}
 
+	protected ClassName mapperClass() {
+		return mapperType("DynamoAsyncMapper");
+	}
+
 	@Override
 	protected ClassName builderClass() {
 		return TypeHelper.dynamoAsyncMapperBuilder;
@@ -78,5 +83,9 @@ public class AsyncSyncMapperGenerator extends SyncMapperGenerator {
 					.multiple(true)
 					.generate());
 		}
+	}
+
+	public String integrationTestUtilClientConstructor() {
+		return "asyncClient";
 	}
 }

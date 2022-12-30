@@ -21,6 +21,8 @@ import lombok.NonNull;
 public class TypeHelper {
 	public static final String PACKAGE_NAME = "com.autonomouslogic.dynamomapper";
 
+	public static final ClassName dynamoMapper = mapperType("DynamoMapper");
+	public static final ClassName dynamoAsyncMapper = mapperType("DynamoAsyncMapper");
 	public static final ClassName dynamoDecoder = mapperType("codec", "DynamoDecoder");
 	public static final ClassName dynamoEncoder = mapperType("codec", "DynamoEncoder");
 	public static final ClassName checkedFunction = mapperType("function", "CheckedFunction");
@@ -36,6 +38,9 @@ public class TypeHelper {
 	public static final ClassName mappedUpdateItemResponse = mapperType("model", "MappedUpdateItemResponse");
 	public static final ClassName dynamoMapperBuilder = mapperType("DynamoMapperBuilder");
 	public static final ClassName dynamoAsyncMapperBuilder = mapperType("DynamoAsyncMapperBuilder");
+	public static final ClassName assertions = ClassName.get("org.junit.jupiter.api", "Assertions");
+	public static final ClassName integrationTestUtil = mapperType("test", "IntegrationTestUtil");
+	public static final ClassName integrationTestObject = mapperType("model", "IntegrationTestObject");
 
 	public static final TypeVariableName T = TypeVariableName.get("T");
 
@@ -59,6 +64,10 @@ public class TypeHelper {
 
 	public static FieldSpec field(ClassName className, String value) {
 		return FieldSpec.builder(className, value).addModifiers(Modifier.FINAL).build();
+	}
+
+	public static FieldSpec testField(ClassName className, String value) {
+		return FieldSpec.builder(className, value).addModifiers(Modifier.STATIC).build();
 	}
 
 	public static List<Method> overridableMethods(Class<?> clazz, String methodName) {

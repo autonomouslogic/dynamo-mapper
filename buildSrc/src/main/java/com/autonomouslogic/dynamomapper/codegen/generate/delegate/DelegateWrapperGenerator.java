@@ -3,6 +3,7 @@ package com.autonomouslogic.dynamomapper.codegen.generate.delegate;
 import com.autonomouslogic.dynamomapper.codegen.generate.MethodGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.SyncMapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.util.TestGenerationHelper;
+import com.autonomouslogic.dynamomapper.codegen.util.TypeHelper;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import java.lang.reflect.Method;
@@ -55,6 +56,7 @@ public abstract class DelegateWrapperGenerator implements MethodGenerator {
 	public MethodSpec generateTest() {
 		var builder = MethodSpec.methodBuilder(testGenerationHelper.testMethodName(method));
 		testGenerationHelper.standardParameterizedTestMethod(builder);
+		builder.addCode("$T.fail(\"todo\");", TypeHelper.assertions);
 		return builder.build();
 	}
 }

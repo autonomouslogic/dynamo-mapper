@@ -1,6 +1,7 @@
 package com.autonomouslogic.dynamomapper.codegen.generate;
 
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.field;
+import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.integrationTestUtil;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedBatchGetItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedDeleteItemResponse;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedGetItemResponse;
@@ -8,7 +9,9 @@ import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedPut
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedQueryResponse;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedScanResponse;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mappedUpdateItemResponse;
+import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.mapperType;
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.overridableMethods;
+import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.testField;
 
 import com.autonomouslogic.dynamomapper.codegen.generate.delegate.DelegateWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.keyobject.KeyObjectWrapperGenerator;
@@ -16,6 +19,7 @@ import com.autonomouslogic.dynamomapper.codegen.generate.primarykey.PrimaryKeyWr
 import com.autonomouslogic.dynamomapper.codegen.util.TypeHelper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
@@ -25,6 +29,7 @@ import java.util.function.Supplier;
 import javax.lang.model.element.Modifier;
 import lombok.RequiredArgsConstructor;
 import org.gradle.api.logging.Logger;
+import org.junit.jupiter.api.BeforeAll;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
@@ -59,7 +64,13 @@ public class SyncMapperGenerator {
 	protected FieldSpec requestFactoryField;
 	protected FieldSpec reflectionUtilField;
 
+	protected FieldSpec testClientField;
+	protected FieldSpec testMapperField;
+
 	public void generate() {
+		generateTestFields();
+		generateTestBeforeAll();
+
 		generateFields();
 		generateConstructor();
 		generateGetWrappers();
@@ -74,6 +85,10 @@ public class SyncMapperGenerator {
 
 	protected Class<?> clientClass() {
 		return DynamoDbClient.class;
+	}
+
+	protected ClassName mapperClass() {
+		return mapperType("DynamoMapper");
 	}
 
 	protected ClassName builderClass() {
@@ -275,5 +290,28 @@ public class SyncMapperGenerator {
 				.returns(builderClass())
 				.addStatement("return new $T()", builderClass())
 				.build());
+	}
+
+	public void generateTestFields() {
+		testClientField = testField(ClassName.get(clientClass()), "client");
+		mapperTest.addField(testClientField);
+		testMapperField = testField(mapperClass(), "mapper");
+		mapperTest.addField(testMapperField);
+	}
+
+	public void generateTestBeforeAll() {
+		var beforeAll = MethodSpec.methodBuilder("beforeAll")
+				.addAnnotation(BeforeAll.class)
+				.addModifiers(Modifier.STATIC)
+				.addCode(CodeBlock.builder()
+						.addStatement("client = $T.$L()", integrationTestUtil, integrationTestUtilClientConstructor())
+						.addStatement("mapper = $T.builder().client($L).build()", mapperClass(), testClientField.name)
+						.build())
+				.build();
+		mapperTest.addMethod(beforeAll);
+	}
+
+	public String integrationTestUtilClientConstructor() {
+		return "client";
 	}
 }

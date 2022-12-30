@@ -1,5 +1,7 @@
 package com.autonomouslogic.dynamomapper.codegen.util;
 
+import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.integrationTestObject;
+
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
@@ -23,7 +25,8 @@ public class TestGenerationHelper {
 										"\"$L\"",
 										"com.autonomouslogic.dynamomapper.test.IntegrationTestUtil#loadIntegrationTestObjects")
 								.build())
-				.addAnnotation(SneakyThrows.class);
+				.addAnnotation(SneakyThrows.class)
+				.addParameter(integrationTestObject, "obj");
 	}
 
 	public String testMethodName(Method source) {
