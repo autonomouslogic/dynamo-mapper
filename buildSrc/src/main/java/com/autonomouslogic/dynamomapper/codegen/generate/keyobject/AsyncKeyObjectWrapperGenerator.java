@@ -33,7 +33,7 @@ public class AsyncKeyObjectWrapperGenerator extends KeyObjectWrapperGenerator {
 				.build());
 		// Add parameters.
 		if (!multiple) {
-			wrapper.addParameter(Object.class, "keyObject");
+			wrapper.addParameter(TypeHelper.T, "keyObject");
 		} else {
 			var type = TypeHelper.genericWildcard(ClassName.get(List.class));
 			wrapper.addParameter(type, "keyObject");
