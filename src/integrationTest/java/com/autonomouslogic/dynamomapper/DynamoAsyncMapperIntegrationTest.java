@@ -68,7 +68,8 @@ public class DynamoAsyncMapperIntegrationTest {
 						(req, clazz) -> dynamoAsyncMapper.updateItem(req, clazz).join())
 				.updateItemRequestConsumer((consumer, clazz) ->
 						dynamoAsyncMapper.updateItem(consumer, clazz).join())
-				.updateItemKeyObjectStraight((key) -> dynamoAsyncMapper.updateItemFromKeyObject(key))
+				.updateItemKeyObjectStraight(
+						(key) -> dynamoAsyncMapper.updateItemFromKeyObject(key).join())
 				.updateItemKeyObjectConsumer((key, consumer) ->
 						dynamoAsyncMapper.updateItemFromKeyObject(key, consumer).join())
 				.deleteItemRequestStraight(
