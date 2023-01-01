@@ -18,7 +18,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import software.amazon.awssdk.services.dynamodb.model.ReturnValue;
 
 public class DynamoMapperIntegrationTest {
 	static DynamoMapper dynamoMapper;
@@ -34,24 +33,38 @@ public class DynamoMapperIntegrationTest {
 	}
 
 	@ParameterizedTest
-	@MethodSource("com.autonomouslogic.dynamomapper.test.IntegrationTestUtil#loadIntegrationTestObjects")
+	@MethodSource("com.autonomouslogic.dynamomapper.PermutationTester#objectAndTestMethods")
 	@SneakyThrows
-	void shouldPutAndGetAndUpdateAndDelete(IntegrationTestObject obj) {
-		obj = IntegrationTestObjects.setKeyAndTtl(obj);
-		System.out.println(obj);
-		// Put.
-		dynamoMapper.putItemFromKeyObject(obj);
-		// Get.
-		var getResponse = dynamoMapper.getItemFromPrimaryKey(obj.partitionKey(), IntegrationTestObject.class);
-		assertEquals(obj, getResponse.item());
-		// Update.
-		var obj2 = obj.toBuilder().str("new-val").build();
-		var updateResponse = dynamoMapper.updateItemFromKeyObject(obj2, req -> req.returnValues(ReturnValue.ALL_OLD));
-		assertEquals(obj, updateResponse.item());
-		// Delete.
-		var deleteResponse = dynamoMapper.deleteItemFromPrimaryKey(
-				obj.partitionKey(), req -> req.returnValues(ReturnValue.ALL_OLD), IntegrationTestObject.class);
-		assertEquals(obj2, deleteResponse.item());
+	void shouldPutAndGetAndUpdateAndDelete(PermutationTester.ObjectAndTestMethod test) {
+		var obj = IntegrationTestObjects.setKeyAndTtl(test.obj());
+		System.out.println(test);
+		new PermutationTester(encoder)
+				.obj(obj)
+				.methodType(test.methodType())
+				.callMethod(test.callMethod())
+				.getItemRequestStraight((req, clazz) -> dynamoMapper.getItem(req, clazz))
+				.getItemRequestConsumer((consumer, clazz) -> dynamoMapper.getItem(consumer, clazz))
+				.getItemPrimaryKeyStraight((key, clazz) -> dynamoMapper.getItemFromPrimaryKey(key, clazz))
+				.getItemPrimaryKeyConsumer(
+						(key, consumer, clazz) -> dynamoMapper.getItemFromPrimaryKey(key, consumer, clazz))
+				.getItemKeyObjectStraight((key) -> dynamoMapper.getItemFromKeyObject(key))
+				.getItemKeyObjectConsumer((key, consumer) -> dynamoMapper.getItemFromKeyObject(key, consumer))
+				.putItemRequestStraight((req, clazz) -> dynamoMapper.putItem(req, clazz))
+				.putItemRequestConsumer((consumer, clazz) -> dynamoMapper.putItem(consumer, clazz))
+				.putItemKeyObjectStraight((key) -> dynamoMapper.putItemFromKeyObject(key))
+				.putItemKeyObjectConsumer((key, consumer) -> dynamoMapper.putItemFromKeyObject(key, consumer))
+				.updateItemRequestStraight((req, clazz) -> dynamoMapper.updateItem(req, clazz))
+				.updateItemRequestConsumer((consumer, clazz) -> dynamoMapper.updateItem(consumer, clazz))
+				.updateItemKeyObjectStraight((key) -> dynamoMapper.updateItemFromKeyObject(key))
+				.updateItemKeyObjectConsumer((key, consumer) -> dynamoMapper.updateItemFromKeyObject(key, consumer))
+				.deleteItemRequestStraight((req, clazz) -> dynamoMapper.deleteItem(req, clazz))
+				.deleteItemRequestConsumer((consumer, clazz) -> dynamoMapper.deleteItem(consumer, clazz))
+				.deleteItemPrimaryKeyStraight((key, clazz) -> dynamoMapper.deleteItemFromPrimaryKey(key, clazz))
+				.deleteItemPrimaryKeyConsumer(
+						(key, consumer, clazz) -> dynamoMapper.deleteItemFromPrimaryKey(key, consumer, clazz))
+				.deleteItemKeyObjectStraight((key) -> dynamoMapper.deleteItemFromKeyObject(key))
+				.deleteItemKeyObjectConsumer((key, consumer) -> dynamoMapper.deleteItemFromKeyObject(key, consumer))
+				.runTest();
 	}
 
 	@Test

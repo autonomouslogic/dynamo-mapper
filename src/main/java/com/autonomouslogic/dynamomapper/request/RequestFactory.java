@@ -5,14 +5,11 @@ import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
@@ -32,13 +29,13 @@ public class RequestFactory {
 			throws IOException {
 		return GetItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(clazz))
-				.key(createKeyValue(primaryKey, clazz));
+				.key(encoder.encodeKeyValue(primaryKey, clazz));
 	}
 
 	public <T> GetItemRequest.Builder getItemRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
 		return GetItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
-				.key(createKeyValue(keyObject));
+				.key(encoder.encodeKeyValue(keyObject));
 	}
 
 	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromPrimaryKeys(
@@ -46,7 +43,7 @@ public class RequestFactory {
 		var tableName = reflectionUtil.resolveTableName(clazz);
 		var keyObjects = new ArrayList<Map<String, AttributeValue>>(primaryKeys.size());
 		for (Object primaryKey : primaryKeys) {
-			keyObjects.add(createKeyValue(primaryKey, clazz));
+			keyObjects.add(encoder.encodeKeyValue(primaryKey, clazz));
 		}
 		return BatchGetItemRequest.builder()
 				.requestItems(Map.of(
@@ -55,7 +52,6 @@ public class RequestFactory {
 
 	public <T> BatchGetItemRequest.Builder batchGetItemRequestFromKeyObjects(@NonNull List<T> keyObjects)
 			throws IOException {
-
 		Class<?> clazz = null;
 		for (var k : keyObjects) {
 			if (clazz == null) {
@@ -68,7 +64,7 @@ public class RequestFactory {
 		var tableName = reflectionUtil.resolveTableName(clazz);
 		var keys = new ArrayList<Map<String, AttributeValue>>(keyObjects.size());
 		for (Object primaryKey : keyObjects) {
-			var keyValue = createKeyValue(primaryKey);
+			var keyValue = encoder.encodeKeyValue(primaryKey);
 			keys.add(keyValue);
 		}
 		return BatchGetItemRequest.builder()
@@ -84,18 +80,8 @@ public class RequestFactory {
 	}
 
 	public UpdateItemRequest.Builder updateItemRequestFromKeyObject(@NonNull Object obj) throws IOException {
-		var encoded = encoder.encode(obj);
-		var key = createKeyValue(obj);
-		for (String k : key.keySet()) {
-			encoded.remove(k);
-		}
-		var updates = new HashMap<String, AttributeValueUpdate>();
-		encoded.forEach((k, val) -> updates.put(
-				k,
-				AttributeValueUpdate.builder()
-						.value(val)
-						.action(AttributeAction.PUT)
-						.build()));
+		var key = encoder.encodeKeyValue(obj);
+		var updates = encoder.encodeUpdates(obj);
 		return UpdateItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(obj.getClass()))
 				.key(key)
@@ -106,38 +92,13 @@ public class RequestFactory {
 			@NonNull Object primaryKey, @NonNull Class<T> clazz) throws IOException {
 		return DeleteItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(clazz))
-				.key(createKeyValue(primaryKey, clazz));
+				.key(encoder.encodeKeyValue(primaryKey, clazz));
 	}
 
 	public DeleteItemRequest.Builder deleteItemRequestFromKeyObject(@NonNull Object keyObject) throws IOException {
 		return DeleteItemRequest.builder()
 				.tableName(reflectionUtil.resolveTableName(keyObject.getClass()))
-				.key(createKeyValue(keyObject));
-	}
-
-	private <T> Map<String, AttributeValue> createKeyValue(@NonNull Object primaryKey, @NonNull Class<T> clazz)
-			throws IOException {
-		var primaryKeys = reflectionUtil.resolvePrimaryKeyFields(clazz);
-		if (primaryKeys.isEmpty()) {
-			throw new IllegalArgumentException(String.format("No primary key defined on %s", clazz.getSimpleName()));
-		}
-		if (primaryKeys.size() > 1) {
-			throw new IllegalArgumentException(
-					String.format("Multiple primary keys defined on %s", clazz.getSimpleName()));
-		}
-		var json = objectMapper.valueToTree(primaryKey);
-		var primaryKeyValue = encoder.encodeValue(json);
-		return Map.of(primaryKeys.get(0), primaryKeyValue);
-	}
-
-	private <T> Map<String, AttributeValue> createKeyValue(@NonNull T keyObject) throws IOException {
-		var encoded = encoder.encode(keyObject);
-		var primaryKeys = reflectionUtil.resolvePrimaryKeyFields(keyObject.getClass());
-		var keyValues = new HashMap<String, AttributeValue>();
-		for (String field : primaryKeys) {
-			keyValues.put(field, encoded.get(field));
-		}
-		return keyValues;
+				.key(encoder.encodeKeyValue(keyObject));
 	}
 
 	public GetItemRequest acceptGetItemRequest(@NonNull GetItemRequest req, @NonNull Class<?> clazz) {

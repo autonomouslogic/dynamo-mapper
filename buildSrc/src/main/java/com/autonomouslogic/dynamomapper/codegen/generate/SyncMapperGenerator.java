@@ -102,9 +102,9 @@ public class SyncMapperGenerator {
 
 		constructor
 				.addStatement("this.client = client")
-				.addStatement("encoder = new $T(objectMapper)", encoderField.type)
-				.addStatement("decoder = new $T(objectMapper)", decoderField.type)
 				.addStatement("reflectionUtil = new $T(objectMapper)", reflectionUtilField.type)
+				.addStatement("encoder = new $T(objectMapper, reflectionUtil)", encoderField.type)
+				.addStatement("decoder = new $T(objectMapper)", decoderField.type)
 				.addStatement(
 						"requestFactory = new $T(encoder, objectMapper, reflectionUtil)", requestFactoryField.type);
 

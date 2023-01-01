@@ -1,5 +1,6 @@
 package com.autonomouslogic.dynamomapper.codec;
 
+import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -9,12 +10,17 @@ import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
 
 @RequiredArgsConstructor
 public class DynamoEncoder {
 	@NonNull
 	private final ObjectMapper objectMapper;
+
+	@NonNull
+	private final ReflectionUtil reflectionUtil;
 
 	/**
 	 * Encodes a POJO into DynamoDB values.
@@ -73,5 +79,46 @@ public class DynamoEncoder {
 			values.add(encodeValue(entry));
 		}
 		return AttributeValue.builder().l(values).build();
+	}
+
+	public <T> Map<String, AttributeValue> encodeKeyValue(@NonNull T keyObject) throws IOException {
+		var encoded = encode(keyObject);
+		var primaryKeys = reflectionUtil.resolvePrimaryKeyFields(keyObject.getClass());
+		var keyValues = new HashMap<String, AttributeValue>();
+		for (String field : primaryKeys) {
+			keyValues.put(field, encoded.get(field));
+		}
+		return keyValues;
+	}
+
+	public <T> Map<String, AttributeValue> encodeKeyValue(@NonNull Object primaryKey, @NonNull Class<T> clazz)
+			throws IOException {
+		var primaryKeys = reflectionUtil.resolvePrimaryKeyFields(clazz);
+		if (primaryKeys.isEmpty()) {
+			throw new IllegalArgumentException(String.format("No primary key defined on %s", clazz.getSimpleName()));
+		}
+		if (primaryKeys.size() > 1) {
+			throw new IllegalArgumentException(
+					String.format("Multiple primary keys defined on %s", clazz.getSimpleName()));
+		}
+		var json = objectMapper.valueToTree(primaryKey);
+		var primaryKeyValue = encodeValue(json);
+		return Map.of(primaryKeys.get(0), primaryKeyValue);
+	}
+
+	public Map<String, AttributeValueUpdate> encodeUpdates(@NonNull Object obj) throws IOException {
+		var encoded = encode(obj);
+		var key = encodeKeyValue(obj);
+		for (String k : key.keySet()) {
+			encoded.remove(k);
+		}
+		var updates = new HashMap<String, AttributeValueUpdate>();
+		encoded.forEach((k, val) -> updates.put(
+				k,
+				AttributeValueUpdate.builder()
+						.value(val)
+						.action(AttributeAction.PUT)
+						.build()));
+		return updates;
 	}
 }
