@@ -50,9 +50,9 @@ public class DynamoAsyncMapper {
 
 	protected DynamoAsyncMapper(DynamoDbAsyncClient client, ObjectMapper objectMapper) {
 		this.client = client;
-		encoder = new DynamoEncoder(objectMapper);
-		decoder = new DynamoDecoder(objectMapper);
 		reflectionUtil = new ReflectionUtil(objectMapper);
+		encoder = new DynamoEncoder(objectMapper, reflectionUtil);
+		decoder = new DynamoDecoder(objectMapper);
 		requestFactory = new RequestFactory(encoder, objectMapper, reflectionUtil);
 	}
 

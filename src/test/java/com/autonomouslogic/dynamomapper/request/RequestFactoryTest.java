@@ -18,8 +18,9 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
 
 public class RequestFactoryTest {
 	ObjectMapper objectMapper = StdObjectMapper.objectMapper();
-	RequestFactory factory =
-			new RequestFactory(new DynamoEncoder(objectMapper), objectMapper, new ReflectionUtil(objectMapper));
+	ReflectionUtil reflectionUtil = new ReflectionUtil(objectMapper);
+	RequestFactory factory = new RequestFactory(
+			new DynamoEncoder(objectMapper, reflectionUtil), objectMapper, new ReflectionUtil(objectMapper));
 
 	@Test
 	@SneakyThrows

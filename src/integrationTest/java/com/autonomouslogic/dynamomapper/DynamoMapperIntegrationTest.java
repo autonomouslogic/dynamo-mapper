@@ -1,11 +1,14 @@
 package com.autonomouslogic.dynamomapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
+import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
+import com.autonomouslogic.dynamomapper.model.MappedUpdateItemResponse;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
@@ -13,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -23,10 +25,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.ReturnValue;
+import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
 public class DynamoMapperIntegrationTest {
 	private enum MethodType {
@@ -93,6 +96,9 @@ public class DynamoMapperIntegrationTest {
 	void shouldPutAndGetAndUpdateAndDelete(ObjectAndTestMethod test) {
 		var obj = IntegrationTestObjects.setKeyAndTtl(test.obj());
 		System.out.println(obj);
+		// Get
+		var emptyGetResponse = testGet(obj, test.methodType(), test.callMethod());
+		assertNull(emptyGetResponse.item());
 		// Put.
 		testPut(obj, test.methodType(), test.callMethod());
 		// Get.
@@ -100,40 +106,40 @@ public class DynamoMapperIntegrationTest {
 		assertEquals(obj, getResponse.item());
 		// Update.
 		var obj2 = obj.toBuilder().str("new-val").build();
-		var updateResponse = dynamoMapper.updateItemFromKeyObject(obj2, req -> req.returnValues(ReturnValue.ALL_OLD));
-		assertEquals(obj, updateResponse.item());
+		var updateResponse = testUpdate(obj2, test.methodType(), test.callMethod());
+		if (test.methodType() == MethodType.REQUEST || test.callMethod() == CallMethod.CONSUMER) {
+			assertEquals(obj2, updateResponse.item());
+		} else {
+			assertNull(updateResponse.item());
+		}
 		// Delete.
-		var deleteResponse = dynamoMapper.deleteItemFromPrimaryKey(
-				obj.partitionKey(), req -> req.returnValues(ReturnValue.ALL_OLD), IntegrationTestObject.class);
-		assertEquals(obj2, deleteResponse.item());
+		var deleteResponse = testDelete(obj2, test.methodType(), test.callMethod());
+		if (test.methodType() == MethodType.REQUEST || test.callMethod() == CallMethod.CONSUMER) {
+			assertEquals(obj2, deleteResponse.item());
+		} else {
+			assertNull(updateResponse.item());
+		}
+		// Get
+		var emptyGetResponse2 = testGet(obj, test.methodType(), test.callMethod());
+		assertNull(emptyGetResponse2.item());
 	}
 
 	@SneakyThrows
 	private MappedGetItemResponse<IntegrationTestObject> testGet(
 			IntegrationTestObject obj, MethodType methodType, CallMethod callMethod) {
+		var key = encoder.encodeKeyValue(obj);
 		switch (methodType) {
 			case REQUEST:
 				switch (callMethod) {
 					case STRAIGHT:
 						return dynamoMapper.getItem(
-								GetItemRequest.builder()
-										.key(Map.of(
-												"partitionKey",
-												AttributeValue.builder()
-														.s(obj.partitionKey())
-														.build()))
-										.build(),
-								IntegrationTestObject.class);
+								GetItemRequest.builder().key(key).build(), IntegrationTestObject.class);
 					case CONSUMER:
 						return dynamoMapper.getItem(
 								builder -> {
 									var req = builder.build();
 									assertEquals("integration-test-table", req.tableName());
-									builder.key(Map.of(
-											"partitionKey",
-											AttributeValue.builder()
-													.s(obj.partitionKey())
-													.build()));
+									builder.key(key);
 								},
 								IntegrationTestObject.class);
 				}
@@ -199,6 +205,103 @@ public class DynamoMapperIntegrationTest {
 							var req = builder.build();
 							assertEquals("integration-test-table", req.tableName());
 							assertEquals(item, req.item());
+						});
+				}
+		}
+		throw new IllegalStateException();
+	}
+
+	@SneakyThrows
+	private MappedUpdateItemResponse<IntegrationTestObject> testUpdate(
+			IntegrationTestObject obj, MethodType methodType, CallMethod callMethod) {
+		var key = encoder.encodeKeyValue(obj);
+		var updates = encoder.encodeUpdates(obj);
+		switch (methodType) {
+			case REQUEST:
+				switch (callMethod) {
+					case STRAIGHT:
+						return dynamoMapper.updateItem(
+								UpdateItemRequest.builder()
+										.key(key)
+										.attributeUpdates(updates)
+										.returnValues(ReturnValue.ALL_NEW)
+										.build(),
+								IntegrationTestObject.class);
+					case CONSUMER:
+						return dynamoMapper.updateItem(
+								builder -> {
+									var req = builder.build();
+									assertEquals("integration-test-table", req.tableName());
+									builder.key(key).attributeUpdates(updates).returnValues(ReturnValue.ALL_NEW);
+								},
+								IntegrationTestObject.class);
+				}
+			case PRIMARY_KEY: // Updates don't have a straight primary-key method, just use key objects.
+			case KEY_OBJECT:
+				switch (callMethod) {
+					case STRAIGHT:
+						return dynamoMapper.updateItemFromKeyObject(obj);
+					case CONSUMER:
+						return dynamoMapper.updateItemFromKeyObject(obj, builder -> {
+							var req = builder.build();
+							assertEquals("integration-test-table", req.tableName());
+							assertEquals(key, req.key());
+							assertEquals(updates, req.attributeUpdates());
+							builder.returnValues(ReturnValue.ALL_NEW);
+						});
+				}
+		}
+		throw new IllegalStateException();
+	}
+
+	@SneakyThrows
+	private MappedDeleteItemResponse<IntegrationTestObject> testDelete(
+			IntegrationTestObject obj, MethodType methodType, CallMethod callMethod) {
+		var key = encoder.encodeKeyValue(obj);
+		switch (methodType) {
+			case REQUEST:
+				switch (callMethod) {
+					case STRAIGHT:
+						return dynamoMapper.deleteItem(
+								DeleteItemRequest.builder()
+										.key(key)
+										.returnValues(ReturnValue.ALL_OLD)
+										.build(),
+								IntegrationTestObject.class);
+					case CONSUMER:
+						return dynamoMapper.deleteItem(
+								builder -> {
+									var req = builder.build();
+									assertEquals("integration-test-table", req.tableName());
+									builder.key(key).returnValues(ReturnValue.ALL_OLD);
+								},
+								IntegrationTestObject.class);
+				}
+			case PRIMARY_KEY:
+				switch (callMethod) {
+					case STRAIGHT:
+						return dynamoMapper.deleteItemFromPrimaryKey(obj.partitionKey(), IntegrationTestObject.class);
+					case CONSUMER:
+						return dynamoMapper.deleteItemFromPrimaryKey(
+								obj.partitionKey(),
+								builder -> {
+									var req = builder.build();
+									assertEquals("integration-test-table", req.tableName());
+									assertEquals(key, req.key());
+									builder.returnValues(ReturnValue.ALL_OLD);
+								},
+								IntegrationTestObject.class);
+				}
+			case KEY_OBJECT:
+				switch (callMethod) {
+					case STRAIGHT:
+						return dynamoMapper.deleteItemFromKeyObject(obj);
+					case CONSUMER:
+						return dynamoMapper.deleteItemFromKeyObject(obj, builder -> {
+							var req = builder.build();
+							assertEquals("integration-test-table", req.tableName());
+							assertEquals(key, req.key());
+							builder.returnValues(ReturnValue.ALL_OLD);
 						});
 				}
 		}
