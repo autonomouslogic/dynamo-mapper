@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
@@ -47,11 +46,10 @@ public class CompatibilityTest {
 	void shouldReadFromV1(CompatibilityTestObject obj) {
 		System.out.println(obj);
 		v1Client.save(obj);
-		assertEquals(
-				obj,
-				dynamoMapper
-						.getItemFromPrimaryKey(obj.getPartitionKey(), CompatibilityTestObject.class)
-						.item());
+		var loaded = dynamoMapper
+				.getItemFromPrimaryKey(obj.getPartitionKey(), CompatibilityTestObject.class)
+				.item();
+		assertEquals(obj, loaded);
 	}
 
 	@ParameterizedTest
@@ -60,31 +58,30 @@ public class CompatibilityTest {
 	void shouldWriteToV1(CompatibilityTestObject obj) {
 		System.out.println(obj);
 		dynamoMapper.putItemFromKeyObject(obj);
-		assertEquals(obj, v1Client.load(CompatibilityTestObject.class, obj.getPartitionKey()));
+		var loaded = v1Client.load(CompatibilityTestObject.class, obj.getPartitionKey());
+		assertEquals(obj, loaded);
 	}
 
 	@ParameterizedTest
 	@MethodSource("loadCompatibilityTestObjects")
-	@Disabled // v2 SDK isn't set up correctly.
 	@SneakyThrows
 	void shouldReadFromV2(CompatibilityTestObject obj) {
 		System.out.println(obj);
 		v2Table.putItem(obj);
-		assertEquals(
-				obj,
-				dynamoMapper
-						.getItemFromPrimaryKey(obj.getPartitionKey(), CompatibilityTestObject.class)
-						.item());
+		var loaded = dynamoMapper
+				.getItemFromPrimaryKey(obj.getPartitionKey(), CompatibilityTestObject.class)
+				.item();
+		assertEquals(obj, loaded);
 	}
 
 	@ParameterizedTest
 	@MethodSource("loadCompatibilityTestObjects")
-	@Disabled // v2 SDK isn't set up correctly.
 	@SneakyThrows
 	void shouldWriteToV2(CompatibilityTestObject obj) {
 		System.out.println(obj);
 		dynamoMapper.putItemFromKeyObject(obj);
-		assertEquals(obj, v2Table.getItem(obj));
+		var loaded = v2Table.getItem(obj);
+		assertEquals(obj, loaded);
 	}
 
 	@SneakyThrows

@@ -63,80 +63,71 @@ public class CompatibilityTestObject {
 		return partitionKey;
 	}
 
-	public CompatibilityTestObject setPartitionKey(String partitionKey) {
+	public void setPartitionKey(String partitionKey) {
 		this.partitionKey = partitionKey;
-		return this;
 	}
 
 	public Integer getI() {
 		return i;
 	}
 
-	public CompatibilityTestObject setI(Integer i) {
+	public void setI(Integer i) {
 		this.i = i;
-		return this;
 	}
 
 	public String getStr() {
 		return str;
 	}
 
-	public CompatibilityTestObject setStr(String str) {
+	public void setStr(String str) {
 		this.str = str;
-		return this;
 	}
 
 	public Double getDbl() {
 		return dbl;
 	}
 
-	public CompatibilityTestObject setDbl(Double dbl) {
+	public void setDbl(Double dbl) {
 		this.dbl = dbl;
-		return this;
 	}
 
 	public BigInteger getBigint() {
 		return bigint;
 	}
 
-	public CompatibilityTestObject setBigint(BigInteger bigint) {
+	public void setBigint(BigInteger bigint) {
 		this.bigint = bigint;
-		return this;
 	}
 
 	public BigDecimal getBigdec() {
 		return bigdec;
 	}
 
-	public CompatibilityTestObject setBigdec(BigDecimal bigdec) {
+	public void setBigdec(BigDecimal bigdec) {
 		this.bigdec = bigdec;
-		return this;
 	}
 
 	public byte[] getBytes() {
 		return bytes;
 	}
 
-	public CompatibilityTestObject setBytes(byte[] bytes) {
+	public void setBytes(byte[] bytes) {
 		this.bytes = bytes;
-		return this;
 	}
 
 	public List<String> getListString() {
 		return listString;
 	}
 
-	public CompatibilityTestObject setListString(List<String> listString) {
+	public void setListString(List<String> listString) {
 		this.listString = listString;
-		return this;
 	}
 
 	public long getTtl() {
 		return ttl;
 	}
 
-	public CompatibilityTestObject setTtl(long ttl) {
+	public void setTtl(long ttl) {
 		this.ttl = ttl;
-		return this;
 	}
 }
