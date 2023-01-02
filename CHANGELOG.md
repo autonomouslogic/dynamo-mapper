@@ -1,5 +1,32 @@
 Dynamo Mapper Changelog
 
+## [2.0.1](https://github.com/autonomouslogic/dynamo-mapper/compare/2.0.0...2.0.1) (2023-01-02)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#91](https://github.com/autonomouslogic/dynamo-mapper/issues/91)) ([92b6af4](https://github.com/autonomouslogic/dynamo-mapper/commit/92b6af433ba60025a7381abab3fade8abcd05c9f))
+* Fixed generic return on async primary key object ([#90](https://github.com/autonomouslogic/dynamo-mapper/issues/90)) ([ce13070](https://github.com/autonomouslogic/dynamo-mapper/commit/ce1307039c6bf4afdda977bf3a11b646c8d03859))
+
+
+### Miscellaneous Chores
+
+* Added Lombok generated annotations ([#86](https://github.com/autonomouslogic/dynamo-mapper/issues/86)) ([725822f](https://github.com/autonomouslogic/dynamo-mapper/commit/725822f44b6b94b75450650e29b6cdc03edaefe0))
+* **deps:** update all non-major dependencies ([#82](https://github.com/autonomouslogic/dynamo-mapper/issues/82)) ([819b61c](https://github.com/autonomouslogic/dynamo-mapper/commit/819b61c6720a498e018ee71e822c55e0d669a1ac))
+
+
+### Code Refactoring
+
+* Code generation refactor ([#87](https://github.com/autonomouslogic/dynamo-mapper/issues/87)) ([2e8766f](https://github.com/autonomouslogic/dynamo-mapper/commit/2e8766f8b3b661956ce9a0bcbbceb000cadbad5c))
+* Codegen refactor ([#80](https://github.com/autonomouslogic/dynamo-mapper/issues/80)) ([630777d](https://github.com/autonomouslogic/dynamo-mapper/commit/630777d8fad4b89cf1de10498dfead9f5c6f1d0e))
+
+
+### Tests
+
+* Fixed v2 compatibility testing ([#89](https://github.com/autonomouslogic/dynamo-mapper/issues/89)) ([8443499](https://github.com/autonomouslogic/dynamo-mapper/commit/8443499f3ff890beb9e54442d91f2396094dfd2d))
+* More thorough integration testing ([#88](https://github.com/autonomouslogic/dynamo-mapper/issues/88)) ([5866ae9](https://github.com/autonomouslogic/dynamo-mapper/commit/5866ae9bf56cb4a4a9d211da788ca40dad6d4d78))
+* More thorough integration testing ([#88](https://github.com/autonomouslogic/dynamo-mapper/issues/88)) ([f0e2fb1](https://github.com/autonomouslogic/dynamo-mapper/commit/f0e2fb13edf286800ea54bb636c1e0fc80bcae21))
+
 ## [2.0.0](https://github.com/autonomouslogic/dynamo-mapper/compare/1.2.23...2.0.0) (2022-12-04)
 
 
