@@ -1,5 +1,18 @@
 Dynamo Mapper Changelog
 
+## [2.0.3](https://github.com/autonomouslogic/dynamo-mapper/compare/2.0.2...2.0.3) (2023-03-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency org.mockito:mockito-core to v5 ([#93](https://github.com/autonomouslogic/dynamo-mapper/issues/93)) ([ca3751e](https://github.com/autonomouslogic/dynamo-mapper/commit/ca3751edcfa403b66571b8ebe1579f6265de5c77))
+
+
+### Miscellaneous Chores
+
+* **deps:** update all non-major dependencies ([#96](https://github.com/autonomouslogic/dynamo-mapper/issues/96)) ([9a8c2a4](https://github.com/autonomouslogic/dynamo-mapper/commit/9a8c2a4faa6c33956f5ff93b4259e4736dde02d0))
+* **deps:** update plugin io.freefair.lombok to v8 ([#97](https://github.com/autonomouslogic/dynamo-mapper/issues/97)) ([1eba09d](https://github.com/autonomouslogic/dynamo-mapper/commit/1eba09deb5913285d4abad1ec79172ddc51e3450))
+
 ## [2.0.2](https://github.com/autonomouslogic/dynamo-mapper/compare/2.0.1...2.0.2) (2023-02-06)
 
 
