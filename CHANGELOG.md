@@ -1,5 +1,12 @@
 Dynamo Mapper Changelog
 
+## [2.0.5](https://github.com/autonomouslogic/dynamo-mapper/compare/2.0.4...2.0.5) (2023-05-01)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#99](https://github.com/autonomouslogic/dynamo-mapper/issues/99)) ([204ddd7](https://github.com/autonomouslogic/dynamo-mapper/commit/204ddd7d7461423a38df449a7f3affadd69477de))
+
 ## [2.0.4](https://github.com/autonomouslogic/dynamo-mapper/compare/2.0.3...2.0.4) (2023-04-03)
 
 
