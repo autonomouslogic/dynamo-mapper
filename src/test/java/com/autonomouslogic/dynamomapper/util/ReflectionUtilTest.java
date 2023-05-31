@@ -40,13 +40,13 @@ public class ReflectionUtilTest {
 
 	@Test
 	@SneakyThrows
-	void shouldResolveTablesName() {
+	void shouldResolveTableName() {
 		assertEquals("test", reflectionUtil.resolveTableName(TestObject.class));
 	}
 
 	@Test
 	@SneakyThrows
-	void shouldDecorateTablesName() {
+	void shouldDecorateTableName() {
 		TableNameDecorator decorator = (clazz, tableName) -> tableName + "-" + clazz.getSimpleName();
 		var reflectionUtil = new ReflectionUtil(StdObjectMapper.objectMapper(), decorator);
 		assertEquals("test-TestObject", reflectionUtil.resolveTableName(TestObject.class));
