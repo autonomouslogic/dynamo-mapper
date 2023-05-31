@@ -1,5 +1,17 @@
 Dynamo Mapper Changelog
 
+## [2.1.0](https://github.com/autonomouslogic/dynamo-mapper/compare/2.0.5...2.1.0) (2023-05-31)
+
+
+### Features
+
+* Table name decorator ([#100](https://github.com/autonomouslogic/dynamo-mapper/issues/100)) ([5d99a3a](https://github.com/autonomouslogic/dynamo-mapper/commit/5d99a3a7edb7eef391ed49091b8d8ade36778f9f))
+
+
+### Miscellaneous Chores
+
+* **deps:** update plugin org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin to v1 ([#92](https://github.com/autonomouslogic/dynamo-mapper/issues/92)) ([2997b3c](https://github.com/autonomouslogic/dynamo-mapper/commit/2997b3cb2b44c3c50803ae57c896f4ae178e9e3e))
+
 ## [2.0.5](https://github.com/autonomouslogic/dynamo-mapper/compare/2.0.4...2.0.5) (2023-05-01)
 
 
