@@ -42,6 +42,7 @@ If you do not provide a DynamoDB client or Jackson ObjectMapper, defaults will b
 var dynamoMapper = DynamoMapper.builder()
     .client(DynamoDbClient.create())
     .objectMapper(new ObjectMapper())
+    .tableNameDecorator(decorator) // optional
     .build();
 ```
 
@@ -50,6 +51,7 @@ Or, for the asynchronous API:
 var asyncDynamoMapper = DynamoAsyncMapper.builder()
     .client(DynamoDbAsyncClient.create())
     .objectMapper(new ObjectMapper())
+	.tableNameDecorator(decorator) // optional
     .build();
 ```
 
