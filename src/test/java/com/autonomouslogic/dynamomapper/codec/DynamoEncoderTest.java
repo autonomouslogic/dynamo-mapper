@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class DynamoEncoderTest {
 	ObjectMapper objectMapper = StdObjectMapper.objectMapper();
-	ReflectionUtil reflectionUtil = new ReflectionUtil(objectMapper);
+	ReflectionUtil reflectionUtil = new ReflectionUtil(objectMapper, null);
 	DynamoEncoder encoder = new DynamoEncoder(StdObjectMapper.objectMapper(), reflectionUtil);
 
 	@ParameterizedTest

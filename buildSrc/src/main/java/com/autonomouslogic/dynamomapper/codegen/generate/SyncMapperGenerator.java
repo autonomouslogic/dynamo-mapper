@@ -97,12 +97,15 @@ public class SyncMapperGenerator {
 		var client = ParameterSpec.builder(clientField.type, "client").build();
 		var objectMapper =
 				ParameterSpec.builder(ObjectMapper.class, "objectMapper").build();
+		var tableNameDecorator = ParameterSpec.builder(TypeHelper.tableNameDecorator, "tableNameDecorator")
+				.build();
 		constructor.addParameter(client);
 		constructor.addParameter(objectMapper);
+		constructor.addParameter(tableNameDecorator);
 
 		constructor
 				.addStatement("this.client = client")
-				.addStatement("reflectionUtil = new $T(objectMapper)", reflectionUtilField.type)
+				.addStatement("reflectionUtil = new $T(objectMapper, tableNameDecorator)", reflectionUtilField.type)
 				.addStatement("encoder = new $T(objectMapper, reflectionUtil)", encoderField.type)
 				.addStatement("decoder = new $T(objectMapper)", decoderField.type)
 				.addStatement(

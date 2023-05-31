@@ -2,6 +2,7 @@ package com.autonomouslogic.dynamomapper.util;
 
 import com.autonomouslogic.dynamomapper.annotations.DynamoPrimaryKey;
 import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
+import com.autonomouslogic.dynamomapper.function.TableNameDecorator;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
@@ -14,9 +15,10 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class ReflectionUtil {
-	private static final Map<Class<?>, List<String>> primaryKeyCache = new ConcurrentHashMap<>();
-	private static final Map<Class<?>, String> tableNameCache = new ConcurrentHashMap<>();
+	private final Map<Class<?>, List<String>> primaryKeyCache = new ConcurrentHashMap<>();
+	private final Map<Class<?>, String> tableNameCache = new ConcurrentHashMap<>();
 	private final ObjectMapper objectMapper;
+	private final TableNameDecorator tableNameDecorator;
 
 	public List<String> resolvePrimaryKeyFields(Class clazz) {
 		return primaryKeyCache.computeIfAbsent(clazz, ignore -> {
@@ -52,7 +54,11 @@ public class ReflectionUtil {
 				throw new IllegalArgumentException(
 						String.format("Class %s is not annotated with @DynamoTableName", clazz.getSimpleName()));
 			}
-			return tableName.value();
+			var name = tableName.value();
+			if (tableNameDecorator != null) {
+				name = tableNameDecorator.apply(clazz, name);
+			}
+			return name;
 		});
 	}
 }

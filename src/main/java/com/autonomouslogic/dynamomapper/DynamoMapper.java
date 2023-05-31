@@ -3,6 +3,7 @@ package com.autonomouslogic.dynamomapper;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoDecoder;
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
+import com.autonomouslogic.dynamomapper.function.TableNameDecorator;
 import com.autonomouslogic.dynamomapper.model.MappedBatchGetItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedDeleteItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedGetItemResponse;
@@ -48,9 +49,9 @@ public class DynamoMapper {
 
 	final ReflectionUtil reflectionUtil;
 
-	protected DynamoMapper(DynamoDbClient client, ObjectMapper objectMapper) {
+	protected DynamoMapper(DynamoDbClient client, ObjectMapper objectMapper, TableNameDecorator tableNameDecorator) {
 		this.client = client;
-		reflectionUtil = new ReflectionUtil(objectMapper);
+		reflectionUtil = new ReflectionUtil(objectMapper, tableNameDecorator);
 		encoder = new DynamoEncoder(objectMapper, reflectionUtil);
 		decoder = new DynamoDecoder(objectMapper);
 		requestFactory = new RequestFactory(encoder, objectMapper, reflectionUtil);

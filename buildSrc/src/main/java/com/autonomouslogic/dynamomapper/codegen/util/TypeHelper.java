@@ -25,6 +25,7 @@ public class TypeHelper {
 	public static final ClassName dynamoEncoder = mapperType("codec", "DynamoEncoder");
 	public static final ClassName checkedFunction = mapperType("function", "CheckedFunction");
 	public static final ClassName reflectionUtil = mapperType("util", "ReflectionUtil");
+	public static final ClassName tableNameDecorator = mapperType("function", "TableNameDecorator");
 	public static final ClassName futureUtil = mapperType("util", "FutureUtil");
 	public static final ClassName requestFactory = mapperType("request", "RequestFactory");
 	public static final ClassName mappedDeleteItemResponse = mapperType("model", "MappedDeleteItemResponse");
