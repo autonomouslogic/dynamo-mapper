@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-	implementation "software.amazon.awssdk:dynamodb:2.21.15"
+	implementation "software.amazon.awssdk:dynamodb:2.21.16"
 	implementation "com.fasterxml.jackson.core:jackson-databind:2.15.3"
 
 	testImplementation "org.junit.jupiter:junit-jupiter-api:5.10.1"
@@ -30,10 +30,10 @@ dependencies {
 	testImplementation "org.mockito:mockito-core:5.7.0"
 
 	testImplementation "commons-codec:commons-codec:1.16.0"
-	testImplementation "software.amazon.awssdk:sts:2.21.15"
-	testImplementation "com.amazonaws:aws-java-sdk-sts:1.12.581"
-	testImplementation "software.amazon.awssdk:dynamodb-enhanced:2.21.15"
-	testImplementation "com.amazonaws:aws-java-sdk-dynamodb:1.12.581"
+	testImplementation "software.amazon.awssdk:sts:2.21.16"
+	testImplementation "com.amazonaws:aws-java-sdk-sts:1.12.582"
+	testImplementation "software.amazon.awssdk:dynamodb-enhanced:2.21.16"
+	testImplementation "com.amazonaws:aws-java-sdk-dynamodb:1.12.582"
 	testImplementation "org.apache.commons:commons-math3:3.6.1"
 	testImplementation "com.autonomouslogic.jacksonobjectstream:jackson-object-stream:0.2.17"
 	testImplementation "org.apache.commons:commons-lang3:3.13.0"
