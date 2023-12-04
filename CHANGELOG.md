@@ -1,5 +1,17 @@
 Dynamo Mapper Changelog
 
+## [2.1.6](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.5...2.1.6) (2023-12-04)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#112](https://github.com/autonomouslogic/dynamo-mapper/issues/112)) ([882db16](https://github.com/autonomouslogic/dynamo-mapper/commit/882db1629f4a8e22ef8340e63e98ab4e21ee24a2))
+
+
+### Miscellaneous Chores
+
+* **deps:** update plugin com.diffplug.spotless to v6.23.3 ([#113](https://github.com/autonomouslogic/dynamo-mapper/issues/113)) ([1a8f20c](https://github.com/autonomouslogic/dynamo-mapper/commit/1a8f20c5a330ad2921864dea850d6fbab159cad6))
+
 ## [2.1.5](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.4...2.1.5) (2023-11-07)
 
 
