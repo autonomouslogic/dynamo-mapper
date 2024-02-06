@@ -1,5 +1,21 @@
 Dynamo Mapper Changelog
 
+## [2.1.8](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.7...2.1.8) (2024-02-06)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#119](https://github.com/autonomouslogic/dynamo-mapper/issues/119)) ([accbcb6](https://github.com/autonomouslogic/dynamo-mapper/commit/accbcb66d7011737aba87cae8109249d33d8362f))
+
+
+### Miscellaneous Chores
+
+* **deps:** update actions/checkout action to v4 ([#105](https://github.com/autonomouslogic/dynamo-mapper/issues/105)) ([0002ee7](https://github.com/autonomouslogic/dynamo-mapper/commit/0002ee74ac7cd2d58fbbe1991f90ae505e069deb))
+* **deps:** update actions/setup-java action to v4 ([#111](https://github.com/autonomouslogic/dynamo-mapper/issues/111)) ([deed2e7](https://github.com/autonomouslogic/dynamo-mapper/commit/deed2e7a009cda02ca265e60dd23cbefb82f3072))
+* **deps:** update all non-major dependencies ([#115](https://github.com/autonomouslogic/dynamo-mapper/issues/115)) ([96e941c](https://github.com/autonomouslogic/dynamo-mapper/commit/96e941c285a0071be0f3c4d462fd6e685d2832b6))
+* **deps:** update plugin org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin to v2 ([#108](https://github.com/autonomouslogic/dynamo-mapper/issues/108)) ([d36e378](https://github.com/autonomouslogic/dynamo-mapper/commit/d36e378726870666657b3721b2d1512e402b0bbf))
+* **deps:** update plugin org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin to v3 ([#117](https://github.com/autonomouslogic/dynamo-mapper/issues/117)) ([bc43bac](https://github.com/autonomouslogic/dynamo-mapper/commit/bc43bacb4ec635b729b841bb9f005909c0a918e9))
+
 ## [2.1.7](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.6...2.1.7) (2023-12-05)
 
 
