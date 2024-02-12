@@ -97,8 +97,8 @@ task integrationTest(type: Test, description: "Runs the integration tests", grou
 jacocoTestReport {
 	executionData(test, integrationTest)
 	reports {
-		xml.enabled true
-		html.enabled true
+		xml.required = true
+		html.required = true
 	}
 }
 
