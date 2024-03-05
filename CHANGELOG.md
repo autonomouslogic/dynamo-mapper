@@ -1,5 +1,19 @@
 Dynamo Mapper Changelog
 
+## [2.1.9](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.8...2.1.9) (2024-03-05)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#120](https://github.com/autonomouslogic/dynamo-mapper/issues/120)) ([f0148f6](https://github.com/autonomouslogic/dynamo-mapper/commit/f0148f64e6658c31503eae91b10e752f1d37199b))
+
+
+### Miscellaneous Chores
+
+* **deps:** update actions/cache action to v4 [skip release] ([#116](https://github.com/autonomouslogic/dynamo-mapper/issues/116)) ([221dd99](https://github.com/autonomouslogic/dynamo-mapper/commit/221dd99211c88ee87b6a5c811bcf4afc75a43345))
+* **deps:** update codecov/codecov-action action to v4 [skip release] ([#118](https://github.com/autonomouslogic/dynamo-mapper/issues/118)) ([fc14892](https://github.com/autonomouslogic/dynamo-mapper/commit/fc1489237c231d7d9f8c3a5bd485a8cfe85b8ea2))
+* **deps:** update dependency gradle to v8 [skip release] ([#95](https://github.com/autonomouslogic/dynamo-mapper/issues/95)) ([7e71df3](https://github.com/autonomouslogic/dynamo-mapper/commit/7e71df33f458529b7ba05f7a54483f8665317c7f))
+
 ## [2.1.8](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.7...2.1.8) (2024-02-06)
 
 
