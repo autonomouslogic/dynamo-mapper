@@ -1,5 +1,20 @@
 Dynamo Mapper Changelog
 
+## [2.1.15](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.14...2.1.15) (2024-10-08)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies to v2.28.17 ([#132](https://github.com/autonomouslogic/dynamo-mapper/issues/132)) ([35a5155](https://github.com/autonomouslogic/dynamo-mapper/commit/35a51555bd7f22259dc800bc0c3b7677f96ef32c))
+
+
+### Miscellaneous Chores
+
+* **deps:** update all non-major dependencies ([#129](https://github.com/autonomouslogic/dynamo-mapper/issues/129)) ([4a95cac](https://github.com/autonomouslogic/dynamo-mapper/commit/4a95cac4e5df29f46f68d94720667a9641f00adc))
+* **deps:** update all non-major dependencies ([#130](https://github.com/autonomouslogic/dynamo-mapper/issues/130)) ([67a2a89](https://github.com/autonomouslogic/dynamo-mapper/commit/67a2a893aa4c4bd98eee10faa8f65ebf5a25a7c4))
+* **deps:** update all non-major dependencies ([#131](https://github.com/autonomouslogic/dynamo-mapper/issues/131)) ([902a5c5](https://github.com/autonomouslogic/dynamo-mapper/commit/902a5c5040f02e9a0e0b55d7ad1f91f33e801f06))
+* **deps:** update plugin io.github.gradle-nexus.publish-plugin to v2 ([#122](https://github.com/autonomouslogic/dynamo-mapper/issues/122)) ([148eeb9](https://github.com/autonomouslogic/dynamo-mapper/commit/148eeb98ab2e8b46e927438cddbda2fd9b3168ca))
+
 ## [2.1.14](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.13...2.1.14) (2024-07-02)
 
 
