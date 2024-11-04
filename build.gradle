@@ -35,7 +35,7 @@ dependencies {
 	testImplementation "software.amazon.awssdk:dynamodb-enhanced:2.29.6"
 	testImplementation "com.amazonaws:aws-java-sdk-dynamodb:1.12.777"
 	testImplementation "org.apache.commons:commons-math3:3.6.1"
-	testImplementation "com.autonomouslogic.jacksonobjectstream:jackson-object-stream:0.2.21"
+	testImplementation "com.autonomouslogic.jacksonobjectstream:jackson-object-stream:0.2.22"
 	testImplementation "org.apache.commons:commons-lang3:3.17.0"
 }
 
