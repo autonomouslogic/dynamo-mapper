@@ -1,5 +1,12 @@
 Dynamo Mapper Changelog
 
+## [2.1.17](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.16...2.1.17) (2024-11-05)
+
+
+### Bug Fixes
+
+* **deps:** update dependency com.autonomouslogic.jacksonobjectstream:jackson-object-stream to v0.2.22 ([#134](https://github.com/autonomouslogic/dynamo-mapper/issues/134)) ([84c7af5](https://github.com/autonomouslogic/dynamo-mapper/commit/84c7af5caf9778bf2697eab0c853fd41da3c3cca))
+
 ## [2.1.16](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.15...2.1.16) (2024-11-04)
 
 
