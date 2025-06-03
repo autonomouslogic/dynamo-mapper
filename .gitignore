@@ -4,3 +4,4 @@ out/
 .idea/
 .directory
 node_modules/
+.profileconfig.json
