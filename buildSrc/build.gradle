@@ -1,7 +1,7 @@
 plugins {
     id "java"
     id "idea"
-    id "io.freefair.lombok" version "8.11"
+    id "io.freefair.lombok" version "8.13.1"
 }
 
 group "com.autonomouslogic.dynamomapper"
@@ -14,14 +14,14 @@ repositories {
 }
 
 dependencies {
-    implementation "software.amazon.awssdk:dynamodb:2.29.24"
+    implementation "software.amazon.awssdk:dynamodb:2.31.55"
     implementation "com.squareup:javapoet:1.13.0"
     implementation "org.apache.commons:commons-lang3:3.17.0"
-    implementation "org.projectlombok:lombok:1.18.36"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.18.2"
+    implementation "org.projectlombok:lombok:1.18.38"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.19.0"
 
-    testImplementation "org.junit.jupiter:junit-jupiter-api:5.11.3"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:5.11.3"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.13.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.13.0"
 }
 
 test {

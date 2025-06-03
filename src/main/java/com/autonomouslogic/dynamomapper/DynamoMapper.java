@@ -32,6 +32,7 @@ import software.amazon.awssdk.services.dynamodb.model.ItemCollectionSizeLimitExc
 import software.amazon.awssdk.services.dynamodb.model.ProvisionedThroughputExceededException;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
+import software.amazon.awssdk.services.dynamodb.model.ReplicatedWriteConflictException;
 import software.amazon.awssdk.services.dynamodb.model.RequestLimitExceededException;
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
@@ -187,8 +188,8 @@ public class DynamoMapper {
 			@NonNull Consumer<PutItemRequest.Builder> consumer, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException {
 		Consumer<PutItemRequest.Builder> reqOrConsumer = (builder) -> {
 			{
 				requestFactory.acceptPutItemRequest(builder, clazz);
@@ -203,8 +204,8 @@ public class DynamoMapper {
 			@NonNull T keyObject, @NonNull Consumer<PutItemRequest.Builder> consumer)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException, IOException {
 		var builder = requestFactory.putItemRequestFromKeyObject(keyObject);
 		consumer.accept(builder);
 		return putItem(builder.build(), (Class<T>) keyObject.getClass());
@@ -213,8 +214,8 @@ public class DynamoMapper {
 	public <T> MappedPutItemResponse<T> putItem(@NonNull PutItemRequest request, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException {
 		var reqOrConsumer = requestFactory.acceptPutItemRequest(request, clazz);
 		return decoder.mapPutItemResponse(client.putItem(reqOrConsumer), clazz);
 	}
@@ -223,8 +224,8 @@ public class DynamoMapper {
 	public <T> MappedPutItemResponse<T> putItemFromKeyObject(@NonNull T keyObject)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException, IOException {
 		var builder = requestFactory.putItemRequestFromKeyObject(keyObject);
 		return putItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
@@ -233,8 +234,8 @@ public class DynamoMapper {
 			@NonNull Consumer<UpdateItemRequest.Builder> consumer, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException {
 		Consumer<UpdateItemRequest.Builder> reqOrConsumer = (builder) -> {
 			{
 				requestFactory.acceptUpdateItemRequest(builder, clazz);
@@ -249,8 +250,8 @@ public class DynamoMapper {
 			@NonNull T keyObject, @NonNull Consumer<UpdateItemRequest.Builder> consumer)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException, IOException {
 		var builder = requestFactory.updateItemRequestFromKeyObject(keyObject);
 		consumer.accept(builder);
 		return updateItem(builder.build(), (Class<T>) keyObject.getClass());
@@ -259,8 +260,8 @@ public class DynamoMapper {
 	public <T> MappedUpdateItemResponse<T> updateItem(@NonNull UpdateItemRequest request, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException {
 		var reqOrConsumer = requestFactory.acceptUpdateItemRequest(request, clazz);
 		return decoder.mapUpdateItemResponse(client.updateItem(reqOrConsumer), clazz);
 	}
@@ -269,8 +270,8 @@ public class DynamoMapper {
 	public <T> MappedUpdateItemResponse<T> updateItemFromKeyObject(@NonNull T keyObject)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException, IOException {
 		var builder = requestFactory.updateItemRequestFromKeyObject(keyObject);
 		return updateItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
@@ -279,8 +280,8 @@ public class DynamoMapper {
 			@NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException {
 		Consumer<DeleteItemRequest.Builder> reqOrConsumer = (builder) -> {
 			{
 				requestFactory.acceptDeleteItemRequest(builder, clazz);
@@ -294,8 +295,8 @@ public class DynamoMapper {
 			@NonNull Object primaryKey, @NonNull Consumer<DeleteItemRequest.Builder> consumer, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException, IOException {
 		var builder = requestFactory.deleteItemRequestFromPrimaryKey(primaryKey, clazz);
 		consumer.accept(builder);
 		return deleteItem(builder.build(), clazz);
@@ -306,8 +307,8 @@ public class DynamoMapper {
 			@NonNull T keyObject, @NonNull Consumer<DeleteItemRequest.Builder> consumer)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException, IOException {
 		var builder = requestFactory.deleteItemRequestFromKeyObject(keyObject);
 		consumer.accept(builder);
 		return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
@@ -316,8 +317,8 @@ public class DynamoMapper {
 	public <T> MappedDeleteItemResponse<T> deleteItem(@NonNull DeleteItemRequest request, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException {
 		var reqOrConsumer = requestFactory.acceptDeleteItemRequest(request, clazz);
 		return decoder.mapDeleteItemResponse(client.deleteItem(reqOrConsumer), clazz);
 	}
@@ -325,8 +326,8 @@ public class DynamoMapper {
 	public <T> MappedDeleteItemResponse<T> deleteItemFromPrimaryKey(@NonNull Object primaryKey, @NonNull Class<T> clazz)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException, IOException {
 		var builder = requestFactory.deleteItemRequestFromPrimaryKey(primaryKey, clazz);
 		return deleteItem(builder.build(), clazz);
 	}
@@ -335,8 +336,8 @@ public class DynamoMapper {
 	public <T> MappedDeleteItemResponse<T> deleteItemFromKeyObject(@NonNull T keyObject)
 			throws ConditionalCheckFailedException, ProvisionedThroughputExceededException, ResourceNotFoundException,
 					ItemCollectionSizeLimitExceededException, TransactionConflictException,
-					RequestLimitExceededException, InternalServerErrorException, AwsServiceException,
-					SdkClientException, DynamoDbException, JsonProcessingException, IOException {
+					RequestLimitExceededException, InternalServerErrorException, ReplicatedWriteConflictException,
+					AwsServiceException, SdkClientException, DynamoDbException, JsonProcessingException, IOException {
 		var builder = requestFactory.deleteItemRequestFromKeyObject(keyObject);
 		return deleteItem(builder.build(), (Class<T>) keyObject.getClass());
 	}
