@@ -1,5 +1,20 @@
 Dynamo Mapper Changelog
 
+## [2.1.18](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.17...2.1.18) (2025-06-04)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#137](https://github.com/autonomouslogic/dynamo-mapper/issues/137)) ([893a7d6](https://github.com/autonomouslogic/dynamo-mapper/commit/893a7d699bae3074d19d50c833b719bf7e83f1f8))
+
+
+### Miscellaneous Chores
+
+* **deps:** update all non-major dependencies ([#136](https://github.com/autonomouslogic/dynamo-mapper/issues/136)) ([b6a6601](https://github.com/autonomouslogic/dynamo-mapper/commit/b6a66015e1325d8a5e48a7ce15ef1506b72704ea))
+* **deps:** update codecov/codecov-action action to v5 ([#135](https://github.com/autonomouslogic/dynamo-mapper/issues/135)) ([97babd4](https://github.com/autonomouslogic/dynamo-mapper/commit/97babd42b019aca6cdeee8f90b7a3ceed688ddf6))
+* **deps:** update plugin com.diffplug.spotless to v7 ([#138](https://github.com/autonomouslogic/dynamo-mapper/issues/138)) ([eccffca](https://github.com/autonomouslogic/dynamo-mapper/commit/eccffca476bda8fdd0f6059256822d3be2cd029a))
+* **deps:** update plugin org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin to v5 ([#140](https://github.com/autonomouslogic/dynamo-mapper/issues/140)) ([36c126f](https://github.com/autonomouslogic/dynamo-mapper/commit/36c126f3b673d82207361037814f0b9bb9488f47))
+
 ## [2.1.17](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.16...2.1.17) (2024-11-05)
 
 
