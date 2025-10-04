@@ -24,9 +24,9 @@ dependencies {
 	implementation "software.amazon.awssdk:dynamodb:2.31.55"
 	implementation "com.fasterxml.jackson.core:jackson-databind:2.19.0"
 
-	testImplementation "org.junit.jupiter:junit-jupiter-api:6.0.0"
-	testImplementation "org.junit.jupiter:junit-jupiter-params:6.0.0"
-	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:6.0.0"
+	testImplementation(platform("org.junit:junit-bom:6.0.0"))
+	testImplementation("org.junit.jupiter:junit-jupiter")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testImplementation "org.mockito:mockito-core:5.18.0"
 
 	testImplementation "commons-codec:commons-codec:1.18.0"
