@@ -2,7 +2,7 @@ plugins {
 	id "java"
 	id "groovy"
 	id "idea"
-    id "org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin" version "7.0.4"
+	id "org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin" version "7.0.4"
 	id "io.freefair.lombok" version "9.0.0"
 	id "jacoco"
 	id "maven-publish"
@@ -26,9 +26,9 @@ dependencies {
 	implementation "software.amazon.awssdk:dynamodb:2.35.0"
 	implementation "com.fasterxml.jackson.core:jackson-databind:2.20.0"
 
-    testImplementation(platform("org.junit:junit-bom:6.0.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation(platform("org.junit:junit-bom:6.0.0"))
+	testImplementation("org.junit.jupiter:junit-jupiter")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testImplementation "org.mockito:mockito-core:5.20.0"
 
 	testImplementation "commons-codec:commons-codec:1.19.0"
