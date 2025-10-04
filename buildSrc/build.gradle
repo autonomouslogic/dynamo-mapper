@@ -1,7 +1,7 @@
 plugins {
     id "java"
     id "idea"
-    id "io.freefair.lombok" version "8.13.1"
+    id "io.freefair.lombok" version "9.0.0"
 }
 
 group "com.autonomouslogic.dynamomapper"
