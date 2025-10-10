@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation "software.amazon.awssdk:dynamodb:2.35.0"
+    implementation "software.amazon.awssdk:dynamodb:2.35.4"
     implementation "com.squareup:javapoet:1.13.0"
     implementation "org.apache.commons:commons-lang3:3.19.0"
     implementation "org.projectlombok:lombok:1.18.42"
