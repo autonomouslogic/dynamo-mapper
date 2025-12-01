@@ -2,13 +2,13 @@ plugins {
 	id "java"
 	id "groovy"
 	id "idea"
-	id "org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin" version "7.0.6"
-	id "io.freefair.lombok" version "9.0.0"
+	id "org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin" version "7.0.7"
+	id "io.freefair.lombok" version "9.1.0"
 	id "jacoco"
 	id "maven-publish"
 	id "signing"
 	id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
-	id "com.diffplug.spotless" version "8.0.0"
+	id "com.diffplug.spotless" version "8.1.0"
 }
 
 group "com.autonomouslogic.dynamomapper"
@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-	implementation "software.amazon.awssdk:dynamodb:2.37.3"
+	implementation "software.amazon.awssdk:dynamodb:2.39.6"
 	implementation "com.fasterxml.jackson.core:jackson-databind:2.20.1"
 
 	testImplementation(platform("org.junit:junit-bom:6.0.1"))
@@ -31,14 +31,14 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	testImplementation "org.mockito:mockito-core:5.20.0"
 
-	testImplementation "commons-codec:commons-codec:1.19.0"
-	testImplementation "software.amazon.awssdk:sts:2.37.3"
-	testImplementation "com.amazonaws:aws-java-sdk-sts:1.12.793"
-	testImplementation "software.amazon.awssdk:dynamodb-enhanced:2.37.3"
-	testImplementation "com.amazonaws:aws-java-sdk-dynamodb:1.12.793"
+	testImplementation "commons-codec:commons-codec:1.20.0"
+	testImplementation "software.amazon.awssdk:sts:2.39.6"
+	testImplementation "com.amazonaws:aws-java-sdk-sts:1.12.794"
+	testImplementation "software.amazon.awssdk:dynamodb-enhanced:2.39.6"
+	testImplementation "com.amazonaws:aws-java-sdk-dynamodb:1.12.794"
 	testImplementation "org.apache.commons:commons-math3:3.6.1"
 	testImplementation "com.autonomouslogic.jacksonobjectstream:jackson-object-stream:0.2.26"
-	testImplementation "org.apache.commons:commons-lang3:3.19.0"
+	testImplementation "org.apache.commons:commons-lang3:3.20.0"
 }
 
 task codegen(type: com.autonomouslogic.dynamomapper.codegen.Codegen) {
