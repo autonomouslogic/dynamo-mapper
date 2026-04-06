@@ -16,11 +16,11 @@ repositories {
 }
 
 dependencies {
-    implementation "software.amazon.awssdk:dynamodb:2.42.4"
+    implementation "software.amazon.awssdk:dynamodb:2.42.28"
     implementation "com.squareup:javapoet:1.13.0"
     implementation "org.apache.commons:commons-lang3:3.20.0"
-    implementation "org.projectlombok:lombok:1.18.42"
-    implementation "com.fasterxml.jackson.core:jackson-databind:2.21.1"
+    implementation "org.projectlombok:lombok:1.18.44"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.21.2"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:6.0.3"
     testImplementation "org.junit.jupiter:junit-jupiter-params:6.0.3"

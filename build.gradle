@@ -2,13 +2,13 @@ plugins {
 	id "java"
 	id "groovy"
 	id "idea"
-	id "org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin" version "7.0.12"
+	id "org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin" version "7.0.16"
 	id "io.freefair.lombok" version "9.2.0"
 	id "jacoco"
 	id "maven-publish"
 	id "signing"
 	id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
-	id "com.diffplug.spotless" version "8.2.1"
+	id "com.diffplug.spotless" version "8.4.0"
 }
 
 group "com.autonomouslogic.dynamomapper"
@@ -23,18 +23,18 @@ repositories {
 }
 
 dependencies {
-	implementation "software.amazon.awssdk:dynamodb:2.42.4"
-	implementation "com.fasterxml.jackson.core:jackson-databind:2.21.1"
+	implementation "software.amazon.awssdk:dynamodb:2.42.28"
+	implementation "com.fasterxml.jackson.core:jackson-databind:2.21.2"
 
 	testImplementation(platform("org.junit:junit-bom:6.0.3"))
 	testImplementation("org.junit.jupiter:junit-jupiter")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	testImplementation "org.mockito:mockito-core:5.22.0"
+	testImplementation "org.mockito:mockito-core:5.23.0"
 
 	testImplementation "commons-codec:commons-codec:1.21.0"
-	testImplementation "software.amazon.awssdk:sts:2.42.4"
+	testImplementation "software.amazon.awssdk:sts:2.42.28"
 	testImplementation "com.amazonaws:aws-java-sdk-sts:1.12.797"
-	testImplementation "software.amazon.awssdk:dynamodb-enhanced:2.42.4"
+	testImplementation "software.amazon.awssdk:dynamodb-enhanced:2.42.28"
 	testImplementation "com.amazonaws:aws-java-sdk-dynamodb:1.12.797"
 	testImplementation "org.apache.commons:commons-math3:3.6.1"
 	testImplementation "com.autonomouslogic.jacksonobjectstream:jackson-object-stream:0.2.26"
