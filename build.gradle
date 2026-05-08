@@ -5,9 +5,8 @@ plugins {
 	id "org.danilopianini.git-sensitive-semantic-versioning-gradle-plugin" version "7.0.18"
 	id "io.freefair.lombok" version "9.5.0"
 	id "jacoco"
-	id "maven-publish"
 	id "signing"
-	id "io.github.gradle-nexus.publish-plugin" version "2.0.0"
+	id "org.danilopianini.publish-on-central" version "9.2.2"
 	id "com.diffplug.spotless" version "8.4.0"
 }
 
@@ -109,45 +108,38 @@ java {
 	withSourcesJar()
 }
 
+publishOnCentral {
+	repoOwner = "autonomouslogic"
+	projectDescription = "An object mapper for AWS DynamoDB using Jackson."
+	projectLongName = "Dynamo Mapper"
+	projectUrl = "https://github.com/autonomouslogic/dynamo-mapper"
+	licenseName = "MIT-0"
+	licenseUrl = "https://spdx.org/licenses/MIT-0.html"
+}
+
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			pom {
-				name = "Dynamo Mapper"
-				description = "An object mapper for AWS DynamoDB using Jackson."
-				url = "https://github.com/autonomouslogic/dynamo-mapper"
-				licenses {
-					license {
-						name = "MIT-0"
-						url = "https://spdx.org/licenses/MIT-0.html"
-					}
-				}
-				developers {
-					developer {
-						id = "kennethjor"
-						name = "Kenneth Jørgensen"
-						email = "kenneth@autonomouslogic.com"
-					}
-				}
-				scm {
-					connection = "scm:git:git://github.com:autonomouslogic/dynamo-mapper.git"
-					developerConnection = "scm:git:ssh://github.com:autonomouslogic/sedynamo-mapper.git"
-					url = "https://github.com/autonomouslogic/dynamo-mapper"
-				}
-			}
 			from(components.java)
+		}
+	}
+}
+
+publishing.publications.withType(MavenPublication).configureEach {
+	pom {
+		developers {
+			developer {
+				id = "kennethjor"
+				name = "Kenneth Jorgensen"
+				email = "kenneth@autonomouslogic.com"
+				url = "https://kennethjorgensen.com/"
+			}
 		}
 	}
 }
 
 signing {
 	sign publishing.publications.mavenJava
-}
-
-nexusPublishing {
-	repositories {
-		sonatype()
-	}
 }
 
 spotless {
