@@ -1,5 +1,18 @@
 Dynamo Mapper Changelog
 
+## [2.1.32](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.31...2.1.32) (2026-07-06)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#171](https://github.com/autonomouslogic/dynamo-mapper/issues/171)) ([4d5c7fe](https://github.com/autonomouslogic/dynamo-mapper/commit/4d5c7fe74f8b119d32870ad6aa2c5e7099e2d1e3))
+
+
+### Miscellaneous Chores
+
+* **deps:** update actions/cache action to v6 ([#170](https://github.com/autonomouslogic/dynamo-mapper/issues/170)) ([49237de](https://github.com/autonomouslogic/dynamo-mapper/commit/49237dea598466fa7c4bad9319f069f755ba89f3))
+* **deps:** update actions/checkout action to v7 ([#169](https://github.com/autonomouslogic/dynamo-mapper/issues/169)) ([32f43c6](https://github.com/autonomouslogic/dynamo-mapper/commit/32f43c6d51c963cf1b1fa4c440f56f7776105c26))
+
 ## [2.1.31](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.30...2.1.31) (2026-06-04)
 
 
