@@ -1,5 +1,17 @@
 Dynamo Mapper Changelog
 
+## [2.1.33](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.32...2.1.33) (2026-07-07)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies to v2.47.0 ([#172](https://github.com/autonomouslogic/dynamo-mapper/issues/172)) ([657f07a](https://github.com/autonomouslogic/dynamo-mapper/commit/657f07a61703de339d2e970a85cf28ad1b11d05f))
+
+
+### Miscellaneous Chores
+
+* **deps:** update codecov/codecov-action action to v7 ([#168](https://github.com/autonomouslogic/dynamo-mapper/issues/168)) [skip release] ([57e490d](https://github.com/autonomouslogic/dynamo-mapper/commit/57e490d28325a4e8a4bd9495d2a20fe0faef3a93))
+
 ## [2.1.32](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.31...2.1.32) (2026-07-06)
 
 
