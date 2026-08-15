@@ -109,10 +109,14 @@ public enum CodecTests {
 			Map.of("doubleValue", AttributeValue.builder().n("3.5E38").build())),
 	BIG_INTEGER(
 			new TestObject().setBigInteger(new BigInteger("12345678901234567890")),
-			Map.of("bigInteger", AttributeValue.builder().n("12345678901234567890").build())),
+			Map.of(
+					"bigInteger",
+					AttributeValue.builder().n("12345678901234567890").build())),
 	BIG_INTEGER_OVERFLOW_LONG(
 			new TestObject().setBigInteger(new BigInteger("9223372036854775808")),
-			Map.of("bigInteger", AttributeValue.builder().n("9223372036854775808").build())),
+			Map.of(
+					"bigInteger",
+					AttributeValue.builder().n("9223372036854775808").build())),
 	BIG_DECIMAL(
 			new TestObject().setBigDecimal(new BigDecimal("123.456")),
 			Map.of("bigDecimal", AttributeValue.builder().n("123.456").build())),
