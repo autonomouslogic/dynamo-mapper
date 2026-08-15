@@ -165,7 +165,12 @@ public class DynamoDecoder {
 	}
 
 	private JsonNode decodeNumber(String num) {
-		return decodeString(num);
+		try {
+			var val = Long.parseLong(num);
+			return objectMapper.getNodeFactory().numberNode(val);
+		} catch (NumberFormatException e) {
+			return decodeString(num);
+		}
 	}
 
 	private JsonNode decodeMap(AttributeValue val) {

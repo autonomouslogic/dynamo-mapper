@@ -47,4 +47,10 @@ public class IntegrationTestObject {
 
 	@JsonProperty
 	long ttl;
+
+	@JsonProperty
+	boolean boolPrimitive;
+
+	@JsonProperty
+	Boolean boolBoxed;
 }

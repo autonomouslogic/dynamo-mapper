@@ -4,6 +4,8 @@ import com.autonomouslogic.dynamomapper.annotations.DynamoPrimaryKey;
 import com.autonomouslogic.dynamomapper.annotations.DynamoTableName;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import lombok.Data;
@@ -21,6 +23,10 @@ public class TestObject {
 	protected Boolean bool;
 
 	@JsonProperty
+	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	protected boolean boolPrimitive;
+
+	@JsonProperty
 	protected List<byte[]> binaryList;
 
 	@JsonProperty
@@ -36,7 +42,25 @@ public class TestObject {
 	protected Map<String, String> map;
 
 	@JsonProperty
-	protected Number number; // @todo Long, BigInteger, BigDecimal
+	protected Number number;
+
+	@JsonProperty
+	protected Integer integer;
+
+	@JsonProperty
+	protected Long longValue;
+
+	@JsonProperty
+	protected Float floatValue;
+
+	@JsonProperty
+	protected Double doubleValue;
+
+	@JsonProperty
+	protected BigInteger bigInteger;
+
+	@JsonProperty
+	protected BigDecimal bigDecimal;
 
 	@JsonProperty
 	protected List<Number> numberList;
