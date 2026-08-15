@@ -165,8 +165,6 @@ public class DynamoDecoder {
 	}
 
 	private JsonNode decodeNumber(String num) {
-		// Integer values are decoded as numeric nodes, so Jackson can coerce them into booleans stored by the v1 SDK
-		// as N ("0"/"1"). Other values are decoded as text to preserve existing number type behaviour.
 		try {
 			var val = Long.parseLong(num);
 			var nodeFactory = objectMapper.getNodeFactory();

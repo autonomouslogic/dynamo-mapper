@@ -119,13 +119,11 @@ public class DynamoMapperIntegrationTest {
 		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
 	}
 
-	// DynamoDB numbers are limited to 38 significant digits.
-	// https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes.Number
 	@Test
 	@SneakyThrows
 	void shouldRejectBigIntegersExceedingDynamoDbPrecision() {
 		var obj = IntegrationTestObjects.setKeyAndTtl(IntegrationTestObject.builder()
-				.bigint(new BigInteger("999999999999999999999999999999999999999")) // 39 digits
+				.bigint(new BigInteger("9".repeat(39)))
 				.build());
 		assertThrows(DynamoDbException.class, () -> dynamoMapper.putItemFromKeyObject(obj));
 	}
@@ -134,7 +132,7 @@ public class DynamoMapperIntegrationTest {
 	@SneakyThrows
 	void shouldRejectBigDecimalsExceedingDynamoDbPrecision() {
 		var obj = IntegrationTestObjects.setKeyAndTtl(IntegrationTestObject.builder()
-				.bigdec(new BigDecimal("1.23456789012345678901234567890123456789")) // 39 significant digits
+				.bigdec(new BigDecimal("1." + "9".repeat(38)))
 				.build());
 		assertThrows(DynamoDbException.class, () -> dynamoMapper.putItemFromKeyObject(obj));
 	}

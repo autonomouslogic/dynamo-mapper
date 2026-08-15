@@ -137,7 +137,6 @@ public enum CodecTests {
 			Map.of("stringList", AttributeValue.builder().ss("str1", "str2").build()),
 			EncodeDecode.DECODE_ONLY // @todo
 			),
-	// v1 SDK stores boolean as N ("0"/"1") instead of BOOL.
 	BOOL_V1_FALSE(
 			new TestObject().setBoolPrimitive(false),
 			Map.of("boolPrimitive", AttributeValue.builder().n("0").build()),
