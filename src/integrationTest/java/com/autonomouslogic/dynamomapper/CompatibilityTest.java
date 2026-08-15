@@ -7,7 +7,7 @@ import com.autonomouslogic.dynamomapper.model.CompatibilityTestObject;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
-import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
+import com.autonomouslogic.dynamomapper.util.StdJsonMapper;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.SneakyThrows;
@@ -86,7 +86,7 @@ public class CompatibilityTest {
 
 	@SneakyThrows
 	static List<CompatibilityTestObject> loadCompatibilityTestObjects() {
-		var objectMapper = StdObjectMapper.objectMapper();
+		var objectMapper = StdJsonMapper.objectMapper();
 		var list = new ArrayList<CompatibilityTestObject>();
 		for (IntegrationTestObject obj : IntegrationTestUtil.loadIntegrationTestObjects()) {
 			obj = IntegrationTestObjects.setKeyAndTtl(obj);

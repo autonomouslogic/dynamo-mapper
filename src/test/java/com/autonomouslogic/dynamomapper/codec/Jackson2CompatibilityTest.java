@@ -3,7 +3,7 @@ package com.autonomouslogic.dynamomapper.codec;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
-import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
+import com.autonomouslogic.dynamomapper.util.StdJsonMapper;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -15,7 +15,7 @@ import tools.jackson.databind.json.JsonMapper;
  * It exists to ensure that backwards compatibility continues to exist with future releases on Jackson 3.
  */
 public class Jackson2CompatibilityTest {
-	JsonMapper jsonMapper = StdObjectMapper.jsonMapper();
+	JsonMapper jsonMapper = StdJsonMapper.jsonMapper();
 	ReflectionUtil reflectionUtil = new ReflectionUtil(jsonMapper, null);
 	DynamoEncoder encoder = new DynamoEncoder(jsonMapper, reflectionUtil);
 	DynamoDecoder decoder = new DynamoDecoder(jsonMapper);

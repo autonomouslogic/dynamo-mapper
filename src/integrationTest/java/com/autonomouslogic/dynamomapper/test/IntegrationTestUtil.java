@@ -7,7 +7,7 @@ import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
-import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
+import com.autonomouslogic.dynamomapper.util.StdJsonMapper;
 import com.autonomouslogic.jacksonobjectstream.JacksonObjectStreamFactory;
 import java.time.Duration;
 import java.time.Instant;
@@ -78,7 +78,7 @@ public class IntegrationTestUtil {
 	@SneakyThrows
 	public static List<IntegrationTestObject> loadIntegrationTestObjects() {
 		var in = Objects.requireNonNull(IntegrationTestUtil.class.getResourceAsStream("/integration-tests.jsonl"));
-		var factory = new JacksonObjectStreamFactory(StdObjectMapper.objectMapper());
+		var factory = new JacksonObjectStreamFactory(StdJsonMapper.objectMapper());
 		var iterator = factory.createReader(in, IntegrationTestObject.class);
 		var list = new ArrayList<IntegrationTestObject>();
 		iterator.forEachRemaining(list::add);

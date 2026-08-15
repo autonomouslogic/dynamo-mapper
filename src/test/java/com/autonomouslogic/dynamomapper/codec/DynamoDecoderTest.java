@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import com.autonomouslogic.dynamomapper.model.TestObject;
 import com.autonomouslogic.dynamomapper.test.CodecTests;
-import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
+import com.autonomouslogic.dynamomapper.util.StdJsonMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
 import tools.jackson.databind.json.JsonMapper;
 
 public class DynamoDecoderTest {
-	JsonMapper jsonMapper = StdObjectMapper.jsonMapper();
+	JsonMapper jsonMapper = StdJsonMapper.jsonMapper();
 	DynamoDecoder decoder = new DynamoDecoder(jsonMapper);
 
 	@ParameterizedTest

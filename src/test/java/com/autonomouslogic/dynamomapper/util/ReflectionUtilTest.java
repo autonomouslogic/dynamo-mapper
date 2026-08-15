@@ -12,7 +12,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 public class ReflectionUtilTest {
-	ReflectionUtil reflectionUtil = new ReflectionUtil(StdObjectMapper.jsonMapper(), null);
+	ReflectionUtil reflectionUtil = new ReflectionUtil(StdJsonMapper.jsonMapper(), null);
 
 	@Test
 	@SneakyThrows
@@ -48,7 +48,7 @@ public class ReflectionUtilTest {
 	@SneakyThrows
 	void shouldDecorateTableName() {
 		TableNameDecorator decorator = (clazz, tableName) -> tableName + "-" + clazz.getSimpleName();
-		var reflectionUtil = new ReflectionUtil(StdObjectMapper.jsonMapper(), decorator);
+		var reflectionUtil = new ReflectionUtil(StdJsonMapper.jsonMapper(), decorator);
 		assertEquals("test-TestObject", reflectionUtil.resolveTableName(TestObject.class));
 	}
 }

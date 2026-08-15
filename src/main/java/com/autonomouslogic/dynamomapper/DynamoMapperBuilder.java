@@ -1,7 +1,7 @@
 package com.autonomouslogic.dynamomapper;
 
 import com.autonomouslogic.dynamomapper.function.TableNameDecorator;
-import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
+import com.autonomouslogic.dynamomapper.util.StdJsonMapper;
 import java.util.Optional;
 import lombok.Setter;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -15,7 +15,7 @@ public class DynamoMapperBuilder {
 
 	public DynamoMapper build() {
 		var client = Optional.ofNullable(this.client).orElseGet(DynamoDbClient::create);
-		var jsonMapper = Optional.ofNullable(this.jsonMapper).orElseGet(StdObjectMapper::jsonMapper);
+		var jsonMapper = Optional.ofNullable(this.jsonMapper).orElseGet(StdJsonMapper::jsonMapper);
 		return new DynamoMapper(client, jsonMapper, tableNameDecorator);
 	}
 }
