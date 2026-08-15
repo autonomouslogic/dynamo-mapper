@@ -4,6 +4,8 @@ import static com.autonomouslogic.dynamomapper.test.Util.BYTE_STRING_1;
 import static com.autonomouslogic.dynamomapper.test.Util.BYTE_STRING_2;
 
 import com.autonomouslogic.dynamomapper.model.TestObject;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -87,6 +89,36 @@ public enum CodecTests {
 	INTEGER(
 			new TestObject().setNumber(100),
 			Map.of("number", AttributeValue.builder().n("100").build())),
+	INTEGER_TYPED(
+			new TestObject().setInteger(100),
+			Map.of("integer", AttributeValue.builder().n("100").build())),
+	LONG(
+			new TestObject().setLongValue(100L),
+			Map.of("longValue", AttributeValue.builder().n("100").build())),
+	LONG_OVERFLOW_INT(
+			new TestObject().setLongValue(2147483648L),
+			Map.of("longValue", AttributeValue.builder().n("2147483648").build())),
+	FLOAT(
+			new TestObject().setFloatValue(1.5f),
+			Map.of("floatValue", AttributeValue.builder().n("1.5").build())),
+	DOUBLE(
+			new TestObject().setDoubleValue(1.5d),
+			Map.of("doubleValue", AttributeValue.builder().n("1.5").build())),
+	DOUBLE_OVERFLOW_FLOAT(
+			new TestObject().setDoubleValue(3.5E38d),
+			Map.of("doubleValue", AttributeValue.builder().n("3.5E38").build())),
+	BIG_INTEGER(
+			new TestObject().setBigInteger(new BigInteger("12345678901234567890")),
+			Map.of("bigInteger", AttributeValue.builder().n("12345678901234567890").build())),
+	BIG_INTEGER_OVERFLOW_LONG(
+			new TestObject().setBigInteger(new BigInteger("9223372036854775808")),
+			Map.of("bigInteger", AttributeValue.builder().n("9223372036854775808").build())),
+	BIG_DECIMAL(
+			new TestObject().setBigDecimal(new BigDecimal("123.456")),
+			Map.of("bigDecimal", AttributeValue.builder().n("123.456").build())),
+	BIG_DECIMAL_OVERFLOW_DOUBLE(
+			new TestObject().setBigDecimal(new BigDecimal("1.8E+308")),
+			Map.of("bigDecimal", AttributeValue.builder().n("1.8E+308").build())),
 	INTEGER_LIST(
 			new TestObject().setNumberList(List.of(1, 2, 3)),
 			Map.of("numberList", AttributeValue.builder().ns("1", "2", "3").build()),

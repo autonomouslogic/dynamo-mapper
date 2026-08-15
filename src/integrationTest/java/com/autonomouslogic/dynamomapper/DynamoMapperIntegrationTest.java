@@ -1,12 +1,15 @@
 package com.autonomouslogic.dynamomapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 
 public class DynamoMapperIntegrationTest {
 	static DynamoMapper dynamoMapper;
@@ -113,6 +117,26 @@ public class DynamoMapperIntegrationTest {
 				.map(item -> item.partitionKey())
 				.collect(Collectors.toList());
 		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
+	}
+
+	// DynamoDB numbers are limited to 38 significant digits.
+	// https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes.Number
+	@Test
+	@SneakyThrows
+	void shouldRejectBigIntegersExceedingDynamoDbPrecision() {
+		var obj = IntegrationTestObjects.setKeyAndTtl(IntegrationTestObject.builder()
+				.bigint(new BigInteger("999999999999999999999999999999999999999")) // 39 digits
+				.build());
+		assertThrows(DynamoDbException.class, () -> dynamoMapper.putItemFromKeyObject(obj));
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldRejectBigDecimalsExceedingDynamoDbPrecision() {
+		var obj = IntegrationTestObjects.setKeyAndTtl(IntegrationTestObject.builder()
+				.bigdec(new BigDecimal("1.23456789012345678901234567890123456789")) // 39 significant digits
+				.build());
+		assertThrows(DynamoDbException.class, () -> dynamoMapper.putItemFromKeyObject(obj));
 	}
 
 	@Test

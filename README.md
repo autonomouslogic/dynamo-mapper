@@ -107,6 +107,21 @@ dynamoMapper.putItemFromKeyObject(item).thenAccept(response -> {
 * To properly serialize BigDecimals, use `objectMapper.enable(JsonGenerator.Feature.WRITE_BIGDECIMAL_AS_PLAIN)`
 * To encode `java.time` objects properly, use `jackson-datatype-jsr310`
 
+## Number precision limits
+DynamoDB stores numbers with a maximum of 38 significant digits of precision and an exponent range of
+10^-130 to 10^+125.
+This means arbitrarily large `BigInteger` and `BigDecimal` values cannot be stored:
+* A `BigInteger` with more than 38 digits will be rejected by DynamoDB.
+* A `BigDecimal` with more than 38 significant digits or an exponent outside the supported range will be rejected.
+
+Values within these limits, but exceeding the range or precision of `long` and `double`, work fine.
+Requests exceeding the limits fail with a `ValidationException` from DynamoDB itself &mdash; this library performs no
+validation of its own.
+
+See the AWS documentation:
+* [Supported data types - Number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html#HowItWorks.DataTypes.Number)
+* [API reference - AttributeValue](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html)
+
 ## Comparison with DynamoDBMapper and DynamoDB Enhanced
 The [DynamoDBMapper in the v1 AWS SDK](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.html)
 and the [DynamoDB Enhanced Client in the v2 AWS SDK](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/dynamodb-enhanced-client.html)
