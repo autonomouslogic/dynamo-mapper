@@ -8,12 +8,14 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import lombok.Builder;
+import lombok.Value;
+import lombok.extern.jackson.Jacksonized;
 
 @DynamoTableName("test")
-@Data
-@Accessors(fluent = false)
+@Value
+@Builder(toBuilder = true)
+@Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TestObject {
 	@JsonProperty
