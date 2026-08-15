@@ -7,3 +7,6 @@
 {"i": 60, "bigdec": 0.0000000000001}
 {"i": 70, "bytes": "RHluYW1vIE1hcHBlcg=="}
 {"i": 80, "listString": ["a", "b", "c"]}
+{"i": 90, "boolPrimitive": true}
+{"i": 91, "boolBoxed": true}
+{"i": 92, "boolBoxed": false}
