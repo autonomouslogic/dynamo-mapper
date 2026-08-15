@@ -7,11 +7,8 @@ import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
-import com.autonomouslogic.jacksonobjectstream.JacksonObjectStreamFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.SneakyThrows;
@@ -23,6 +20,7 @@ import software.amazon.awssdk.regions.providers.AwsRegionProvider;
 import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import tools.jackson.databind.json.JsonMapper;
 
 public class IntegrationTestUtil {
 	public static final RandomGenerator RNG = new ISAACRandom();
@@ -77,11 +75,12 @@ public class IntegrationTestUtil {
 
 	@SneakyThrows
 	public static List<IntegrationTestObject> loadIntegrationTestObjects() {
-		var in = Objects.requireNonNull(IntegrationTestUtil.class.getResourceAsStream("/integration-tests.jsonl"));
-		var factory = new JacksonObjectStreamFactory(new ObjectMapper());
-		var iterator = factory.createReader(in, IntegrationTestObject.class);
-		var list = new ArrayList<IntegrationTestObject>();
-		iterator.forEachRemaining(list::add);
-		return list;
+		try (var in =
+				Objects.requireNonNull(IntegrationTestUtil.class.getResourceAsStream("/integration-tests.jsonl"))) {
+			return new JsonMapper()
+					.readerFor(IntegrationTestObject.class)
+					.<IntegrationTestObject>readValues(in)
+					.readAll();
+		}
 	}
 }
