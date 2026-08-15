@@ -21,6 +21,7 @@ public class TestObject {
 	protected Boolean bool;
 
 	@JsonProperty
+	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 	protected boolean boolPrimitive;
 
 	@JsonProperty
