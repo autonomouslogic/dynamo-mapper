@@ -100,7 +100,16 @@ public enum CodecTests {
 			new TestObject().setStringList(List.of("str1", "str2")),
 			Map.of("stringList", AttributeValue.builder().ss("str1", "str2").build()),
 			EncodeDecode.DECODE_ONLY // @todo
-			);
+			),
+	// v1 SDK stores boolean as N ("0"/"1") instead of BOOL.
+	BOOL_V1_FALSE(
+			new TestObject().setBoolPrimitive(false),
+			Map.of("boolPrimitive", AttributeValue.builder().n("0").build()),
+			EncodeDecode.DECODE_ONLY),
+	BOOL_V1_TRUE(
+			new TestObject().setBoolPrimitive(true),
+			Map.of("boolPrimitive", AttributeValue.builder().n("1").build()),
+			EncodeDecode.DECODE_ONLY);
 
 	TestObject pojo;
 	Map<String, AttributeValue> ddb;

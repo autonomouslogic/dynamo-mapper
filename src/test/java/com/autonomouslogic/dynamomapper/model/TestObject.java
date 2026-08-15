@@ -21,6 +21,9 @@ public class TestObject {
 	protected Boolean bool;
 
 	@JsonProperty
+	protected boolean boolPrimitive;
+
+	@JsonProperty
 	protected List<byte[]> binaryList;
 
 	@JsonProperty
