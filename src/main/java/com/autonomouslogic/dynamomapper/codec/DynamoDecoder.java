@@ -167,11 +167,7 @@ public class DynamoDecoder {
 	private JsonNode decodeNumber(String num) {
 		try {
 			var val = Long.parseLong(num);
-			var nodeFactory = objectMapper.getNodeFactory();
-			if (val >= Integer.MIN_VALUE && val <= Integer.MAX_VALUE) {
-				return nodeFactory.numberNode((int) val);
-			}
-			return nodeFactory.numberNode(val);
+			return objectMapper.getNodeFactory().numberNode(val);
 		} catch (NumberFormatException e) {
 			return decodeString(num);
 		}
