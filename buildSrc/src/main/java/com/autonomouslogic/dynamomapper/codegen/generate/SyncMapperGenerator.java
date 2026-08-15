@@ -95,11 +95,11 @@ public class SyncMapperGenerator {
 	protected void generateConstructor() {
 		var constructor = MethodSpec.constructorBuilder().addModifiers(Modifier.PROTECTED);
 		var client = ParameterSpec.builder(clientField.type, "client").build();
-		var objectMapper = ParameterSpec.builder(JsonMapper.class, "jsonMapper").build();
+		var jsonMapper = ParameterSpec.builder(JsonMapper.class, "jsonMapper").build();
 		var tableNameDecorator = ParameterSpec.builder(TypeHelper.tableNameDecorator, "tableNameDecorator")
 				.build();
 		constructor.addParameter(client);
-		constructor.addParameter(objectMapper);
+		constructor.addParameter(jsonMapper);
 		constructor.addParameter(tableNameDecorator);
 
 		constructor

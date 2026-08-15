@@ -86,11 +86,11 @@ public class CompatibilityTest {
 
 	@SneakyThrows
 	static List<CompatibilityTestObject> loadCompatibilityTestObjects() {
-		var objectMapper = StdJsonMapper.objectMapper();
+		var jsonMapper = StdJsonMapper.jsonMapper();
 		var list = new ArrayList<CompatibilityTestObject>();
 		for (IntegrationTestObject obj : IntegrationTestUtil.loadIntegrationTestObjects()) {
 			obj = IntegrationTestObjects.setKeyAndTtl(obj);
-			list.add(objectMapper.readValue(objectMapper.writeValueAsString(obj), CompatibilityTestObject.class));
+			list.add(jsonMapper.readValue(jsonMapper.writeValueAsString(obj), CompatibilityTestObject.class));
 		}
 		return list;
 	}
