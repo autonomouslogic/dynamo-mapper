@@ -7,13 +7,13 @@ import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedQueryResponse;
 import com.autonomouslogic.dynamomapper.model.MappedScanResponse;
 import com.autonomouslogic.dynamomapper.model.MappedUpdateItemResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.BooleanNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,16 +34,16 @@ import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
 @RequiredArgsConstructor
 public class DynamoDecoder {
 	@NonNull
-	private final ObjectMapper objectMapper;
+	private final JsonMapper jsonMapper;
 
 	public <T> MappedGetItemResponse<T> mapGetItemResponse(GetItemResponse response, Class<T> clazz)
-			throws JsonProcessingException {
+			throws JacksonException {
 		var item = response.hasItem() ? decode(response.item(), clazz) : null;
 		return new MappedGetItemResponse<>(response, item);
 	}
 
 	public <T> MappedBatchGetItemResponse<T> mapBatchGetItemResponse(BatchGetItemResponse response, Class<T> clazz)
-			throws JsonProcessingException {
+			throws JacksonException {
 		Map<String, List<T>> decodedResponses = null;
 		if (response.hasResponses()) {
 			decodedResponses = new LinkedHashMap<>();
@@ -62,37 +62,37 @@ public class DynamoDecoder {
 	}
 
 	public <T> MappedPutItemResponse<T> mapPutItemResponse(PutItemResponse response, Class<T> clazz)
-			throws JsonProcessingException {
+			throws JacksonException {
 		var item = response.hasAttributes() ? decode(response.attributes(), clazz) : null;
 		return new MappedPutItemResponse<>(response, item);
 	}
 
 	public <T> MappedUpdateItemResponse<T> mapUpdateItemResponse(UpdateItemResponse response, Class<T> clazz)
-			throws JsonProcessingException {
+			throws JacksonException {
 		var item = response.hasAttributes() ? decode(response.attributes(), clazz) : null;
 		return new MappedUpdateItemResponse<>(response, item);
 	}
 
 	public <T> MappedDeleteItemResponse<T> mapDeleteItemResponse(DeleteItemResponse response, Class<T> clazz)
-			throws JsonProcessingException {
+			throws JacksonException {
 		var item = response.hasAttributes() ? decode(response.attributes(), clazz) : null;
 		return new MappedDeleteItemResponse<>(response, item);
 	}
 
 	public <T> MappedScanResponse<T> mapScanResponse(ScanResponse response, Class<T> clazz)
-			throws JsonProcessingException {
+			throws JacksonException {
 		var decoded = decodeItems(response.items(), clazz);
 		return new MappedScanResponse<>(response, decoded);
 	}
 
 	public <T> MappedQueryResponse<T> mapQueryResponse(QueryResponse response, Class<T> clazz)
-			throws JsonProcessingException {
+			throws JacksonException {
 		var decoded = decodeItems(response.items(), clazz);
 		return new MappedQueryResponse<>(response, decoded);
 	}
 
 	private <T> List<T> decodeItems(List<Map<String, AttributeValue>> items, Class<T> clazz)
-			throws JsonProcessingException {
+			throws JacksonException {
 		if (items == null) {
 			return null;
 		}
@@ -109,16 +109,16 @@ public class DynamoDecoder {
 	/**
 	 * Decodes DynamoDB values into a POJO.
 	 */
-	public <T> T decode(Map<String, AttributeValue> map, Class<T> clazz) throws JsonProcessingException {
-		ObjectNode json = objectMapper.createObjectNode();
+	public <T> T decode(Map<String, AttributeValue> map, Class<T> clazz) throws JacksonException {
+		ObjectNode json = jsonMapper.createObjectNode();
 		for (Map.Entry<String, AttributeValue> entry : map.entrySet()) {
 			json.set(entry.getKey(), decodeValue(entry.getValue()));
 		}
-		return objectMapper.treeToValue(json, clazz);
+		return jsonMapper.treeToValue(json, clazz);
 	}
 
 	private JsonNode decodeValue(AttributeValue val) {
-		var nodeFactory = objectMapper.getNodeFactory();
+		var nodeFactory = jsonMapper.getNodeFactory();
 		if (val.b() != null) {
 			return decodeBinary(val.b());
 		}
@@ -153,15 +153,15 @@ public class DynamoDecoder {
 	}
 
 	private BooleanNode decodeBoolean(AttributeValue val) {
-		return objectMapper.getNodeFactory().booleanNode(val.bool());
+		return jsonMapper.getNodeFactory().booleanNode(val.bool());
 	}
 
-	private TextNode decodeString(String val) {
-		return objectMapper.getNodeFactory().textNode(val);
+	private StringNode decodeString(String val) {
+		return jsonMapper.getNodeFactory().stringNode(val);
 	}
 
 	private JsonNode decodeBinary(SdkBytes bytes) {
-		return objectMapper.getNodeFactory().binaryNode(bytes.asByteArray());
+		return jsonMapper.getNodeFactory().binaryNode(bytes.asByteArray());
 	}
 
 	private JsonNode decodeNumber(String num) {
@@ -169,7 +169,7 @@ public class DynamoDecoder {
 	}
 
 	private JsonNode decodeMap(AttributeValue val) {
-		var obj = objectMapper.getNodeFactory().objectNode();
+		var obj = jsonMapper.getNodeFactory().objectNode();
 		for (var entry : val.m().entrySet()) {
 			obj.set(entry.getKey(), decodeValue(entry.getValue()));
 		}
@@ -177,7 +177,7 @@ public class DynamoDecoder {
 	}
 
 	private JsonNode decodeList(AttributeValue val) {
-		var arr = objectMapper.getNodeFactory().arrayNode();
+		var arr = jsonMapper.getNodeFactory().arrayNode();
 		for (var entry : val.l()) {
 			arr.add(decodeValue(entry));
 		}
@@ -185,7 +185,7 @@ public class DynamoDecoder {
 	}
 
 	private JsonNode decodeBinarySet(AttributeValue val) {
-		var arr = objectMapper.getNodeFactory().arrayNode();
+		var arr = jsonMapper.getNodeFactory().arrayNode();
 		for (var entry : val.bs()) {
 			arr.add(decodeBinary(entry));
 		}
@@ -201,7 +201,7 @@ public class DynamoDecoder {
 	}
 
 	private <T> ArrayNode decodeArray(List<T> vals, Function<T, JsonNode> f) {
-		var arr = objectMapper.getNodeFactory().arrayNode();
+		var arr = jsonMapper.getNodeFactory().arrayNode();
 		for (var val : vals) {
 			arr.add(f.apply(val));
 		}

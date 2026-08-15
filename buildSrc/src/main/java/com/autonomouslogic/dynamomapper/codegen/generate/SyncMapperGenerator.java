@@ -14,7 +14,7 @@ import com.autonomouslogic.dynamomapper.codegen.generate.delegate.DelegateWrappe
 import com.autonomouslogic.dynamomapper.codegen.generate.keyobject.KeyObjectWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.primarykey.PrimaryKeyWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.util.TypeHelper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
@@ -96,7 +96,7 @@ public class SyncMapperGenerator {
 		var constructor = MethodSpec.constructorBuilder().addModifiers(Modifier.PROTECTED);
 		var client = ParameterSpec.builder(clientField.type, "client").build();
 		var objectMapper =
-				ParameterSpec.builder(ObjectMapper.class, "objectMapper").build();
+				ParameterSpec.builder(JsonMapper.class, "jsonMapper").build();
 		var tableNameDecorator = ParameterSpec.builder(TypeHelper.tableNameDecorator, "tableNameDecorator")
 				.build();
 		constructor.addParameter(client);

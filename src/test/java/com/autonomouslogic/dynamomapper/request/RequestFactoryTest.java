@@ -10,7 +10,7 @@ import com.autonomouslogic.dynamomapper.function.TableNameDecorator;
 import com.autonomouslogic.dynamomapper.model.TestObject;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +24,7 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
 
 public class RequestFactoryTest {
-	ObjectMapper objectMapper = StdObjectMapper.objectMapper();
+	JsonMapper jsonMapper = StdObjectMapper.jsonMapper();
 	TableNameDecorator decorator;
 	ReflectionUtil reflectionUtil;
 	DynamoEncoder dynamoEncoder;
@@ -36,9 +36,9 @@ public class RequestFactoryTest {
 		when(decorator.apply(any(), any()))
 				.thenAnswer((Answer<String>) invocation -> invocation.getArgument(1, String.class));
 
-		reflectionUtil = new ReflectionUtil(objectMapper, decorator);
-		dynamoEncoder = new DynamoEncoder(objectMapper, reflectionUtil);
-		factory = new RequestFactory(dynamoEncoder, objectMapper, reflectionUtil);
+		reflectionUtil = new ReflectionUtil(jsonMapper, decorator);
+		dynamoEncoder = new DynamoEncoder(jsonMapper, reflectionUtil);
+		factory = new RequestFactory(dynamoEncoder, jsonMapper, reflectionUtil);
 	}
 
 	@Test
