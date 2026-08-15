@@ -1,8 +1,6 @@
 package com.autonomouslogic.dynamomapper.codec;
 
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +11,8 @@ import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 @RequiredArgsConstructor
 public class DynamoEncoder {

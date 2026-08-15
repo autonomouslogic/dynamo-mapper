@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.autonomouslogic.dynamomapper.test.CodecTests;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,6 +13,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import tools.jackson.databind.json.JsonMapper;
 
 public class DynamoEncoderTest {
 	JsonMapper jsonMapper = StdObjectMapper.jsonMapper();

@@ -10,7 +10,6 @@ import com.autonomouslogic.dynamomapper.function.TableNameDecorator;
 import com.autonomouslogic.dynamomapper.model.TestObject;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +21,7 @@ import org.mockito.stubbing.Answer;
 import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
+import tools.jackson.databind.json.JsonMapper;
 
 public class RequestFactoryTest {
 	JsonMapper jsonMapper = StdObjectMapper.jsonMapper();

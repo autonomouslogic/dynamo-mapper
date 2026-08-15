@@ -5,6 +5,8 @@ import tools.jackson.databind.json.JsonMapper;
 
 public class StdObjectMapper {
 	public static JsonMapper jsonMapper() {
-		return JsonMapper.builder().enable(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN).build();
+		return JsonMapper.builder()
+				.enable(StreamWriteFeature.WRITE_BIGDECIMAL_AS_PLAIN)
+				.build();
 	}
 }

@@ -14,7 +14,6 @@ import com.autonomouslogic.dynamomapper.codegen.generate.delegate.DelegateWrappe
 import com.autonomouslogic.dynamomapper.codegen.generate.keyobject.KeyObjectWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.generate.primarykey.PrimaryKeyWrapperGenerator;
 import com.autonomouslogic.dynamomapper.codegen.util.TypeHelper;
-import tools.jackson.databind.json.JsonMapper;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
@@ -40,6 +39,7 @@ import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
+import tools.jackson.databind.json.JsonMapper;
 
 @RequiredArgsConstructor
 public class SyncMapperGenerator {
@@ -95,8 +95,7 @@ public class SyncMapperGenerator {
 	protected void generateConstructor() {
 		var constructor = MethodSpec.constructorBuilder().addModifiers(Modifier.PROTECTED);
 		var client = ParameterSpec.builder(clientField.type, "client").build();
-		var objectMapper =
-				ParameterSpec.builder(JsonMapper.class, "jsonMapper").build();
+		var objectMapper = ParameterSpec.builder(JsonMapper.class, "jsonMapper").build();
 		var tableNameDecorator = ParameterSpec.builder(TypeHelper.tableNameDecorator, "tableNameDecorator")
 				.build();
 		constructor.addParameter(client);
@@ -105,11 +104,10 @@ public class SyncMapperGenerator {
 
 		constructor
 				.addStatement("this.client = client")
-				.addStatement("reflectionUtil = new $T(objectMapper, tableNameDecorator)", reflectionUtilField.type)
-				.addStatement("encoder = new $T(objectMapper, reflectionUtil)", encoderField.type)
-				.addStatement("decoder = new $T(objectMapper)", decoderField.type)
-				.addStatement(
-						"requestFactory = new $T(encoder, objectMapper, reflectionUtil)", requestFactoryField.type);
+				.addStatement("reflectionUtil = new $T(jsonMapper, tableNameDecorator)", reflectionUtilField.type)
+				.addStatement("encoder = new $T(jsonMapper, reflectionUtil)", encoderField.type)
+				.addStatement("decoder = new $T(jsonMapper)", decoderField.type)
+				.addStatement("requestFactory = new $T(encoder, jsonMapper, reflectionUtil)", requestFactoryField.type);
 
 		mapper.addMethod(constructor.build());
 	}

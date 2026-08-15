@@ -7,13 +7,6 @@ import com.autonomouslogic.dynamomapper.model.MappedPutItemResponse;
 import com.autonomouslogic.dynamomapper.model.MappedQueryResponse;
 import com.autonomouslogic.dynamomapper.model.MappedScanResponse;
 import com.autonomouslogic.dynamomapper.model.MappedUpdateItemResponse;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.node.ArrayNode;
-import tools.jackson.databind.node.BooleanNode;
-import tools.jackson.databind.node.ObjectNode;
-import tools.jackson.databind.node.StringNode;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +23,13 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.BooleanNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
 @RequiredArgsConstructor
 public class DynamoDecoder {
@@ -79,20 +79,17 @@ public class DynamoDecoder {
 		return new MappedDeleteItemResponse<>(response, item);
 	}
 
-	public <T> MappedScanResponse<T> mapScanResponse(ScanResponse response, Class<T> clazz)
-			throws JacksonException {
+	public <T> MappedScanResponse<T> mapScanResponse(ScanResponse response, Class<T> clazz) throws JacksonException {
 		var decoded = decodeItems(response.items(), clazz);
 		return new MappedScanResponse<>(response, decoded);
 	}
 
-	public <T> MappedQueryResponse<T> mapQueryResponse(QueryResponse response, Class<T> clazz)
-			throws JacksonException {
+	public <T> MappedQueryResponse<T> mapQueryResponse(QueryResponse response, Class<T> clazz) throws JacksonException {
 		var decoded = decodeItems(response.items(), clazz);
 		return new MappedQueryResponse<>(response, decoded);
 	}
 
-	private <T> List<T> decodeItems(List<Map<String, AttributeValue>> items, Class<T> clazz)
-			throws JacksonException {
+	private <T> List<T> decodeItems(List<Map<String, AttributeValue>> items, Class<T> clazz) throws JacksonException {
 		if (items == null) {
 			return null;
 		}
@@ -165,7 +162,12 @@ public class DynamoDecoder {
 	}
 
 	private JsonNode decodeNumber(String num) {
-		return decodeString(num);
+		try {
+			var val = Long.parseLong(num);
+			return jsonMapper.getNodeFactory().numberNode(val);
+		} catch (NumberFormatException e) {
+			return decodeString(num);
+		}
 	}
 
 	private JsonNode decodeMap(AttributeValue val) {

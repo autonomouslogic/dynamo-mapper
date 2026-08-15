@@ -58,6 +58,14 @@ public class CompatibilityTestObject {
 	@JsonProperty
 	long ttl;
 
+	@DynamoDBAttribute // v1
+	@JsonProperty
+	boolean boolPrimitive;
+
+	@DynamoDBAttribute // v1
+	@JsonProperty
+	Boolean boolBoxed;
+
 	@DynamoDbPartitionKey // v2
 	public String getPartitionKey() {
 		return partitionKey;
@@ -129,5 +137,21 @@ public class CompatibilityTestObject {
 
 	public void setTtl(long ttl) {
 		this.ttl = ttl;
+	}
+
+	public boolean isBoolPrimitive() {
+		return boolPrimitive;
+	}
+
+	public void setBoolPrimitive(boolean boolPrimitive) {
+		this.boolPrimitive = boolPrimitive;
+	}
+
+	public Boolean getBoolBoxed() {
+		return boolBoxed;
+	}
+
+	public void setBoolBoxed(Boolean boolBoxed) {
+		this.boolBoxed = boolBoxed;
 	}
 }
