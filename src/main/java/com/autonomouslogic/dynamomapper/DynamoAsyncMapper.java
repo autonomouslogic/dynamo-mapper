@@ -14,7 +14,6 @@ import com.autonomouslogic.dynamomapper.model.MappedScanResponse;
 import com.autonomouslogic.dynamomapper.model.MappedUpdateItemResponse;
 import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.autonomouslogic.dynamomapper.util.FutureUtil;
-import com.autonomouslogic.dynamomapper.util.ListUtil;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
 import java.io.IOException;
 import java.util.List;
@@ -134,11 +133,10 @@ public class DynamoAsyncMapper {
 		});
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItemFromKeyObjects(@NonNull List<?> keyObject)
-			throws IOException {
+	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItemFromKeyObjects(
+			@NonNull List<T> keyObject, @NonNull Class<T> clazz) throws IOException {
 		var builder = requestFactory.batchGetItemRequestFromKeyObjects(keyObject);
-		return batchGetItem(builder.build(), ListUtil.elementClass(keyObject));
+		return batchGetItem(builder.build(), clazz);
 	}
 
 	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItem(
@@ -168,12 +166,14 @@ public class DynamoAsyncMapper {
 		});
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> CompletableFuture<MappedBatchGetItemResponse<T>> batchGetItemFromKeyObjects(
-			@NonNull List<?> keyObject, @NonNull Consumer<BatchGetItemRequest.Builder> consumer) throws IOException {
+			@NonNull List<T> keyObject,
+			@NonNull Class<T> clazz,
+			@NonNull Consumer<BatchGetItemRequest.Builder> consumer)
+			throws IOException {
 		var builder = requestFactory.batchGetItemRequestFromKeyObjects(keyObject);
 		consumer.accept(builder);
-		return batchGetItem(builder.build(), ListUtil.elementClass(keyObject));
+		return batchGetItem(builder.build(), clazz);
 	}
 
 	public <T> CompletableFuture<MappedPutItemResponse<T>> putItem(
@@ -394,11 +394,10 @@ public class DynamoAsyncMapper {
 		return batchGetItemPaginator(builder.build(), clazz);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginatorFromKeyObjects(@NonNull List<?> keyObject)
-			throws IOException {
+	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginatorFromKeyObjects(
+			@NonNull List<T> keyObject, @NonNull Class<T> clazz) throws IOException {
 		var builder = requestFactory.batchGetItemRequestFromKeyObjects(keyObject);
-		return batchGetItemPaginator(builder.build(), ListUtil.elementClass(keyObject));
+		return batchGetItemPaginator(builder.build(), clazz);
 	}
 
 	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginator(
@@ -427,11 +426,13 @@ public class DynamoAsyncMapper {
 		return batchGetItemPaginator(builder.build(), clazz);
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T> Publisher<MappedBatchGetItemResponse<T>> batchGetItemPaginatorFromKeyObjects(
-			@NonNull List<?> keyObject, @NonNull Consumer<BatchGetItemRequest.Builder> consumer) throws IOException {
+			@NonNull List<T> keyObject,
+			@NonNull Class<T> clazz,
+			@NonNull Consumer<BatchGetItemRequest.Builder> consumer)
+			throws IOException {
 		var builder = requestFactory.batchGetItemRequestFromKeyObjects(keyObject);
 		consumer.accept(builder);
-		return batchGetItemPaginator(builder.build(), ListUtil.elementClass(keyObject));
+		return batchGetItemPaginator(builder.build(), clazz);
 	}
 }

@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
@@ -20,8 +19,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
-import software.amazon.awssdk.services.dynamodb.model.KeysAndAttributes;
 
 public class DynamoAsyncMapperIntegrationTest {
 	static DynamoAsyncMapper dynamoAsyncMapper;
@@ -146,51 +143,11 @@ public class DynamoAsyncMapperIntegrationTest {
 
 	@Test
 	@SneakyThrows
-	void shouldBatchGetItemViaRequest() {
-		var keys = putBatchItems(3);
-		var keyMaps = encodeKeys(keys);
-		var req = BatchGetItemRequest.builder()
-				.requestItems(Map.of(
-						"integration-test-table",
-						KeysAndAttributes.builder().keys(keyMaps).build()))
-				.build();
-		var result =
-				dynamoAsyncMapper.batchGetItem(req, IntegrationTestObject.class).join();
-		assertBatchKeys(result, keys);
-	}
-
-	@Test
-	@SneakyThrows
-	void shouldBatchGetItemViaConsumer() {
-		var keys = putBatchItems(3);
-		var keyMaps = encodeKeys(keys);
-		var result = dynamoAsyncMapper
-				.batchGetItem(
-						req -> req.requestItems(Map.of(
-								"integration-test-table",
-								KeysAndAttributes.builder().keys(keyMaps).build())),
-						IntegrationTestObject.class)
-				.join();
-		assertBatchKeys(result, keys);
-	}
-
-	@Test
-	@SneakyThrows
-	void shouldBatchGetItemsFromPrimaryKeysWithoutConsumer() {
-		var keys = putBatchItems(3);
-		var result = dynamoAsyncMapper
-				.batchGetItemFromPrimaryKeys(keys, IntegrationTestObject.class)
-				.join();
-		assertBatchKeys(result, keys);
-	}
-
-	@Test
-	@SneakyThrows
 	void shouldBatchGetItemsFromKeyObjects() {
 		var keys = putBatchItems(3);
 		var keyObjects = toKeyObjects(keys);
 		MappedBatchGetItemResponse<IntegrationTestObject> result = dynamoAsyncMapper
-				.<IntegrationTestObject>batchGetItemFromKeyObjects(keyObjects)
+				.batchGetItemFromKeyObjects(keyObjects, IntegrationTestObject.class)
 				.join();
 		assertBatchKeys(result, keys);
 	}
@@ -201,8 +158,9 @@ public class DynamoAsyncMapperIntegrationTest {
 		var keys = putBatchItems(3);
 		var keyObjects = toKeyObjects(keys);
 		MappedBatchGetItemResponse<IntegrationTestObject> result = dynamoAsyncMapper
-				.<IntegrationTestObject>batchGetItemFromKeyObjects(
+				.batchGetItemFromKeyObjects(
 						keyObjects,
+						IntegrationTestObject.class,
 						req -> assertEquals(
 								Set.of("integration-test-table"),
 								req.build().requestItems().keySet()))
@@ -220,17 +178,6 @@ public class DynamoAsyncMapperIntegrationTest {
 			keys.add(obj.partitionKey());
 		}
 		return keys;
-	}
-
-	@SneakyThrows
-	private List<Map<String, software.amazon.awssdk.services.dynamodb.model.AttributeValue>> encodeKeys(
-			List<String> keys) {
-		var keyMaps =
-				new ArrayList<Map<String, software.amazon.awssdk.services.dynamodb.model.AttributeValue>>(keys.size());
-		for (var k : keys) {
-			keyMaps.add(encoder.encodeKeyValue(k, IntegrationTestObject.class));
-		}
-		return keyMaps;
 	}
 
 	private List<IntegrationTestObject> toKeyObjects(List<String> keys) {

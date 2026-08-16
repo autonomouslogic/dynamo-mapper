@@ -40,7 +40,6 @@ public class AsyncKeyObjectWrapperGenerator extends KeyObjectWrapperGenerator {
 		}
 		var params = new ArrayList<>(method.parameters);
 		params.removeIf(p -> p.name.equals(REQUEST));
-		params.removeIf(p -> p.name.equals("clazz"));
 		wrapper.addParameters(params);
 		// Write body.
 		var requestFactoryCode = CodeBlock.builder();
@@ -49,13 +48,8 @@ public class AsyncKeyObjectWrapperGenerator extends KeyObjectWrapperGenerator {
 		if (firstParamTypeName instanceof ParameterizedTypeName) {
 			requestFactoryCode.addStatement("\tconsumer.accept(builder)");
 		}
-		if (multiple) {
-			requestFactoryCode.add(CodeBlock.of(
-					"return $L(builder.build(), $T.elementClass(keyObject));\n", method.name, TypeHelper.listUtil));
-		} else {
-			requestFactoryCode.add(
-					CodeBlock.of("return $L(builder.build(), (Class<T>) keyObject.getClass());\n", method.name));
-		}
+		requestFactoryCode.add(
+				CodeBlock.of("return $L(builder.build(), (Class<T>) keyObject.getClass());\n", method.name));
 
 		var code = CodeBlock.builder();
 		if (futureWrap) {
