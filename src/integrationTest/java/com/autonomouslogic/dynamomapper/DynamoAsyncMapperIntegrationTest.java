@@ -208,6 +208,7 @@ public class DynamoAsyncMapperIntegrationTest {
 		assertBatchKeys(result, keys);
 	}
 
+	@SneakyThrows
 	private List<String> putBatchItems(int n) {
 		var keys = new ArrayList<String>(n);
 		for (int i = 0; i < n; i++) {
