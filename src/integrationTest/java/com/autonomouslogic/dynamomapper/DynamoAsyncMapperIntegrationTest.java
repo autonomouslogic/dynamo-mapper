@@ -210,11 +210,11 @@ public class DynamoAsyncMapperIntegrationTest {
 		assertBatchKeys(result, keys);
 	}
 
+	@SneakyThrows
 	private List<String> putBatchItems(int n) {
 		var keys = new ArrayList<String>(n);
 		for (int i = 0; i < n; i++) {
-			var obj = IntegrationTestObjects.setKeyAndTtl(
-					IntegrationTestObject.builder().build());
+			var obj = IntegrationTestObjects.setKeyAndTtl(IntegrationTestObject.builder().build());
 			dynamoAsyncMapper.putItemFromKeyObject(obj).join();
 			keys.add(obj.partitionKey());
 		}
