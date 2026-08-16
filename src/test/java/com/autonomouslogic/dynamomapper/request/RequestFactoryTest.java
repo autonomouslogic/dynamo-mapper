@@ -302,6 +302,101 @@ public class RequestFactoryTest {
 	}
 
 	@Test
+	void shouldRejectNullClassInAcceptGetItemRequestBuilder() {
+		assertThrows(NullPointerException.class, () -> factory.acceptGetItemRequest(GetItemRequest.builder(), null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptPutItemRequest() {
+		var req = PutItemRequest.builder().tableName("t").item(Map.of()).build();
+		assertThrows(NullPointerException.class, () -> factory.acceptPutItemRequest(req, null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptPutItemRequestBuilder() {
+		assertThrows(NullPointerException.class, () -> factory.acceptPutItemRequest(PutItemRequest.builder(), null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptUpdateItemRequest() {
+		var req = UpdateItemRequest.builder().tableName("t").key(Map.of()).build();
+		assertThrows(NullPointerException.class, () -> factory.acceptUpdateItemRequest(req, null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptUpdateItemRequestBuilder() {
+		assertThrows(
+				NullPointerException.class, () -> factory.acceptUpdateItemRequest(UpdateItemRequest.builder(), null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptDeleteItemRequest() {
+		var req = DeleteItemRequest.builder().tableName("t").key(Map.of()).build();
+		assertThrows(NullPointerException.class, () -> factory.acceptDeleteItemRequest(req, null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptDeleteItemRequestBuilder() {
+		assertThrows(
+				NullPointerException.class, () -> factory.acceptDeleteItemRequest(DeleteItemRequest.builder(), null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptBatchGetItemRequest() {
+		var req = BatchGetItemRequest.builder()
+				.requestItems(Map.of("t", KeysAndAttributes.builder().build()))
+				.build();
+		assertThrows(NullPointerException.class, () -> factory.acceptBatchGetItemRequest(req, null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptBatchGetItemRequestBuilder() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptBatchGetItemRequest(BatchGetItemRequest.builder(), null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptScanRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptScanRequest(ScanRequest.builder().build(), null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptScanRequestBuilder() {
+		assertThrows(NullPointerException.class, () -> factory.acceptScanRequest(ScanRequest.builder(), null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptQueryRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptQueryRequest(QueryRequest.builder().build(), null));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptQueryRequestBuilder() {
+		assertThrows(NullPointerException.class, () -> factory.acceptQueryRequest(QueryRequest.builder(), null));
+	}
+
+	@Test
+	void shouldRejectNullClassInBatchGetItemRequestFromPrimaryKeys() {
+		assertThrows(
+				NullPointerException.class, () -> factory.batchGetItemRequestFromPrimaryKeys(List.of("key"), null));
+	}
+
+	@Test
+	void shouldRejectNullClassInDeleteItemRequestFromPrimaryKey() {
+		assertThrows(NullPointerException.class, () -> factory.deleteItemRequestFromPrimaryKey("key", null));
+	}
+
+	@Test
+	void shouldRejectNullObjectInUpdateItemRequest() {
+		assertThrows(NullPointerException.class, () -> factory.updateItemRequestFromKeyObject(null));
+	}
+
+	@Test
 	@SneakyThrows
 	void shouldAcceptGetItemRequestWithTableName() {
 		var req = GetItemRequest.builder()
