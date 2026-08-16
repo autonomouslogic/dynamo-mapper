@@ -1,5 +1,12 @@
 Dynamo Mapper Changelog
 
+## [2.1.36](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.35...2.1.36) (2026-08-15)
+
+
+### Bug Fixes
+
+* Decode v1 SDK booleans ([#176](https://github.com/autonomouslogic/dynamo-mapper/issues/176)) ([08b2762](https://github.com/autonomouslogic/dynamo-mapper/commit/08b27627187d353bd6162749db7df5e326fddf4e))
+
 ## [2.1.35](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.34...2.1.35) (2026-08-04)
 
 
