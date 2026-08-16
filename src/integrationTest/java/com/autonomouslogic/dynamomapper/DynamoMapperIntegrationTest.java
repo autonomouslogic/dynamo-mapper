@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
-import com.autonomouslogic.dynamomapper.model.MappedBatchGetItemResponse;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
@@ -192,7 +191,7 @@ public class DynamoMapperIntegrationTest {
 						KeysAndAttributes.builder().keys(keyMaps).build()))
 				.build();
 		var result = dynamoMapper.batchGetItem(req, IntegrationTestObject.class);
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@Test
@@ -205,7 +204,7 @@ public class DynamoMapperIntegrationTest {
 						"integration-test-table",
 						KeysAndAttributes.builder().keys(keyMaps).build())),
 				IntegrationTestObject.class);
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@Test
@@ -213,30 +212,30 @@ public class DynamoMapperIntegrationTest {
 	void shouldBatchGetItemsFromPrimaryKeysWithoutConsumer() {
 		var keys = putBatchItems(3);
 		var result = dynamoMapper.batchGetItemFromPrimaryKeys(keys, IntegrationTestObject.class);
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@Test
 	@SneakyThrows
 	void shouldBatchGetItemsFromKeyObjects() {
 		var keys = putBatchItems(3);
-		var keyObjects = toKeyObjects(keys);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
 		var result = dynamoMapper.batchGetItemFromKeyObjects(keyObjects, IntegrationTestObject.class);
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@Test
 	@SneakyThrows
 	void shouldBatchGetItemsFromKeyObjectsWithConsumer() {
 		var keys = putBatchItems(3);
-		var keyObjects = toKeyObjects(keys);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
 		var result = dynamoMapper.batchGetItemFromKeyObjects(
 				keyObjects,
 				IntegrationTestObject.class,
 				req -> assertEquals(
 						Set.of("integration-test-table"),
 						req.build().requestItems().keySet()));
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@SneakyThrows
@@ -260,20 +259,6 @@ public class DynamoMapperIntegrationTest {
 			keyMaps.add(encoder.encodeKeyValue(k, IntegrationTestObject.class));
 		}
 		return keyMaps;
-	}
-
-	private List<IntegrationTestObject> toKeyObjects(List<String> keys) {
-		return keys.stream()
-				.map(k -> IntegrationTestObject.builder().partitionKey(k).build())
-				.collect(Collectors.toList());
-	}
-
-	private void assertBatchKeys(MappedBatchGetItemResponse<IntegrationTestObject> result, List<String> keys) {
-		var fetchedKeys = result.items().values().stream()
-				.flatMap(Collection::stream)
-				.map(IntegrationTestObject::partitionKey)
-				.collect(Collectors.toList());
-		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
 	}
 
 	@Test

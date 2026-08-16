@@ -199,7 +199,7 @@ public class DynamoAsyncMapperIntegrationTest {
 				.build();
 		var result =
 				dynamoAsyncMapper.batchGetItem(req, IntegrationTestObject.class).join();
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@Test
@@ -214,7 +214,7 @@ public class DynamoAsyncMapperIntegrationTest {
 								KeysAndAttributes.builder().keys(keyMaps).build())),
 						IntegrationTestObject.class)
 				.join();
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@Test
@@ -224,33 +224,34 @@ public class DynamoAsyncMapperIntegrationTest {
 		var result = dynamoAsyncMapper
 				.batchGetItemFromPrimaryKeys(keys, IntegrationTestObject.class)
 				.join();
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@Test
 	@SneakyThrows
 	void shouldBatchGetItemsFromKeyObjects() {
 		var keys = putBatchItems(3);
-		var keyObjects = toKeyObjects(keys);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
 		MappedBatchGetItemResponse<IntegrationTestObject> result = dynamoAsyncMapper
-				.<IntegrationTestObject>batchGetItemFromKeyObjects(keyObjects)
+				.batchGetItemFromKeyObjects(keyObjects, IntegrationTestObject.class)
 				.join();
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@Test
 	@SneakyThrows
 	void shouldBatchGetItemsFromKeyObjectsWithConsumer() {
 		var keys = putBatchItems(3);
-		var keyObjects = toKeyObjects(keys);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
 		MappedBatchGetItemResponse<IntegrationTestObject> result = dynamoAsyncMapper
-				.<IntegrationTestObject>batchGetItemFromKeyObjects(
+				.batchGetItemFromKeyObjects(
 						keyObjects,
+						IntegrationTestObject.class,
 						req -> assertEquals(
 								Set.of("integration-test-table"),
 								req.build().requestItems().keySet()))
 				.join();
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@SneakyThrows
@@ -274,20 +275,6 @@ public class DynamoAsyncMapperIntegrationTest {
 			keyMaps.add(encoder.encodeKeyValue(k, IntegrationTestObject.class));
 		}
 		return keyMaps;
-	}
-
-	private List<IntegrationTestObject> toKeyObjects(List<String> keys) {
-		return keys.stream()
-				.map(k -> IntegrationTestObject.builder().partitionKey(k).build())
-				.collect(Collectors.toList());
-	}
-
-	private void assertBatchKeys(MappedBatchGetItemResponse<IntegrationTestObject> result, List<String> keys) {
-		var fetchedKeys = result.items().values().stream()
-				.flatMap(Collection::stream)
-				.map(IntegrationTestObject::partitionKey)
-				.collect(Collectors.toList());
-		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
 	}
 
 	@Test
@@ -360,9 +347,9 @@ public class DynamoAsyncMapperIntegrationTest {
 	@SneakyThrows
 	void shouldBatchGetItemPaginatorFromKeyObjectsWithoutConsumer() {
 		var keys = putBatchItems(3);
-		var keyObjects = toKeyObjects(keys);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
 		var pages = PublisherUtil.collectBlocking(
-				dynamoAsyncMapper.<IntegrationTestObject>batchGetItemPaginatorFromKeyObjects(keyObjects));
+				dynamoAsyncMapper.batchGetItemPaginatorFromKeyObjects(keyObjects, IntegrationTestObject.class));
 		assertPaginatorBatchKeys(pages, keys);
 	}
 
@@ -370,13 +357,13 @@ public class DynamoAsyncMapperIntegrationTest {
 	@SneakyThrows
 	void shouldBatchGetItemPaginatorFromKeyObjectsWithConsumer() {
 		var keys = putBatchItems(3);
-		var keyObjects = toKeyObjects(keys);
-		var pages = PublisherUtil.collectBlocking(
-				dynamoAsyncMapper.<IntegrationTestObject>batchGetItemPaginatorFromKeyObjects(
-						keyObjects,
-						req -> assertEquals(
-								Set.of("integration-test-table"),
-								req.build().requestItems().keySet())));
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
+		var pages = PublisherUtil.collectBlocking(dynamoAsyncMapper.batchGetItemPaginatorFromKeyObjects(
+				keyObjects,
+				IntegrationTestObject.class,
+				req -> assertEquals(
+						Set.of("integration-test-table"),
+						req.build().requestItems().keySet())));
 		assertPaginatorBatchKeys(pages, keys);
 	}
 
