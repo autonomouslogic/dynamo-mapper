@@ -1,6 +1,7 @@
 package com.autonomouslogic.dynamomapper.codegen.generate.keyobject;
 
 import static com.autonomouslogic.dynamomapper.codegen.generate.SyncMapperGenerator.REQUEST;
+import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.CLASS_T;
 
 import com.autonomouslogic.dynamomapper.codegen.util.TypeHelper;
 import com.squareup.javapoet.AnnotationSpec;
@@ -35,11 +36,13 @@ public class AsyncKeyObjectWrapperGenerator extends KeyObjectWrapperGenerator {
 		if (!multiple) {
 			wrapper.addParameter(TypeHelper.T, "keyObject");
 		} else {
-			var type = TypeHelper.genericWildcard(ClassName.get(List.class));
+			var type = ParameterizedTypeName.get(ClassName.get(List.class), TypeHelper.T);
 			wrapper.addParameter(type, "keyObject");
+			wrapper.addParameter(CLASS_T, "clazz");
 		}
 		var params = new ArrayList<>(method.parameters);
 		params.removeIf(p -> p.name.equals(REQUEST));
+		params.removeIf(p -> p.name.equals("clazz"));
 		wrapper.addParameters(params);
 		// Write body.
 		var requestFactoryCode = CodeBlock.builder();
@@ -48,8 +51,12 @@ public class AsyncKeyObjectWrapperGenerator extends KeyObjectWrapperGenerator {
 		if (firstParamTypeName instanceof ParameterizedTypeName) {
 			requestFactoryCode.addStatement("\tconsumer.accept(builder)");
 		}
-		requestFactoryCode.add(
-				CodeBlock.of("return $L(builder.build(), (Class<T>) keyObject.getClass());\n", method.name));
+		if (!multiple) {
+			requestFactoryCode.add(
+					CodeBlock.of("return $L(builder.build(), ($T) keyObject.getClass());\n", method.name, CLASS_T));
+		} else {
+			requestFactoryCode.add(CodeBlock.of("return $L(builder.build(), clazz);\n", method.name));
+		}
 
 		var code = CodeBlock.builder();
 		if (futureWrap) {
