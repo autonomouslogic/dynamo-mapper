@@ -1,7 +1,11 @@
 package com.autonomouslogic.dynamomapper.codec;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.autonomouslogic.dynamomapper.model.TestObject;
 import com.autonomouslogic.dynamomapper.test.CodecTests;
@@ -11,8 +15,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.GetItemResponse;
@@ -120,6 +126,97 @@ public class DynamoDecoderTest {
 		var json = jsonMapper.writeValueAsString(mapped.items());
 		var expectedJson = jsonMapper.writeValueAsString(List.of(test.pojo()));
 		assertEquals(expectedJson, json);
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldMapGetItemResponseWithNoItem() {
+		var response = GetItemResponse.builder().build();
+		var mapped = decoder.mapGetItemResponse(response, TestObject.class);
+		assertSame(response, mapped.response());
+		assertNull(mapped.item());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldMapBatchGetItemResponseWithNoResponses() {
+		var response = BatchGetItemResponse.builder().build();
+		var mapped = decoder.mapBatchGetItemResponse(response, TestObject.class);
+		assertSame(response, mapped.response());
+		assertNull(mapped.items());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldMapPutItemResponseWithNoAttributes() {
+		var response = PutItemResponse.builder().build();
+		var mapped = decoder.mapPutItemResponse(response, TestObject.class);
+		assertSame(response, mapped.response());
+		assertNull(mapped.item());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldMapUpdateItemResponseWithNoAttributes() {
+		var response = UpdateItemResponse.builder().build();
+		var mapped = decoder.mapUpdateItemResponse(response, TestObject.class);
+		assertSame(response, mapped.response());
+		assertNull(mapped.item());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldMapDeleteItemResponseWithNoAttributes() {
+		var response = DeleteItemResponse.builder().build();
+		var mapped = decoder.mapDeleteItemResponse(response, TestObject.class);
+		assertSame(response, mapped.response());
+		assertNull(mapped.item());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldMapScanResponseWithEmptyItems() {
+		var response = ScanResponse.builder().build();
+		var mapped = decoder.mapScanResponse(response, TestObject.class);
+		assertSame(response, mapped.response());
+		assertEquals(List.of(), mapped.items());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldMapQueryResponseWithEmptyItems() {
+		var response = QueryResponse.builder().build();
+		var mapped = decoder.mapQueryResponse(response, TestObject.class);
+		assertSame(response, mapped.response());
+		assertEquals(List.of(), mapped.items());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldMapScanResponseWithNullItems() {
+		var response = mock(ScanResponse.class);
+		when(response.items()).thenReturn(null);
+		var mapped = decoder.mapScanResponse(response, TestObject.class);
+		assertSame(response, mapped.response());
+		assertNull(mapped.items());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldMapQueryResponseWithNullItems() {
+		var response = mock(QueryResponse.class);
+		when(response.items()).thenReturn(null);
+		var mapped = decoder.mapQueryResponse(response, TestObject.class);
+		assertSame(response, mapped.response());
+		assertNull(mapped.items());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldThrowOnEmptyAttributeValue() {
+		var emptyAttr = AttributeValue.builder().build();
+		assertThrows(
+				IllegalArgumentException.class, () -> decoder.decode(Map.of("string", emptyAttr), TestObject.class));
 	}
 
 	public static List<CodecTests> loadTests() {

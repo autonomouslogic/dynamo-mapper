@@ -61,6 +61,9 @@ public class RequestFactory {
 						"Key objects must be the same class, expected %s, but %s seen", clazz, k.getClass()));
 			}
 		}
+		if (clazz == null) {
+			throw new IllegalArgumentException("Cannot determine class type from empty key objects list");
+		}
 		var tableName = reflectionUtil.resolveTableName(clazz);
 		var keys = new ArrayList<Map<String, AttributeValue>>(keyObjects.size());
 		for (Object primaryKey : keyObjects) {

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
@@ -21,7 +22,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
+import software.amazon.awssdk.services.dynamodb.model.KeysAndAttributes;
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
+import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 
 public class DynamoMapperIntegrationTest {
 	static DynamoMapper dynamoMapper;
@@ -95,6 +101,43 @@ public class DynamoMapperIntegrationTest {
 
 	@Test
 	@SneakyThrows
+	void shouldScanViaRequest() {
+		var shared = Long.toString(IntegrationTestUtil.RNG.nextLong());
+		int n = 10;
+		for (int i = 0; i < n; i++) {
+			var obj = IntegrationTestObjects.setKeyAndTtl(
+					IntegrationTestObject.builder().str(shared).build());
+			dynamoMapper.putItemFromKeyObject(obj);
+		}
+		var req = ScanRequest.builder().tableName("integration-test-table").build();
+		var scanResult = dynamoMapper.scan(req, IntegrationTestObject.class);
+		var filtered = scanResult.items().stream()
+				.filter(o -> o.str() != null)
+				.filter(o -> o.str().equals(shared))
+				.collect(Collectors.toList());
+		assertEquals(n, filtered.size());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldQueryViaRequest() {
+		var obj = IntegrationTestObjects.setKeyAndTtl(
+				IntegrationTestObject.builder().str("str-5678").build());
+		dynamoMapper.putItemFromKeyObject(obj);
+		var req = QueryRequest.builder()
+				.tableName("integration-test-table")
+				.keyConditionExpression("partitionKey = :v")
+				.filterExpression("str = :s")
+				.expressionAttributeValues(Map.of(
+						":v", AttributeValue.builder().s(obj.partitionKey()).build(),
+						":s", AttributeValue.builder().s(obj.str()).build()))
+				.build();
+		var queryResult = dynamoMapper.query(req, IntegrationTestObject.class);
+		assertEquals(List.of(obj), queryResult.items());
+	}
+
+	@Test
+	@SneakyThrows
 	void shouldBatchGetItems() {
 		var shared = Long.toString(IntegrationTestUtil.RNG.nextLong());
 		int n = 10;
@@ -139,6 +182,41 @@ public class DynamoMapperIntegrationTest {
 
 	@Test
 	@SneakyThrows
+	void shouldBatchGetItemViaRequest() {
+		var keys = putBatchItems(3);
+		var keyMaps = encodeKeys(keys);
+		var req = BatchGetItemRequest.builder()
+				.requestItems(Map.of(
+						"integration-test-table",
+						KeysAndAttributes.builder().keys(keyMaps).build()))
+				.build();
+		var result = dynamoMapper.batchGetItem(req, IntegrationTestObject.class);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItemViaConsumer() {
+		var keys = putBatchItems(3);
+		var keyMaps = encodeKeys(keys);
+		var result = dynamoMapper.batchGetItem(
+				req -> req.requestItems(Map.of(
+						"integration-test-table",
+						KeysAndAttributes.builder().keys(keyMaps).build())),
+				IntegrationTestObject.class);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItemsFromPrimaryKeysWithoutConsumer() {
+		var keys = putBatchItems(3);
+		var result = dynamoMapper.batchGetItemFromPrimaryKeys(keys, IntegrationTestObject.class);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
+	}
+
+	@Test
+	@SneakyThrows
 	void shouldBatchGetItemsFromKeyObjects() {
 		var keys = putBatchItems(3);
 		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
@@ -170,6 +248,17 @@ public class DynamoMapperIntegrationTest {
 			keys.add(obj.partitionKey());
 		}
 		return keys;
+	}
+
+	@SneakyThrows
+	private List<Map<String, software.amazon.awssdk.services.dynamodb.model.AttributeValue>> encodeKeys(
+			List<String> keys) {
+		var keyMaps =
+				new ArrayList<Map<String, software.amazon.awssdk.services.dynamodb.model.AttributeValue>>(keys.size());
+		for (var k : keys) {
+			keyMaps.add(encoder.encodeKeyValue(k, IntegrationTestObject.class));
+		}
+		return keyMaps;
 	}
 
 	@Test
