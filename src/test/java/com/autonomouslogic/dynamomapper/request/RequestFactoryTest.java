@@ -9,8 +9,7 @@ import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.function.TableNameDecorator;
 import com.autonomouslogic.dynamomapper.model.TestObject;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
-import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.autonomouslogic.dynamomapper.util.StdJsonMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,9 +21,10 @@ import org.mockito.stubbing.Answer;
 import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
+import tools.jackson.databind.json.JsonMapper;
 
 public class RequestFactoryTest {
-	ObjectMapper objectMapper = StdObjectMapper.objectMapper();
+	JsonMapper jsonMapper = StdJsonMapper.jsonMapper();
 	TableNameDecorator decorator;
 	ReflectionUtil reflectionUtil;
 	DynamoEncoder dynamoEncoder;
@@ -36,9 +36,9 @@ public class RequestFactoryTest {
 		when(decorator.apply(any(), any()))
 				.thenAnswer((Answer<String>) invocation -> invocation.getArgument(1, String.class));
 
-		reflectionUtil = new ReflectionUtil(objectMapper, decorator);
-		dynamoEncoder = new DynamoEncoder(objectMapper, reflectionUtil);
-		factory = new RequestFactory(dynamoEncoder, objectMapper, reflectionUtil);
+		reflectionUtil = new ReflectionUtil(jsonMapper, decorator);
+		dynamoEncoder = new DynamoEncoder(jsonMapper, reflectionUtil);
+		factory = new RequestFactory(dynamoEncoder, jsonMapper, reflectionUtil);
 	}
 
 	@Test
@@ -55,7 +55,8 @@ public class RequestFactoryTest {
 	@Test
 	@SneakyThrows
 	void shouldCreateGetItemRequestFromKeyObject() {
-		var request = factory.getItemRequestFromKeyObject(new TestObject().setString("key1"))
+		var request = factory.getItemRequestFromKeyObject(
+						TestObject.builder().string("key1").build())
 				.build();
 		assertEquals(Map.of("string", AttributeValue.builder().s("key1").build()), request.key());
 		assertEquals("test", request.tableName());
@@ -79,8 +80,9 @@ public class RequestFactoryTest {
 	@Test
 	@SneakyThrows
 	void shouldCreateBatchGetItemRequestFromKeyObject() {
-		var request = factory.batchGetItemRequestFromKeyObjects(
-						List.of(new TestObject().setString("key1"), new TestObject().setString("key2")))
+		var request = factory.batchGetItemRequestFromKeyObjects(List.of(
+						TestObject.builder().string("key1").build(),
+						TestObject.builder().string("key2").build()))
 				.build();
 		assertEquals(Set.of("test"), request.requestItems().keySet());
 		var keys = request.requestItems().get("test").keys();
@@ -94,7 +96,7 @@ public class RequestFactoryTest {
 	@SneakyThrows
 	void shouldCreatePutItemRequestFromKeyObject() {
 		var request = factory.putItemRequestFromKeyObject(
-						new TestObject().setString("key1").setNumber(27))
+						TestObject.builder().string("key1").number(27).build())
 				.build();
 		var expected = Map.ofEntries(
 				Map.entry("string", AttributeValue.builder().s("key1").build()),
@@ -109,7 +111,7 @@ public class RequestFactoryTest {
 	@SneakyThrows
 	void shouldCreateUpdateItemRequestFromKeyObject() {
 		var request = factory.updateItemRequestFromKeyObject(
-						new TestObject().setString("key1").setNumber(27))
+						TestObject.builder().string("key1").number(27).build())
 				.build();
 		var expected = Map.of("string", AttributeValue.builder().s("key1").build());
 		var updates = Map.of(
@@ -139,7 +141,8 @@ public class RequestFactoryTest {
 	@Test
 	@SneakyThrows
 	void shouldCreateDeleteItemRequestFromKeyObject() {
-		var request = factory.deleteItemRequestFromKeyObject(new TestObject().setString("key1"))
+		var request = factory.deleteItemRequestFromKeyObject(
+						TestObject.builder().string("key1").build())
 				.build();
 		assertEquals(Map.of("string", AttributeValue.builder().s("key1").build()), request.key());
 		assertEquals("test", request.tableName());

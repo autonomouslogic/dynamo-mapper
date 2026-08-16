@@ -5,8 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import com.autonomouslogic.dynamomapper.model.TestObject;
 import com.autonomouslogic.dynamomapper.test.CodecTests;
-import com.autonomouslogic.dynamomapper.util.StdObjectMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.autonomouslogic.dynamomapper.util.StdJsonMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,18 +20,19 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
+import tools.jackson.databind.json.JsonMapper;
 
 public class DynamoDecoderTest {
-	ObjectMapper objectMapper = StdObjectMapper.objectMapper();
-	DynamoDecoder decoder = new DynamoDecoder(objectMapper);
+	JsonMapper jsonMapper = StdJsonMapper.jsonMapper();
+	DynamoDecoder decoder = new DynamoDecoder(jsonMapper);
 
 	@ParameterizedTest
 	@MethodSource("loadTests")
 	@SneakyThrows
 	void shouldDecode(CodecTests test) {
 		var pojo = decoder.decode(test.ddb(), TestObject.class);
-		var json = objectMapper.writeValueAsString(pojo);
-		var expectedJson = objectMapper.writeValueAsString(test.pojo());
+		var json = jsonMapper.writeValueAsString(pojo);
+		var expectedJson = jsonMapper.writeValueAsString(test.pojo());
 		assertEquals(expectedJson, json);
 	}
 
@@ -43,8 +43,8 @@ public class DynamoDecoderTest {
 		var response = GetItemResponse.builder().item(test.ddb()).build();
 		var mapped = decoder.mapGetItemResponse(response, TestObject.class);
 		assertSame(response, mapped.response());
-		var json = objectMapper.writeValueAsString(mapped.item());
-		var expectedJson = objectMapper.writeValueAsString(test.pojo());
+		var json = jsonMapper.writeValueAsString(mapped.item());
+		var expectedJson = jsonMapper.writeValueAsString(test.pojo());
 		assertEquals(expectedJson, json);
 	}
 
@@ -57,8 +57,8 @@ public class DynamoDecoderTest {
 				.build();
 		var mapped = decoder.mapBatchGetItemResponse(response, TestObject.class);
 		assertSame(response, mapped.response());
-		var json = objectMapper.writeValueAsString(mapped.items());
-		var expectedJson = objectMapper.writeValueAsString(Map.of("test", List.of(test.pojo())));
+		var json = jsonMapper.writeValueAsString(mapped.items());
+		var expectedJson = jsonMapper.writeValueAsString(Map.of("test", List.of(test.pojo())));
 		assertEquals(expectedJson, json);
 	}
 
@@ -69,8 +69,8 @@ public class DynamoDecoderTest {
 		var response = PutItemResponse.builder().attributes(test.ddb()).build();
 		var mapped = decoder.mapPutItemResponse(response, TestObject.class);
 		assertSame(response, mapped.response());
-		var json = objectMapper.writeValueAsString(mapped.item());
-		var expectedJson = objectMapper.writeValueAsString(test.pojo());
+		var json = jsonMapper.writeValueAsString(mapped.item());
+		var expectedJson = jsonMapper.writeValueAsString(test.pojo());
 		assertEquals(expectedJson, json);
 	}
 
@@ -81,8 +81,8 @@ public class DynamoDecoderTest {
 		var response = UpdateItemResponse.builder().attributes(test.ddb()).build();
 		var mapped = decoder.mapUpdateItemResponse(response, TestObject.class);
 		assertSame(response, mapped.response());
-		var json = objectMapper.writeValueAsString(mapped.item());
-		var expectedJson = objectMapper.writeValueAsString(test.pojo());
+		var json = jsonMapper.writeValueAsString(mapped.item());
+		var expectedJson = jsonMapper.writeValueAsString(test.pojo());
 		assertEquals(expectedJson, json);
 	}
 
@@ -93,8 +93,8 @@ public class DynamoDecoderTest {
 		var response = DeleteItemResponse.builder().attributes(test.ddb()).build();
 		var mapped = decoder.mapDeleteItemResponse(response, TestObject.class);
 		assertSame(response, mapped.response());
-		var json = objectMapper.writeValueAsString(mapped.item());
-		var expectedJson = objectMapper.writeValueAsString(test.pojo());
+		var json = jsonMapper.writeValueAsString(mapped.item());
+		var expectedJson = jsonMapper.writeValueAsString(test.pojo());
 		assertEquals(expectedJson, json);
 	}
 
@@ -105,8 +105,8 @@ public class DynamoDecoderTest {
 		var response = ScanResponse.builder().items(List.of(test.ddb())).build();
 		var mapped = decoder.mapScanResponse(response, TestObject.class);
 		assertSame(response, mapped.response());
-		var json = objectMapper.writeValueAsString(mapped.items());
-		var expectedJson = objectMapper.writeValueAsString(List.of(test.pojo()));
+		var json = jsonMapper.writeValueAsString(mapped.items());
+		var expectedJson = jsonMapper.writeValueAsString(List.of(test.pojo()));
 		assertEquals(expectedJson, json);
 	}
 
@@ -117,8 +117,8 @@ public class DynamoDecoderTest {
 		var response = QueryResponse.builder().items(List.of(test.ddb())).build();
 		var mapped = decoder.mapQueryResponse(response, TestObject.class);
 		assertSame(response, mapped.response());
-		var json = objectMapper.writeValueAsString(mapped.items());
-		var expectedJson = objectMapper.writeValueAsString(List.of(test.pojo()));
+		var json = jsonMapper.writeValueAsString(mapped.items());
+		var expectedJson = jsonMapper.writeValueAsString(List.of(test.pojo()));
 		assertEquals(expectedJson, json);
 	}
 

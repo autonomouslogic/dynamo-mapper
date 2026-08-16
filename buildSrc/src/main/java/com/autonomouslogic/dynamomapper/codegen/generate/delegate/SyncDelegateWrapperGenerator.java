@@ -5,13 +5,13 @@ import static com.autonomouslogic.dynamomapper.codegen.generate.SyncMapperGenera
 import static com.autonomouslogic.dynamomapper.codegen.util.TypeHelper.CLASS_T;
 
 import com.autonomouslogic.dynamomapper.codegen.util.TypeHelper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.lang.model.element.Modifier;
+import tools.jackson.core.JacksonException;
 
 public class SyncDelegateWrapperGenerator extends DelegateWrapperGenerator {
 	public MethodSpec generate() {
@@ -23,7 +23,7 @@ public class SyncDelegateWrapperGenerator extends DelegateWrapperGenerator {
 		wrapper.returns(TypeHelper.genericCapture(returnType));
 		wrapper.addExceptions(
 				Stream.of(method.getExceptionTypes()).map(e -> ClassName.get(e)).collect(Collectors.toList()));
-		wrapper.addException(JsonProcessingException.class);
+		wrapper.addException(JacksonException.class);
 		// Add parameters.
 		var delegateParams = List.of(method.getGenericParameterTypes());
 		if (delegateParams.size() != 1) {

@@ -1,8 +1,6 @@
 package com.autonomouslogic.dynamomapper.codec;
 
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,11 +11,13 @@ import software.amazon.awssdk.core.SdkBytes;
 import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
 
 @RequiredArgsConstructor
 public class DynamoEncoder {
 	@NonNull
-	private final ObjectMapper objectMapper;
+	private final JsonMapper jsonMapper;
 
 	@NonNull
 	private final ReflectionUtil reflectionUtil;
@@ -26,7 +26,7 @@ public class DynamoEncoder {
 	 * Encodes a POJO into DynamoDB values.
 	 */
 	public Map<String, AttributeValue> encode(@NonNull Object obj) throws IOException {
-		var json = objectMapper.valueToTree(obj);
+		var json = jsonMapper.valueToTree(obj);
 		if (json.isObject()) {
 			return encodeObject(json);
 		} else {
@@ -37,9 +37,7 @@ public class DynamoEncoder {
 
 	private Map<String, AttributeValue> encodeObject(@NonNull JsonNode node) throws IOException {
 		var map = new HashMap<String, AttributeValue>();
-		var fieldsIterator = node.fields();
-		while (fieldsIterator.hasNext()) {
-			var field = fieldsIterator.next();
+		for (var field : node.properties()) {
 			map.put(field.getKey(), encodeValue(field.getValue()));
 		}
 		return map;
@@ -101,7 +99,7 @@ public class DynamoEncoder {
 			throw new IllegalArgumentException(
 					String.format("Multiple primary keys defined on %s", clazz.getSimpleName()));
 		}
-		var json = objectMapper.valueToTree(primaryKey);
+		var json = jsonMapper.valueToTree(primaryKey);
 		var primaryKeyValue = encodeValue(json);
 		return Map.of(primaryKeys.get(0), primaryKeyValue);
 	}

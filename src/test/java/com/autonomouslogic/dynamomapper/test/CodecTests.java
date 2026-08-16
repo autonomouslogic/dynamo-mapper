@@ -20,17 +20,19 @@ import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 @Getter
 public enum CodecTests {
 	BINARY(
-			new TestObject().setBinary(BYTE_STRING_1),
+			TestObject.builder().binary(BYTE_STRING_1).build(),
 			Map.of(
 					"binary",
 					AttributeValue.builder()
 							.b(SdkBytes.fromByteArray(BYTE_STRING_1))
 							.build())),
 	BOOL(
-			new TestObject().setBool(true),
+			TestObject.builder().bool(true).build(),
 			Map.of("bool", AttributeValue.builder().bool(true).build())),
 	BINARY_LIST(
-			new TestObject().setBinaryList(List.of(BYTE_STRING_1, BYTE_STRING_2)),
+			TestObject.builder()
+					.binaryList(List.of(BYTE_STRING_1, BYTE_STRING_2))
+					.build(),
 			Map.of(
 					"binaryList",
 					AttributeValue.builder()
@@ -39,7 +41,7 @@ public enum CodecTests {
 			EncodeDecode.DECODE_ONLY // @todo
 			),
 	LIST_STRING(
-			new TestObject().setListString(List.of("str1", "str2")),
+			TestObject.builder().listString(List.of("str1", "str2")).build(),
 			Map.of(
 					"listString",
 					AttributeValue.builder()
@@ -48,8 +50,11 @@ public enum CodecTests {
 									AttributeValue.builder().s("str2").build())
 							.build())),
 	LIST_OBJECT(
-			new TestObject()
-					.setListObject(List.of(new TestObject().setString("str1"), new TestObject().setString("str2"))),
+			TestObject.builder()
+					.listObject(List.of(
+							TestObject.builder().string("str1").build(),
+							TestObject.builder().string("str2").build()))
+					.build(),
 			Map.of(
 					"listObject",
 					AttributeValue.builder()
@@ -70,7 +75,9 @@ public enum CodecTests {
 											.build())
 							.build())),
 	MAP_OBJECT(
-			new TestObject().setObject(new TestObject().setString("str1")),
+			TestObject.builder()
+					.object(TestObject.builder().string("str1").build())
+					.build(),
 			Map.of(
 					"object",
 					AttributeValue.builder()
@@ -78,7 +85,7 @@ public enum CodecTests {
 									"string", AttributeValue.builder().s("str1").build()))
 							.build())),
 	MAP_MAP(
-			new TestObject().setMap(Map.of("k1", "v1", "k2", "v2")),
+			TestObject.builder().map(Map.of("k1", "v1", "k2", "v2")).build(),
 			Map.of(
 					"map",
 					AttributeValue.builder()
@@ -87,62 +94,69 @@ public enum CodecTests {
 									"k2", AttributeValue.builder().s("v2").build()))
 							.build())),
 	INTEGER(
-			new TestObject().setNumber(100),
+			TestObject.builder().number(100).build(),
 			Map.of("number", AttributeValue.builder().n("100").build())),
 	INTEGER_TYPED(
-			new TestObject().setInteger(100),
+			TestObject.builder().integer(100).build(),
 			Map.of("integer", AttributeValue.builder().n("100").build())),
 	LONG(
-			new TestObject().setLongValue(100L),
+			TestObject.builder().longValue(100L).build(),
 			Map.of("longValue", AttributeValue.builder().n("100").build())),
 	LONG_OVERFLOW_INT(
-			new TestObject().setLongValue(2147483648L),
+			TestObject.builder().longValue(2147483648L).build(),
 			Map.of("longValue", AttributeValue.builder().n("2147483648").build())),
 	FLOAT(
-			new TestObject().setFloatValue(1.5f),
+			TestObject.builder().floatValue(1.5f).build(),
 			Map.of("floatValue", AttributeValue.builder().n("1.5").build())),
 	DOUBLE(
-			new TestObject().setDoubleValue(1.5d),
+			TestObject.builder().doubleValue(1.5d).build(),
 			Map.of("doubleValue", AttributeValue.builder().n("1.5").build())),
 	DOUBLE_OVERFLOW_FLOAT(
-			new TestObject().setDoubleValue(3.5E38d),
+			TestObject.builder().doubleValue(3.5E38d).build(),
 			Map.of("doubleValue", AttributeValue.builder().n("3.5E38").build())),
 	BIG_INTEGER(
-			new TestObject().setBigInteger(new BigInteger("12345678901234567890")),
+			TestObject.builder()
+					.bigInteger(new BigInteger("12345678901234567890"))
+					.build(),
 			Map.of(
 					"bigInteger",
 					AttributeValue.builder().n("12345678901234567890").build())),
 	BIG_INTEGER_OVERFLOW_LONG(
-			new TestObject().setBigInteger(new BigInteger("9223372036854775808")),
+			TestObject.builder()
+					.bigInteger(new BigInteger("9223372036854775808"))
+					.build(),
 			Map.of(
 					"bigInteger",
 					AttributeValue.builder().n("9223372036854775808").build())),
 	BIG_DECIMAL(
-			new TestObject().setBigDecimal(new BigDecimal("123.456")),
+			TestObject.builder().bigDecimal(new BigDecimal("123.456")).build(),
 			Map.of("bigDecimal", AttributeValue.builder().n("123.456").build())),
 	BIG_DECIMAL_OVERFLOW_DOUBLE(
-			new TestObject().setBigDecimal(new BigDecimal("1.8E+308")),
+			TestObject.builder().bigDecimal(new BigDecimal("1.8E+308")).build(),
 			Map.of("bigDecimal", AttributeValue.builder().n("1.8E+308").build())),
 	INTEGER_LIST(
-			new TestObject().setNumberList(List.of(1, 2, 3)),
+			TestObject.builder().numberList(List.of(1, 2, 3)).build(),
 			Map.of("numberList", AttributeValue.builder().ns("1", "2", "3").build()),
 			EncodeDecode.DECODE_ONLY // @todo
 			),
-	NULL(new TestObject(), Map.of("nul", AttributeValue.builder().nul(true).build()), EncodeDecode.DECODE_ONLY),
+	NULL(
+			TestObject.builder().build(),
+			Map.of("nul", AttributeValue.builder().nul(true).build()),
+			EncodeDecode.DECODE_ONLY),
 	STRING(
-			new TestObject().setString("str-val"),
+			TestObject.builder().string("str-val").build(),
 			Map.of("string", AttributeValue.builder().s("str-val").build())),
 	STRING_LIST(
-			new TestObject().setStringList(List.of("str1", "str2")),
+			TestObject.builder().stringList(List.of("str1", "str2")).build(),
 			Map.of("stringList", AttributeValue.builder().ss("str1", "str2").build()),
 			EncodeDecode.DECODE_ONLY // @todo
 			),
 	BOOL_V1_FALSE(
-			new TestObject().setBoolPrimitive(false),
+			TestObject.builder().boolPrimitive(false).build(),
 			Map.of("boolPrimitive", AttributeValue.builder().n("0").build()),
 			EncodeDecode.DECODE_ONLY),
 	BOOL_V1_TRUE(
-			new TestObject().setBoolPrimitive(true),
+			TestObject.builder().boolPrimitive(true).build(),
 			Map.of("boolPrimitive", AttributeValue.builder().n("1").build()),
 			EncodeDecode.DECODE_ONLY);
 

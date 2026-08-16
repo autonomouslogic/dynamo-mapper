@@ -112,6 +112,12 @@ DynamoDB stores numbers with a maximum of 38 significant digits of precision and
 This means arbitrarily large `BigInteger` and `BigDecimal` values cannot be stored.
 See the AWS documentation: [API reference - AttributeValue](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html)
 
+## Jackson version
+Jackson 3 continues to use the Jackson 2 variant of `jackson-annotations`, so while this mapper uses Jackson 3,
+most existing use of Jackson 2 should be backwards-compatible. 
+
+* [Jackson Release 3.0](https://github.com/FasterXML/jackson/wiki/Jackson-Release-3.0)
+
 ## Comparison with DynamoDBMapper and DynamoDB Enhanced
 The [DynamoDBMapper in the v1 AWS SDK](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.html)
 and the [DynamoDB Enhanced Client in the v2 AWS SDK](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/dynamodb-enhanced-client.html)

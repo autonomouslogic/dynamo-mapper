@@ -2,7 +2,6 @@ package com.autonomouslogic.dynamomapper.request;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +17,12 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
+import tools.jackson.databind.json.JsonMapper;
 
 @RequiredArgsConstructor
 public class RequestFactory {
 	private final DynamoEncoder encoder;
-	private final ObjectMapper objectMapper;
+	private final JsonMapper jsonMapper;
 	private final ReflectionUtil reflectionUtil;
 
 	public <T> GetItemRequest.Builder getItemRequestFromPrimaryKey(@NonNull Object primaryKey, @NonNull Class<T> clazz)

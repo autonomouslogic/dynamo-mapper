@@ -15,7 +15,6 @@ import com.autonomouslogic.dynamomapper.model.MappedUpdateItemResponse;
 import com.autonomouslogic.dynamomapper.request.RequestFactory;
 import com.autonomouslogic.dynamomapper.util.FutureUtil;
 import com.autonomouslogic.dynamomapper.util.ReflectionUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -37,6 +36,7 @@ import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 import software.amazon.awssdk.services.dynamodb.model.ScanResponse;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemResponse;
+import tools.jackson.databind.json.JsonMapper;
 
 public class DynamoAsyncMapper {
 	private final DynamoDbAsyncClient client;
@@ -50,12 +50,12 @@ public class DynamoAsyncMapper {
 	final ReflectionUtil reflectionUtil;
 
 	protected DynamoAsyncMapper(
-			DynamoDbAsyncClient client, ObjectMapper objectMapper, TableNameDecorator tableNameDecorator) {
+			DynamoDbAsyncClient client, JsonMapper jsonMapper, TableNameDecorator tableNameDecorator) {
 		this.client = client;
-		reflectionUtil = new ReflectionUtil(objectMapper, tableNameDecorator);
-		encoder = new DynamoEncoder(objectMapper, reflectionUtil);
-		decoder = new DynamoDecoder(objectMapper);
-		requestFactory = new RequestFactory(encoder, objectMapper, reflectionUtil);
+		reflectionUtil = new ReflectionUtil(jsonMapper, tableNameDecorator);
+		encoder = new DynamoEncoder(jsonMapper, reflectionUtil);
+		decoder = new DynamoDecoder(jsonMapper);
+		requestFactory = new RequestFactory(encoder, jsonMapper, reflectionUtil);
 	}
 
 	public <T> CompletableFuture<MappedGetItemResponse<T>> getItem(
