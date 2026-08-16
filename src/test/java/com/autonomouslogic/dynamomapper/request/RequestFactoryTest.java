@@ -373,6 +373,12 @@ public class RequestFactoryTest {
 
 	@Test
 	@SneakyThrows
+	void shouldRejectBatchGetItemRequestFromKeyObjectsWithEmptyList() {
+		assertThrows(IllegalArgumentException.class, () -> factory.batchGetItemRequestFromKeyObjects(List.of()));
+	}
+
+	@Test
+	@SneakyThrows
 	void shouldAcceptBatchGetItemRequestBuilder() {
 		var builder = BatchGetItemRequest.builder()
 				.requestItems(Map.of(
