@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
+import com.autonomouslogic.dynamomapper.model.MappedBatchGetItemResponse;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
@@ -138,6 +139,45 @@ public class DynamoAsyncMapperIntegrationTest {
 				.map(item -> item.partitionKey())
 				.collect(Collectors.toList());
 		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItemsFromKeyObjects() {
+		var keys = putBatchItems(3);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
+		MappedBatchGetItemResponse<IntegrationTestObject> result = dynamoAsyncMapper
+				.batchGetItemFromKeyObjects(keyObjects, IntegrationTestObject.class)
+				.join();
+		IntegrationTestObjects.assertBatchKeys(result, keys);
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItemsFromKeyObjectsWithConsumer() {
+		var keys = putBatchItems(3);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
+		MappedBatchGetItemResponse<IntegrationTestObject> result = dynamoAsyncMapper
+				.batchGetItemFromKeyObjects(
+						keyObjects,
+						IntegrationTestObject.class,
+						req -> assertEquals(
+								Set.of("integration-test-table"),
+								req.build().requestItems().keySet()))
+				.join();
+		IntegrationTestObjects.assertBatchKeys(result, keys);
+	}
+
+	@SneakyThrows
+	private List<String> putBatchItems(int n) {
+		var keys = new ArrayList<String>(n);
+		for (int i = 0; i < n; i++) {
+			var obj = IntegrationTestObjects.setKeyAndTtl(
+					IntegrationTestObject.builder().build());
+			dynamoAsyncMapper.putItemFromKeyObject(obj).join();
+			keys.add(obj.partitionKey());
+		}
+		return keys;
 	}
 
 	@Test

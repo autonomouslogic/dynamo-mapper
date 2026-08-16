@@ -139,6 +139,41 @@ public class DynamoMapperIntegrationTest {
 
 	@Test
 	@SneakyThrows
+	void shouldBatchGetItemsFromKeyObjects() {
+		var keys = putBatchItems(3);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
+		var result = dynamoMapper.batchGetItemFromKeyObjects(keyObjects, IntegrationTestObject.class);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItemsFromKeyObjectsWithConsumer() {
+		var keys = putBatchItems(3);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
+		var result = dynamoMapper.batchGetItemFromKeyObjects(
+				keyObjects,
+				IntegrationTestObject.class,
+				req -> assertEquals(
+						Set.of("integration-test-table"),
+						req.build().requestItems().keySet()));
+		IntegrationTestObjects.assertBatchKeys(result, keys);
+	}
+
+	@SneakyThrows
+	private List<String> putBatchItems(int n) {
+		var keys = new ArrayList<String>(n);
+		for (int i = 0; i < n; i++) {
+			var obj = IntegrationTestObjects.setKeyAndTtl(
+					IntegrationTestObject.builder().build());
+			dynamoMapper.putItemFromKeyObject(obj);
+			keys.add(obj.partitionKey());
+		}
+		return keys;
+	}
+
+	@Test
+	@SneakyThrows
 	void shouldQuery() {
 		var obj = IntegrationTestObjects.setKeyAndTtl(
 				IntegrationTestObject.builder().str("str-1234").build());
