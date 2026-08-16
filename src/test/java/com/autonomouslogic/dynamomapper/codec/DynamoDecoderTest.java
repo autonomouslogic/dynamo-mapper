@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.autonomouslogic.dynamomapper.model.TestObject;
 import com.autonomouslogic.dynamomapper.test.CodecTests;
@@ -187,6 +189,26 @@ public class DynamoDecoderTest {
 		var mapped = decoder.mapQueryResponse(response, TestObject.class);
 		assertSame(response, mapped.response());
 		assertEquals(List.of(), mapped.items());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldMapScanResponseWithNullItems() {
+		var response = mock(ScanResponse.class);
+		when(response.items()).thenReturn(null);
+		var mapped = decoder.mapScanResponse(response, TestObject.class);
+		assertSame(response, mapped.response());
+		assertNull(mapped.items());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldMapQueryResponseWithNullItems() {
+		var response = mock(QueryResponse.class);
+		when(response.items()).thenReturn(null);
+		var mapped = decoder.mapQueryResponse(response, TestObject.class);
+		assertSame(response, mapped.response());
+		assertNull(mapped.items());
 	}
 
 	@Test
