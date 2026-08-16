@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.autonomouslogic.dynamomapper.codec.DynamoEncoder;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
-import com.autonomouslogic.dynamomapper.model.MappedBatchGetItemResponse;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
@@ -142,23 +141,23 @@ public class DynamoMapperIntegrationTest {
 	@SneakyThrows
 	void shouldBatchGetItemsFromKeyObjects() {
 		var keys = putBatchItems(3);
-		var keyObjects = toKeyObjects(keys);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
 		var result = dynamoMapper.batchGetItemFromKeyObjects(keyObjects, IntegrationTestObject.class);
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@Test
 	@SneakyThrows
 	void shouldBatchGetItemsFromKeyObjectsWithConsumer() {
 		var keys = putBatchItems(3);
-		var keyObjects = toKeyObjects(keys);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
 		var result = dynamoMapper.batchGetItemFromKeyObjects(
 				keyObjects,
 				IntegrationTestObject.class,
 				req -> assertEquals(
 						Set.of("integration-test-table"),
 						req.build().requestItems().keySet()));
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@SneakyThrows
@@ -171,20 +170,6 @@ public class DynamoMapperIntegrationTest {
 			keys.add(obj.partitionKey());
 		}
 		return keys;
-	}
-
-	private List<IntegrationTestObject> toKeyObjects(List<String> keys) {
-		return keys.stream()
-				.map(k -> IntegrationTestObject.builder().partitionKey(k).build())
-				.collect(Collectors.toList());
-	}
-
-	private void assertBatchKeys(MappedBatchGetItemResponse<IntegrationTestObject> result, List<String> keys) {
-		var fetchedKeys = result.items().values().stream()
-				.flatMap(Collection::stream)
-				.map(IntegrationTestObject::partitionKey)
-				.collect(Collectors.toList());
-		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
 	}
 
 	@Test

@@ -9,11 +9,8 @@ import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -145,18 +142,18 @@ public class DynamoAsyncMapperIntegrationTest {
 	@SneakyThrows
 	void shouldBatchGetItemsFromKeyObjects() {
 		var keys = putBatchItems(3);
-		var keyObjects = toKeyObjects(keys);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
 		MappedBatchGetItemResponse<IntegrationTestObject> result = dynamoAsyncMapper
 				.batchGetItemFromKeyObjects(keyObjects, IntegrationTestObject.class)
 				.join();
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@Test
 	@SneakyThrows
 	void shouldBatchGetItemsFromKeyObjectsWithConsumer() {
 		var keys = putBatchItems(3);
-		var keyObjects = toKeyObjects(keys);
+		var keyObjects = IntegrationTestObjects.toKeyObjects(keys);
 		MappedBatchGetItemResponse<IntegrationTestObject> result = dynamoAsyncMapper
 				.batchGetItemFromKeyObjects(
 						keyObjects,
@@ -165,7 +162,7 @@ public class DynamoAsyncMapperIntegrationTest {
 								Set.of("integration-test-table"),
 								req.build().requestItems().keySet()))
 				.join();
-		assertBatchKeys(result, keys);
+		IntegrationTestObjects.assertBatchKeys(result, keys);
 	}
 
 	@SneakyThrows
@@ -178,20 +175,6 @@ public class DynamoAsyncMapperIntegrationTest {
 			keys.add(obj.partitionKey());
 		}
 		return keys;
-	}
-
-	private List<IntegrationTestObject> toKeyObjects(List<String> keys) {
-		return keys.stream()
-				.map(k -> IntegrationTestObject.builder().partitionKey(k).build())
-				.collect(Collectors.toList());
-	}
-
-	private void assertBatchKeys(MappedBatchGetItemResponse<IntegrationTestObject> result, List<String> keys) {
-		var fetchedKeys = result.items().values().stream()
-				.flatMap(Collection::stream)
-				.map(IntegrationTestObject::partitionKey)
-				.collect(Collectors.toList());
-		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
 	}
 
 	@Test
