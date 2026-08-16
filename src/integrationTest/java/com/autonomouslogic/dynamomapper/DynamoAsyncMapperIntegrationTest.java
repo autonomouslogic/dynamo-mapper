@@ -154,7 +154,8 @@ public class DynamoAsyncMapperIntegrationTest {
 						"integration-test-table",
 						KeysAndAttributes.builder().keys(keyMaps).build()))
 				.build();
-		var result = dynamoAsyncMapper.batchGetItem(req, IntegrationTestObject.class).join();
+		var result =
+				dynamoAsyncMapper.batchGetItem(req, IntegrationTestObject.class).join();
 		assertBatchKeys(result, keys);
 	}
 
@@ -188,8 +189,9 @@ public class DynamoAsyncMapperIntegrationTest {
 	void shouldBatchGetItemsFromKeyObjects() {
 		var keys = putBatchItems(3);
 		var keyObjects = toKeyObjects(keys);
-		MappedBatchGetItemResponse<IntegrationTestObject> result =
-				dynamoAsyncMapper.<IntegrationTestObject>batchGetItemFromKeyObjects(keyObjects).join();
+		MappedBatchGetItemResponse<IntegrationTestObject> result = dynamoAsyncMapper
+				.<IntegrationTestObject>batchGetItemFromKeyObjects(keyObjects)
+				.join();
 		assertBatchKeys(result, keys);
 	}
 
@@ -211,7 +213,8 @@ public class DynamoAsyncMapperIntegrationTest {
 	private List<String> putBatchItems(int n) {
 		var keys = new ArrayList<String>(n);
 		for (int i = 0; i < n; i++) {
-			var obj = IntegrationTestObjects.setKeyAndTtl(IntegrationTestObject.builder().build());
+			var obj = IntegrationTestObjects.setKeyAndTtl(
+					IntegrationTestObject.builder().build());
 			dynamoAsyncMapper.putItemFromKeyObject(obj).join();
 			keys.add(obj.partitionKey());
 		}
@@ -221,8 +224,8 @@ public class DynamoAsyncMapperIntegrationTest {
 	@SneakyThrows
 	private List<Map<String, software.amazon.awssdk.services.dynamodb.model.AttributeValue>> encodeKeys(
 			List<String> keys) {
-		var keyMaps = new ArrayList<Map<String, software.amazon.awssdk.services.dynamodb.model.AttributeValue>>(
-				keys.size());
+		var keyMaps =
+				new ArrayList<Map<String, software.amazon.awssdk.services.dynamodb.model.AttributeValue>>(keys.size());
 		for (var k : keys) {
 			keyMaps.add(encoder.encodeKeyValue(k, IntegrationTestObject.class));
 		}
