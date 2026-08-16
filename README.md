@@ -11,11 +11,6 @@
 A simple mapper for converting to and from DynamoDB [AttributeValues](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html)
 and POJOs using [Jackson](https://github.com/FasterXML/jackson).
 
-## In development
-Dynamo Mapper is still in development.
-Currently, only single gets, puts, updates, and deletes are supported.
-More is planned in the future and submissions are welcome.
-
 ## Installation
 Dynamo Mapper is available from [Maven Central](https://search.maven.org/search?q=g:com.autonomouslogic.dynamomapper%20AND%20a:dynamo-mapper).
 
