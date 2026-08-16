@@ -49,8 +49,13 @@ public class AsyncKeyObjectWrapperGenerator extends KeyObjectWrapperGenerator {
 		if (firstParamTypeName instanceof ParameterizedTypeName) {
 			requestFactoryCode.addStatement("\tconsumer.accept(builder)");
 		}
-		requestFactoryCode.add(
-				CodeBlock.of("return $L(builder.build(), (Class<T>) keyObject.getClass());\n", method.name));
+		if (multiple) {
+			requestFactoryCode.add(CodeBlock.of(
+					"return $L(builder.build(), $T.elementClass(keyObject));\n", method.name, TypeHelper.listUtil));
+		} else {
+			requestFactoryCode.add(
+					CodeBlock.of("return $L(builder.build(), (Class<T>) keyObject.getClass());\n", method.name));
+		}
 
 		var code = CodeBlock.builder();
 		if (futureWrap) {
