@@ -6,7 +6,7 @@
 ![License](https://img.shields.io/github/license/autonomouslogic/dynamo-mapper)
 [![javadoc](https://javadoc.io/badge2/com.autonomouslogic.dynamomapper/dynamo-mapper/javadoc.svg)](https://javadoc.io/doc/com.autonomouslogic.dynamomapper/dynamo-mapper)
 [![Code Coverage](https://codecov.io/gh/autonomouslogic/dynamo-mapper/graph/badge.svg)](https://codecov.io/gh/autonomouslogic/dynamo-mapper)
-[![CodeClimate Maintainability](https://api.codeclimate.com/v1/badges/REPLACE_TOKEN/maintainability)](https://codeclimate.com/github/autonomouslogic/dynamo-mapper/maintainability)
+[![Maintainability](https://qlty.sh/gh/autonomouslogic/projects/dynamo-mapper/maintainability.svg)](https://qlty.sh/gh/autonomouslogic/projects/dynamo-mapper)
 
 A simple mapper for converting to and from DynamoDB [AttributeValues](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html)
 and POJOs using [Jackson](https://github.com/FasterXML/jackson).
