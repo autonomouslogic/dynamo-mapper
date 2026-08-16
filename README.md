@@ -1,9 +1,12 @@
 # Dynamo Mapper
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/autonomouslogic/dynamo-mapper)](https://github.com/autonomouslogic/dynamo-mapper/releases)
+![GitHub branch status](https://img.shields.io/github/checks-status/autonomouslogic/dynamo-mapper/main)
+![Latest Release](https://img.shields.io/github/v/release/autonomouslogic/dynamo-mapper)
+![GitHub last commit](https://img.shields.io/github/last-commit/autonomouslogic/dynamo-mapper)
+![License](https://img.shields.io/github/license/autonomouslogic/dynamo-mapper)
 [![javadoc](https://javadoc.io/badge2/com.autonomouslogic.dynamomapper/dynamo-mapper/javadoc.svg)](https://javadoc.io/doc/com.autonomouslogic.dynamomapper/dynamo-mapper)
-[![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/autonomouslogic/dynamo-mapper/Test/main)](https://github.com/autonomouslogic/dynamo-mapper/actions)
-[![GitHub](https://img.shields.io/github/license/autonomouslogic/dynamo-mapper)](https://spdx.org/licenses/MIT-0.html)
+[![Code Coverage](https://codecov.io/gh/autonomouslogic/dynamo-mapper/graph/badge.svg)](https://codecov.io/gh/autonomouslogic/dynamo-mapper)
+[![CodeClimate Maintainability](https://api.codeclimate.com/v1/badges/REPLACE_TOKEN/maintainability)](https://codeclimate.com/github/autonomouslogic/dynamo-mapper/maintainability)
 
 A simple mapper for converting to and from DynamoDB [AttributeValues](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html)
 and POJOs using [Jackson](https://github.com/FasterXML/jackson).
