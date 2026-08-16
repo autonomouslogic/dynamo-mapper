@@ -232,6 +232,76 @@ public class RequestFactoryTest {
 	}
 
 	@Test
+	void shouldRejectNullRequestInAcceptUpdateItemRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptUpdateItemRequest((UpdateItemRequest) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullRequestInAcceptDeleteItemRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptDeleteItemRequest((DeleteItemRequest) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullRequestInAcceptBatchGetItemRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptBatchGetItemRequest((BatchGetItemRequest) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullBuilderInAcceptGetItemRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptGetItemRequest((GetItemRequest.Builder) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullBuilderInAcceptPutItemRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptPutItemRequest((PutItemRequest.Builder) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullBuilderInAcceptUpdateItemRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptUpdateItemRequest((UpdateItemRequest.Builder) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullBuilderInAcceptDeleteItemRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptDeleteItemRequest((DeleteItemRequest.Builder) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullBuilderInAcceptScanRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptScanRequest((ScanRequest.Builder) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullBuilderInAcceptQueryRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptQueryRequest((QueryRequest.Builder) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullBuilderInAcceptBatchGetItemRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptBatchGetItemRequest((BatchGetItemRequest.Builder) null, TestObject.class));
+	}
+
+	@Test
 	@SneakyThrows
 	void shouldAcceptGetItemRequestWithTableName() {
 		var req = GetItemRequest.builder()
