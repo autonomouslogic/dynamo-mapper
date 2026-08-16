@@ -1,5 +1,30 @@
 Dynamo Mapper Changelog
 
+## [3.0.0](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.36...3.0.0) (2026-08-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* require Class<T> in async batchGetItemFromKeyObjects (#179)
+* Upgraded to Jackson 3 (#175)
+
+### Features
+
+* require Class<T> in async batchGetItemFromKeyObjects ([#179](https://github.com/autonomouslogic/dynamo-mapper/issues/179)) ([0ef2d68](https://github.com/autonomouslogic/dynamo-mapper/commit/0ef2d6800804bf60d4252af4069a3a00269f4ebe))
+* Upgraded to Jackson 3 ([#175](https://github.com/autonomouslogic/dynamo-mapper/issues/175)) ([9510d15](https://github.com/autonomouslogic/dynamo-mapper/commit/9510d15a1a45979aff98d91fa11a6d3847206457))
+
+
+### Documentation
+
+* Badges ([#177](https://github.com/autonomouslogic/dynamo-mapper/issues/177)) ([017cce9](https://github.com/autonomouslogic/dynamo-mapper/commit/017cce991af4ee3d21e65a0540cd19967658a82e))
+* Removed in-development notice [skip ci] ([dddb75c](https://github.com/autonomouslogic/dynamo-mapper/commit/dddb75c232173eea5b5bf1bf35f37446a813eef0))
+* Updated Maven Central link [skip ci] ([a6fea28](https://github.com/autonomouslogic/dynamo-mapper/commit/a6fea282564eb9dc764b4cfcd8bdebb9b48943bb))
+
+
+### Tests
+
+* Coverage testing ([#178](https://github.com/autonomouslogic/dynamo-mapper/issues/178)) ([feff9e5](https://github.com/autonomouslogic/dynamo-mapper/commit/feff9e5ac5753bb126fc58e0cb5d484575ae457b))
+
 ## [2.1.36](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.35...2.1.36) (2026-08-15)
 
 
