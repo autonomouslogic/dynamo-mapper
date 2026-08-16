@@ -12,7 +12,7 @@ A simple mapper for converting to and from DynamoDB [AttributeValues](https://do
 and POJOs using [Jackson](https://github.com/FasterXML/jackson).
 
 ## Installation
-Dynamo Mapper is available from [Maven Central](https://search.maven.org/search?q=g:com.autonomouslogic.dynamomapper%20AND%20a:dynamo-mapper).
+Dynamo Mapper is available from [Maven Central](https://central.sonatype.com/artifact/com.autonomouslogic.dynamomapper/dynamo-mapper).
 
 ### Gradle
 
