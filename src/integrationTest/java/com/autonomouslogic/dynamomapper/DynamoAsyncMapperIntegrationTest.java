@@ -20,8 +20,11 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.KeysAndAttributes;
+import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
+import software.amazon.awssdk.services.dynamodb.model.ScanRequest;
 
 public class DynamoAsyncMapperIntegrationTest {
 	static DynamoAsyncMapper dynamoAsyncMapper;
@@ -114,6 +117,45 @@ public class DynamoAsyncMapperIntegrationTest {
 				.filter(o -> o.str().equals(shared))
 				.collect(Collectors.toList());
 		assertEquals(n, filtered.size());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldScanViaRequest() {
+		String shared = Long.toString(IntegrationTestUtil.RNG.nextLong());
+		int n = 10;
+		for (int i = 0; i < n; i++) {
+			var obj = IntegrationTestObjects.setKeyAndTtl(
+					IntegrationTestObject.builder().str(shared).build());
+			dynamoAsyncMapper.putItemFromKeyObject(obj).join();
+		}
+		var req = ScanRequest.builder().tableName("integration-test-table").build();
+		var scanResult =
+				dynamoAsyncMapper.scan(req, IntegrationTestObject.class).join();
+		var filtered = scanResult.items().stream()
+				.filter(o -> o.str() != null)
+				.filter(o -> o.str().equals(shared))
+				.collect(Collectors.toList());
+		assertEquals(n, filtered.size());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldQueryViaRequest() {
+		var obj = IntegrationTestObjects.setKeyAndTtl(
+				IntegrationTestObject.builder().str("str-5678").build());
+		dynamoAsyncMapper.putItemFromKeyObject(obj).join();
+		var req = QueryRequest.builder()
+				.tableName("integration-test-table")
+				.keyConditionExpression("partitionKey = :v")
+				.filterExpression("str = :s")
+				.expressionAttributeValues(Map.of(
+						":v", AttributeValue.builder().s(obj.partitionKey()).build(),
+						":s", AttributeValue.builder().s(obj.str()).build()))
+				.build();
+		var queryResult =
+				dynamoAsyncMapper.query(req, IntegrationTestObject.class).join();
+		assertEquals(List.of(obj), queryResult.items());
 	}
 
 	@Test
