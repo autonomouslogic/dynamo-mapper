@@ -1,6 +1,7 @@
 package com.autonomouslogic.dynamomapper.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.autonomouslogic.dynamomapper.function.TableNameDecorator;
 import com.autonomouslogic.dynamomapper.model.MethodTestObject;
@@ -50,5 +51,11 @@ public class ReflectionUtilTest {
 		TableNameDecorator decorator = (clazz, tableName) -> tableName + "-" + clazz.getSimpleName();
 		var reflectionUtil = new ReflectionUtil(StdJsonMapper.jsonMapper(), decorator);
 		assertEquals("test-TestObject", reflectionUtil.resolveTableName(TestObject.class));
+	}
+
+	@Test
+	void shouldThrowOnMissingTableNameAnnotation() {
+		class NoTableName {}
+		assertThrows(IllegalArgumentException.class, () -> reflectionUtil.resolveTableName(NoTableName.class));
 	}
 }
