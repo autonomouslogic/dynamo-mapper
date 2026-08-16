@@ -8,6 +8,7 @@ import com.autonomouslogic.dynamomapper.model.MappedBatchGetItemResponse;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestHelper;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestObjects;
 import com.autonomouslogic.dynamomapper.test.IntegrationTestUtil;
+import com.autonomouslogic.dynamomapper.test.PublisherUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -303,5 +304,89 @@ public class DynamoAsyncMapperIntegrationTest {
 						IntegrationTestObject.class)
 				.join();
 		assertEquals(List.of(obj), queryResult.items());
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItemPaginatorViaRequest() {
+		var keys = putBatchItems(3);
+		var keyMaps = encodeKeys(keys);
+		var req = BatchGetItemRequest.builder()
+				.requestItems(Map.of(
+						"integration-test-table",
+						KeysAndAttributes.builder().keys(keyMaps).build()))
+				.build();
+		var pages = PublisherUtil.collectBlocking(
+				dynamoAsyncMapper.batchGetItemPaginator(req, IntegrationTestObject.class));
+		assertPaginatorBatchKeys(pages, keys);
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItemPaginatorViaConsumer() {
+		var keys = putBatchItems(3);
+		var keyMaps = encodeKeys(keys);
+		var pages = PublisherUtil.collectBlocking(dynamoAsyncMapper.batchGetItemPaginator(
+				req -> req.requestItems(Map.of(
+						"integration-test-table",
+						KeysAndAttributes.builder().keys(keyMaps).build())),
+				IntegrationTestObject.class));
+		assertPaginatorBatchKeys(pages, keys);
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItemPaginatorFromPrimaryKeysWithoutConsumer() {
+		var keys = putBatchItems(3);
+		var pages = PublisherUtil.collectBlocking(
+				dynamoAsyncMapper.batchGetItemPaginatorFromPrimaryKeys(keys, IntegrationTestObject.class));
+		assertPaginatorBatchKeys(pages, keys);
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItemPaginatorFromPrimaryKeysWithConsumer() {
+		var keys = putBatchItems(3);
+		var pages = PublisherUtil.collectBlocking(dynamoAsyncMapper.batchGetItemPaginatorFromPrimaryKeys(
+				keys,
+				req -> assertEquals(
+						Set.of("integration-test-table"),
+						req.build().requestItems().keySet()),
+				IntegrationTestObject.class));
+		assertPaginatorBatchKeys(pages, keys);
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItemPaginatorFromKeyObjectsWithoutConsumer() {
+		var keys = putBatchItems(3);
+		var keyObjects = toKeyObjects(keys);
+		var pages = PublisherUtil.collectBlocking(
+				dynamoAsyncMapper.<IntegrationTestObject>batchGetItemPaginatorFromKeyObjects(keyObjects));
+		assertPaginatorBatchKeys(pages, keys);
+	}
+
+	@Test
+	@SneakyThrows
+	void shouldBatchGetItemPaginatorFromKeyObjectsWithConsumer() {
+		var keys = putBatchItems(3);
+		var keyObjects = toKeyObjects(keys);
+		var pages = PublisherUtil.collectBlocking(
+				dynamoAsyncMapper.<IntegrationTestObject>batchGetItemPaginatorFromKeyObjects(
+						keyObjects,
+						req -> assertEquals(
+								Set.of("integration-test-table"),
+								req.build().requestItems().keySet())));
+		assertPaginatorBatchKeys(pages, keys);
+	}
+
+	private void assertPaginatorBatchKeys(
+			List<MappedBatchGetItemResponse<IntegrationTestObject>> pages, List<String> keys) {
+		var fetchedKeys = pages.stream()
+				.flatMap(page -> page.items().values().stream())
+				.flatMap(Collection::stream)
+				.map(IntegrationTestObject::partitionKey)
+				.collect(Collectors.toList());
+		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
 	}
 }
