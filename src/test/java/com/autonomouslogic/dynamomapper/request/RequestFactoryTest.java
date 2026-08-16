@@ -167,6 +167,71 @@ public class RequestFactoryTest {
 	}
 
 	@Test
+	void shouldRejectNullPrimaryKeyInGetItemRequest() {
+		assertThrows(NullPointerException.class, () -> factory.getItemRequestFromPrimaryKey(null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullClassInGetItemRequest() {
+		assertThrows(NullPointerException.class, () -> factory.getItemRequestFromPrimaryKey("key", null));
+	}
+
+	@Test
+	void shouldRejectNullKeyObjectInGetItemRequest() {
+		assertThrows(NullPointerException.class, () -> factory.getItemRequestFromKeyObject(null));
+	}
+
+	@Test
+	void shouldRejectNullObjectInPutItemRequest() {
+		assertThrows(NullPointerException.class, () -> factory.putItemRequestFromKeyObject(null));
+	}
+
+	@Test
+	void shouldRejectNullObjectInDeleteItemRequest() {
+		assertThrows(NullPointerException.class, () -> factory.deleteItemRequestFromKeyObject(null));
+	}
+
+	@Test
+	void shouldRejectNullPrimaryKeyListInBatchGetItemRequest() {
+		assertThrows(
+				NullPointerException.class, () -> factory.batchGetItemRequestFromPrimaryKeys(null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullRequestInAcceptGetItemRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptGetItemRequest((GetItemRequest) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullClassInAcceptGetItemRequest() {
+		var req = GetItemRequest.builder()
+				.tableName("test")
+				.key(Map.of("string", AttributeValue.builder().s("k").build()))
+				.build();
+		assertThrows(NullPointerException.class, () -> factory.acceptGetItemRequest(req, null));
+	}
+
+	@Test
+	void shouldRejectNullRequestInAcceptPutItemRequest() {
+		assertThrows(
+				NullPointerException.class,
+				() -> factory.acceptPutItemRequest((PutItemRequest) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullRequestInAcceptScanRequest() {
+		assertThrows(NullPointerException.class, () -> factory.acceptScanRequest((ScanRequest) null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullRequestInAcceptQueryRequest() {
+		assertThrows(
+				NullPointerException.class, () -> factory.acceptQueryRequest((QueryRequest) null, TestObject.class));
+	}
+
+	@Test
 	@SneakyThrows
 	void shouldAcceptGetItemRequestWithTableName() {
 		var req = GetItemRequest.builder()

@@ -101,6 +101,38 @@ public class DynamoEncoderTest {
 
 	@Test
 	@SneakyThrows
+	void shouldEncodeNullJavaValueAsNull() {
+		var attr = encoder.encodeValue(null);
+		assertTrue(attr.nul());
+	}
+
+	@Test
+	void shouldRejectNullObjectInEncode() {
+		assertThrows(NullPointerException.class, () -> encoder.encode(null));
+	}
+
+	@Test
+	void shouldRejectNullKeyObjectInEncodeKeyValue() {
+		assertThrows(NullPointerException.class, () -> encoder.encodeKeyValue((NoKeyObject) null));
+	}
+
+	@Test
+	void shouldRejectNullPrimaryKeyInEncodeKeyValue() {
+		assertThrows(NullPointerException.class, () -> encoder.encodeKeyValue(null, NoKeyObject.class));
+	}
+
+	@Test
+	void shouldRejectNullClassInEncodeKeyValue() {
+		assertThrows(NullPointerException.class, () -> encoder.encodeKeyValue("key", (Class<?>) null));
+	}
+
+	@Test
+	void shouldRejectNullObjectInEncodeUpdates() {
+		assertThrows(NullPointerException.class, () -> encoder.encodeUpdates(null));
+	}
+
+	@Test
+	@SneakyThrows
 	void shouldRejectEncodeValueWithUnsupportedNodeType() {
 		var missingNode = jsonMapper.missingNode();
 		assertThrows(IllegalArgumentException.class, () -> encoder.encodeValue(missingNode));
