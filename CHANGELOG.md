@@ -1,5 +1,17 @@
 Dynamo Mapper Changelog
 
+## [3.0.1](https://github.com/autonomouslogic/dynamo-mapper/compare/3.0.0...3.0.1) (2026-09-07)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#181](https://github.com/autonomouslogic/dynamo-mapper/issues/181)) ([f11b1e9](https://github.com/autonomouslogic/dynamo-mapper/commit/f11b1e9bb3bedb8faa237046be020c92f3d2f8a6))
+
+
+### Miscellaneous Chores
+
+* **deps:** update actions/setup-java action to v6 ([#180](https://github.com/autonomouslogic/dynamo-mapper/issues/180)) ([68d68c8](https://github.com/autonomouslogic/dynamo-mapper/commit/68d68c815abff158b562f0dae1e6bd24bd01072a))
+
 ## [3.0.0](https://github.com/autonomouslogic/dynamo-mapper/compare/2.1.36...3.0.0) (2026-08-16)
 
 
