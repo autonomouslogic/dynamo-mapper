@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
@@ -222,59 +221,5 @@ public class DynamoDecoderTest {
 
 	public static List<CodecTests> loadTests() {
 		return Stream.of(CodecTests.values()).filter(CodecTests::decodeTest).collect(Collectors.toList());
-	}
-
-	// ===== decodeNumber: N decoding must be unchanged, and must not throw on the common decimal case =====
-
-	/** An N that fits in a long still decodes to a long, including the 19-digit Long.MAX_VALUE boundary. */
-	@ParameterizedTest
-	@CsvSource({
-		"1, 1",
-		"-1, -1",
-		"0, 0",
-		"999999999999999999, 999999999999999999",
-		"9223372036854775807, 9223372036854775807",
-		"-9223372036854775808, -9223372036854775808"
-	})
-	@SneakyThrows
-	void shouldDecodeIntegralNAsLong(String n, long expected) {
-		var decoded =
-				decoder.decode(Map.of("longValue", AttributeValue.builder().n(n).build()), TestObject.class);
-		assertEquals(expected, decoded.longValue());
-	}
-
-	/**
-	 * A decimal N decodes to the same value as before. These used to reach Long.parseLong and throw a
-	 * NumberFormatException per attribute -- 11.6M of them in a 600s production profile -- which the catch
-	 * then turned into decodeString. The pattern check now routes them straight to decodeString, so the
-	 * decoded value is identical and no exception is constructed.
-	 */
-	@ParameterizedTest
-	@CsvSource({"0.75, 0.75", "0.8333333, 0.8333333", "0.4, 0.4", "-0.5, -0.5", "1.0, 1.0"})
-	@SneakyThrows
-	void shouldDecodeDecimalNWithoutParsingItAsLong(String n, double expected) {
-		var decoded = decoder.decode(
-				Map.of("doubleValue", AttributeValue.builder().n(n).build()), TestObject.class);
-		assertEquals(expected, decoded.doubleValue());
-	}
-
-	/** An N too large for a long keeps its previous route through decodeString. */
-	@ParameterizedTest
-	@CsvSource({"9223372036854775808", "99999999999999999999999999"})
-	@SneakyThrows
-	void shouldDecodeOverlongNAsBigInteger(String n) {
-		var decoded = decoder.decode(
-				Map.of("bigInteger", AttributeValue.builder().n(n).build()), TestObject.class);
-		assertEquals(new java.math.BigInteger(n), decoded.bigInteger());
-	}
-
-	/** High-precision decimals keep full precision, as they did via decodeString. */
-	@ParameterizedTest
-	@CsvSource({"0.6013582", "123456789.123456789"})
-	@SneakyThrows
-	void shouldDecodeHighPrecisionNAsBigDecimal(String n) {
-		var decoded = decoder.decode(
-				Map.of("bigDecimal", AttributeValue.builder().n(n).build()), TestObject.class);
-		assertEquals(new java.math.BigDecimal(n), decoded.bigDecimal());
 	}
 }

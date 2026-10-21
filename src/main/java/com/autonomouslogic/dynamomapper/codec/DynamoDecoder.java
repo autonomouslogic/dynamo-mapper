@@ -12,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.SdkBytes;
@@ -163,24 +162,12 @@ public class DynamoDecoder {
 	}
 
 	/**
-	 * A DynamoDB N that is certain to parse as a long: an optional sign and at most 18 digits. Long.MAX_VALUE
-	 * has 19 digits, so 18 can never overflow and Long.parseLong cannot throw for a match.
+	 * DynamoDB v1's boolean attributes decode as N "0"/"1". Everything else goes to decodeString and lets
+	 * Jackson's own coercion handle the typed target.
 	 */
-	private static final Pattern CERTAIN_LONG = Pattern.compile("[+-]?[0-9]{1,18}");
-
-	/** A longer run of digits, which may or may not fit in a long, so parsing it still has to be guarded. */
-	private static final Pattern POSSIBLE_LONG = Pattern.compile("[+-]?[0-9]{19,}");
-
 	private JsonNode decodeNumber(String num) {
-		if (CERTAIN_LONG.matcher(num).matches()) {
-			return jsonMapper.getNodeFactory().numberNode(Long.parseLong(num));
-		}
-		if (POSSIBLE_LONG.matcher(num).matches()) {
-			try {
-				return jsonMapper.getNodeFactory().numberNode(Long.parseLong(num));
-			} catch (NumberFormatException e) {
-				return decodeString(num);
-			}
+		if (num.equals("0") || num.equals("1")) {
+			return jsonMapper.getNodeFactory().numberNode(Integer.parseInt(num));
 		}
 		return decodeString(num);
 	}

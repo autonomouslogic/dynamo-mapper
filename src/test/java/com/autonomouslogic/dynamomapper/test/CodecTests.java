@@ -105,6 +105,19 @@ public enum CodecTests {
 	LONG_OVERFLOW_INT(
 			TestObject.builder().longValue(2147483648L).build(),
 			Map.of("longValue", AttributeValue.builder().n("2147483648").build())),
+	LONG_18_DIGITS(
+			TestObject.builder().longValue(999999999999999999L).build(),
+			Map.of("longValue", AttributeValue.builder().n("999999999999999999").build())),
+	LONG_MAX_VALUE(
+			TestObject.builder().longValue(Long.MAX_VALUE).build(),
+			Map.of(
+					"longValue",
+					AttributeValue.builder().n(String.valueOf(Long.MAX_VALUE)).build())),
+	LONG_MIN_VALUE(
+			TestObject.builder().longValue(Long.MIN_VALUE).build(),
+			Map.of(
+					"longValue",
+					AttributeValue.builder().n(String.valueOf(Long.MIN_VALUE)).build())),
 	FLOAT(
 			TestObject.builder().floatValue(1.5f).build(),
 			Map.of("floatValue", AttributeValue.builder().n("1.5").build())),
@@ -134,6 +147,16 @@ public enum CodecTests {
 	BIG_DECIMAL_OVERFLOW_DOUBLE(
 			TestObject.builder().bigDecimal(new BigDecimal("1.8E+308")).build(),
 			Map.of("bigDecimal", AttributeValue.builder().n("1.8E+308").build())),
+	BIG_DECIMAL_PRECISE(
+			TestObject.builder().bigDecimal(new BigDecimal("0.6013582")).build(),
+			Map.of("bigDecimal", AttributeValue.builder().n("0.6013582").build())),
+	BIG_DECIMAL_PRECISION_PAST_DOUBLE(
+			TestObject.builder()
+					.bigDecimal(new BigDecimal("123456789.123456789"))
+					.build(),
+			Map.of(
+					"bigDecimal",
+					AttributeValue.builder().n("123456789.123456789").build())),
 	INTEGER_LIST(
 			TestObject.builder().numberList(List.of(1, 2, 3)).build(),
 			Map.of("numberList", AttributeValue.builder().ns("1", "2", "3").build()),
