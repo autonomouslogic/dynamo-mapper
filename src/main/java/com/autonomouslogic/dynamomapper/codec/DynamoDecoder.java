@@ -161,13 +161,15 @@ public class DynamoDecoder {
 		return jsonMapper.getNodeFactory().binaryNode(bytes.asByteArray());
 	}
 
+	/**
+	 * DynamoDB v1's boolean attributes decode as N "0"/"1". Everything else goes to decodeString and lets
+	 * Jackson's own coercion handle the typed target.
+	 */
 	private JsonNode decodeNumber(String num) {
-		try {
-			var val = Long.parseLong(num);
-			return jsonMapper.getNodeFactory().numberNode(val);
-		} catch (NumberFormatException e) {
-			return decodeString(num);
+		if (num.equals("0") || num.equals("1")) {
+			return jsonMapper.getNodeFactory().numberNode(Integer.parseInt(num));
 		}
+		return decodeString(num);
 	}
 
 	private JsonNode decodeMap(AttributeValue val) {
