@@ -1,5 +1,17 @@
 Dynamo Mapper Changelog
 
+## [3.0.2](https://github.com/autonomouslogic/dynamo-mapper/compare/3.0.1...3.0.2) (2026-10-22)
+
+
+### Bug Fixes
+
+* Decode a decimal N without throwing NumberFormatException ([#186](https://github.com/autonomouslogic/dynamo-mapper/issues/186)) ([d5aa958](https://github.com/autonomouslogic/dynamo-mapper/commit/d5aa958ccce31af35a2e21bbc06d169b460e519c))
+
+
+### Miscellaneous Chores
+
+* **deps:** update all non-major dependencies ([#182](https://github.com/autonomouslogic/dynamo-mapper/issues/182)) ([a88942b](https://github.com/autonomouslogic/dynamo-mapper/commit/a88942b78c5278872e53cd5cd7386512eff6baee))
+
 ## [3.0.1](https://github.com/autonomouslogic/dynamo-mapper/compare/3.0.0...3.0.1) (2026-09-07)
 
 
