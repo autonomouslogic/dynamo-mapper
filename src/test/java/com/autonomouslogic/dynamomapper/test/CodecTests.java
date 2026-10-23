@@ -181,6 +181,14 @@ public enum CodecTests {
 	BOOL_V1_TRUE(
 			TestObject.builder().boolPrimitive(true).build(),
 			Map.of("boolPrimitive", AttributeValue.builder().n("1").build()),
+			EncodeDecode.DECODE_ONLY),
+	BOOL_V1_TRUE_NON_CANONICAL(
+			TestObject.builder().boolPrimitive(true).build(),
+			Map.of("boolPrimitive", AttributeValue.builder().n("2").build()),
+			EncodeDecode.DECODE_ONLY),
+	NEGATIVE_ZERO(
+			TestObject.builder().doubleValue(0.0).build(),
+			Map.of("doubleValue", AttributeValue.builder().n("-0").build()),
 			EncodeDecode.DECODE_ONLY);
 
 	TestObject pojo;
