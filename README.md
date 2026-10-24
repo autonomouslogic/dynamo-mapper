@@ -158,6 +158,19 @@ All three read `BOOL` the same way, but they differ when reading an `N` into a `
 The official clients never write a number other than `0` or `1` for a boolean,
 so the difference only matters for data written some other way, such as with the low-level client or by hand.
 
+## Testing
+[![Code Coverage](https://codecov.io/gh/autonomouslogic/dynamo-mapper/graph/badge.svg)](https://codecov.io/gh/autonomouslogic/dynamo-mapper)
+
+Dynamo Mapper tests across multiple Java versions and dependency combinations.
+See the [GitHub Actions workflows](https://github.com/autonomouslogic/dynamo-mapper/actions) for exact versions covered.
+
+Besides unit tests, two kinds of tests run against real services:
+
+* **Integration tests** put and get items from a real DynamoDB table, confirming Dynamo Mapper works correctly
+  against the actual service rather than just mocks.
+* **Compatibility tests** write with Dynamo Mapper and read back with the official v1 `DynamoDBMapper` and v2
+  Enhanced Client, and vice versa, confirming items written by one are read correctly by the others.
+
 ## Resources
 * https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html
 * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html
