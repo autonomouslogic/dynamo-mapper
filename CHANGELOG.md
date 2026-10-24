@@ -1,5 +1,36 @@
 Dynamo Mapper Changelog
 
+## [3.0.3](https://github.com/autonomouslogic/dynamo-mapper/compare/3.0.2...3.0.3) (2026-10-24)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#185](https://github.com/autonomouslogic/dynamo-mapper/issues/185)) ([e3d9c57](https://github.com/autonomouslogic/dynamo-mapper/commit/e3d9c577f503eea042e279e60be4e2dd84a0647c))
+* Restore integer to boolean decoding from 3.0.1 ([#187](https://github.com/autonomouslogic/dynamo-mapper/issues/187)) ([4da5e39](https://github.com/autonomouslogic/dynamo-mapper/commit/4da5e39cd48a482e381fc18e0b219c972f50c311))
+
+
+### Documentation
+
+* Readme ([afb213e](https://github.com/autonomouslogic/dynamo-mapper/commit/afb213e462125cf6caf810829aa1d145a23b39bf))
+* Testing notes ([32632fc](https://github.com/autonomouslogic/dynamo-mapper/commit/32632fcacb7cfb545a9632f606bae32b4de8bf36))
+
+
+### Miscellaneous Chores
+
+* AGENTS.md ([091d2ec](https://github.com/autonomouslogic/dynamo-mapper/commit/091d2eca52292345e94e23be1875b7e487378ecc))
+* **deps:** update dependency java-jdk to v25 ([#183](https://github.com/autonomouslogic/dynamo-mapper/issues/183)) ([11dc628](https://github.com/autonomouslogic/dynamo-mapper/commit/11dc628e9dd683990eaa8c2bfdef05fe7daba595))
+
+
+### Tests
+
+* Extra testing ([#189](https://github.com/autonomouslogic/dynamo-mapper/issues/189)) ([88340d5](https://github.com/autonomouslogic/dynamo-mapper/commit/88340d58c50740ff543155058066ff7320ed6794))
+* Fixed test AWS credentials to work with assumed STS roles ([292f9df](https://github.com/autonomouslogic/dynamo-mapper/commit/292f9df0b01c6416c0af6745ced414804e27420f))
+
+
+### Continuous Integration
+
+* Matrix testing ([#188](https://github.com/autonomouslogic/dynamo-mapper/issues/188)) ([fcc9e37](https://github.com/autonomouslogic/dynamo-mapper/commit/fcc9e3774c437cc3d7a4d136c2b3df1ba7688348))
+
 ## [3.0.2](https://github.com/autonomouslogic/dynamo-mapper/compare/3.0.1...3.0.2) (2026-10-22)
 
 
