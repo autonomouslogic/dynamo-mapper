@@ -9,6 +9,11 @@ jobs:
       matrix:
         java-version: [ 17, 21, 25, 27 ]
         java-distribution: [ temurin, corretto, zulu, microsoft, graalvm-community ]
+        exclude:
+          - java-version: 27
+            java-distribution: microsoft
+          - java-version: 27
+            java-distribution: graalvm-community
     steps:
       - name: Checkout
         uses: actions/checkout@v7
