@@ -100,10 +100,13 @@ public class DynamoAsyncMapperIntegrationTest {
 	@MethodSource("com.autonomouslogic.dynamomapper.test.IntegrationTestHelper#numberAsBooleanCases")
 	@SneakyThrows
 	void shouldReadNumbersAsBooleans(String n, boolean expected) {
-		helper.testReadNumberAsBoolean(n, expected, key -> dynamoAsyncMapper
-				.getItemFromPrimaryKey(key, IntegrationTestObject.class)
-				.join()
-				.item());
+		helper.testReadNumberAsBoolean(
+				n,
+				expected,
+				key -> dynamoAsyncMapper
+						.getItemFromPrimaryKey(key, IntegrationTestObject.class)
+						.join()
+						.item());
 	}
 
 	@Test
