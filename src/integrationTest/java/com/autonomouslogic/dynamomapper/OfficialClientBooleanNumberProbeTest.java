@@ -16,8 +16,10 @@ import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 
-// Temporary: shows how the official v1 and v2 clients read a boolean stored as N. Delete before merging.
-public class TempBooleanNumberProbeTest {
+/**
+ * Shows how the official v1 and v2 clients read a boolean stored as N.
+ */
+public class OfficialClientBooleanNumberProbeTest {
 	static DynamoDbClient client;
 	static DynamoDBMapper v1Client;
 	static DynamoDbTable<CompatibilityTestObject> v2Table;

@@ -162,6 +162,15 @@ public class DynamoMapperIntegrationTest {
 		assertEquals(new HashSet<>(keys), new HashSet<>(fetchedKeys));
 	}
 
+	@ParameterizedTest
+	@MethodSource("com.autonomouslogic.dynamomapper.test.IntegrationTestHelper#numberAsBooleanCases")
+	@SneakyThrows
+	void shouldReadNumbersAsBooleans(String n, boolean expected) {
+		helper.testReadNumberAsBoolean(n, expected, key -> dynamoMapper
+				.getItemFromPrimaryKey(key, IntegrationTestObject.class)
+				.item());
+	}
+
 	@Test
 	@SneakyThrows
 	void shouldRejectBigIntegersExceedingDynamoDbPrecision() {

@@ -127,6 +127,10 @@ public enum CodecTests {
 	DOUBLE_OVERFLOW_FLOAT(
 			TestObject.builder().doubleValue(3.5E38d).build(),
 			Map.of("doubleValue", AttributeValue.builder().n("3.5E38").build())),
+	NEGATIVE_ZERO(
+			TestObject.builder().doubleValue(0.0).build(),
+			Map.of("doubleValue", AttributeValue.builder().n("-0").build()),
+			EncodeDecode.DECODE_ONLY),
 	BIG_INTEGER(
 			TestObject.builder()
 					.bigInteger(new BigInteger("12345678901234567890"))
@@ -182,13 +186,9 @@ public enum CodecTests {
 			TestObject.builder().boolPrimitive(true).build(),
 			Map.of("boolPrimitive", AttributeValue.builder().n("1").build()),
 			EncodeDecode.DECODE_ONLY),
-	BOOL_V1_TRUE_NON_CANONICAL(
+	BOOL_NON_CANONICAL_TRUE(
 			TestObject.builder().boolPrimitive(true).build(),
 			Map.of("boolPrimitive", AttributeValue.builder().n("2").build()),
-			EncodeDecode.DECODE_ONLY),
-	NEGATIVE_ZERO(
-			TestObject.builder().doubleValue(0.0).build(),
-			Map.of("doubleValue", AttributeValue.builder().n("-0").build()),
 			EncodeDecode.DECODE_ONLY);
 
 	TestObject pojo;
