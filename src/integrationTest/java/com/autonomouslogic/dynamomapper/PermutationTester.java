@@ -345,8 +345,9 @@ public class PermutationTester {
 
 	public static List<ObjectAndTestMethod> objectAndTestMethods() {
 		return IntegrationTestUtil.loadIntegrationTestObjects().stream()
-				.flatMap(obj -> Stream.of(MethodType.values()).flatMap(methodType -> Stream.of(CallMethod.values())
-						.map(callMethod -> new ObjectAndTestMethod(obj, methodType, callMethod))))
+				.flatMap(obj -> Stream.of(MethodType.values())
+						.flatMap(methodType -> Stream.of(CallMethod.values())
+								.map(callMethod -> new ObjectAndTestMethod(obj, methodType, callMethod))))
 				.collect(Collectors.toList());
 	}
 }
