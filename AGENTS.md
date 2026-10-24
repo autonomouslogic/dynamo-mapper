@@ -28,7 +28,8 @@ Keep this file up to date. Change affects anything described here (stack, layout
 - Never run `release.sh` / `publish.sh`. Never edit `CHANGELOG.md` (semantic-release writes it).
 
 ## CI (`.github/workflows`)
-- `build.yml`: `test`, `integrationTest`, jacoco, codecov.
+- `build.yml`: `test`, `integrationTest`, jacoco, codecov. Java 17 only.
+- `matrix-test.yml`: `test` across Java 17, 21, 25, matrix jobs run concurrently. No integration tests, no coverage.
 - `codegen.yml`: `codegen` + `spotlessApply` must leave zero diff. Commit regenerated mappers.
 - `spotless.yml`: `spotlessCheck`.
 - `semantic-pr.yml`: PR title must be conventional commit.

@@ -1,0 +1,38 @@
+name: Matrix Test
+on: [ push ]
+jobs:
+  Test:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [ 17, 21, 25, 27 ]
+        java-distribution: [ temurin, corretto, zulu, microsoft, graalvm-community ]
+        exclude:
+          - java-version: 27
+            java-distribution: microsoft
+          - java-version: 27
+            java-distribution: graalvm-community
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: ${{ matrix.java-distribution }}
+          java-version: ${{ matrix.java-version }}
+
+      - name: Caches
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ matrix.java-distribution }}-${{ matrix.java-version }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-${{ matrix.java-distribution }}-${{ matrix.java-version }}-
+
+      - name: Test
+        run: ./gradlew test --stacktrace
