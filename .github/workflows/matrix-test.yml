@@ -7,7 +7,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java-version: [ 17, 21, 25, 27, 28-ea, 29-ea, 30-ea ]
+        java-version: [ 17, 21, 25, 27 ]
+        java-distribution: [ temurin, corretto, zulu, microsoft, graalvm-community ]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -15,7 +16,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v6
         with:
-          distribution: temurin
+          distribution: ${{ matrix.java-distribution }}
           java-version: ${{ matrix.java-version }}
 
       - name: Caches
@@ -24,9 +25,9 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ matrix.java-version }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-${{ matrix.java-distribution }}-${{ matrix.java-version }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-${{ matrix.java-version }}-
+            ${{ runner.os }}-gradle-${{ matrix.java-distribution }}-${{ matrix.java-version }}-
 
       - name: Test
         run: ./gradlew test --stacktrace
