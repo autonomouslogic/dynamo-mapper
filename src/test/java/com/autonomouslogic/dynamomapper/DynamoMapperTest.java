@@ -1,6 +1,7 @@
 package com.autonomouslogic.dynamomapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -499,5 +500,225 @@ public class DynamoMapperTest {
 	@Test
 	void builderShouldCreateMapper() {
 		assertTrue(DynamoMapper.builder() instanceof DynamoMapperBuilder);
+	}
+
+	// Null argument rejection: every @NonNull parameter on every generated delegate method.
+
+	@Test
+	void shouldRejectNullArgsInGetItemFromConsumer() {
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.getItem((Consumer<GetItemRequest.Builder>) null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.getItem(b -> {}, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInGetItemFromPrimaryKeyWithConsumer() {
+		assertThrows(NullPointerException.class, () -> mapper.getItemFromPrimaryKey(null, b -> {}, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.getItemFromPrimaryKey("key1", null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.getItemFromPrimaryKey("key1", b -> {}, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInGetItemFromKeyObjectWithConsumer() {
+		assertThrows(NullPointerException.class, () -> mapper.getItemFromKeyObject(null, b -> {}));
+		assertThrows(NullPointerException.class, () -> mapper.getItemFromKeyObject(KEY_OBJECT, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInGetItemFromRequest() {
+		assertThrows(NullPointerException.class, () -> mapper.getItem((GetItemRequest) null, TestObject.class));
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.getItem(GetItemRequest.builder().build(), null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInGetItemFromPrimaryKey() {
+		assertThrows(NullPointerException.class, () -> mapper.getItemFromPrimaryKey(null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.getItemFromPrimaryKey("key1", null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInGetItemFromKeyObject() {
+		assertThrows(NullPointerException.class, () -> mapper.getItemFromKeyObject(null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInBatchGetItemFromRequest() {
+		assertThrows(
+				NullPointerException.class, () -> mapper.batchGetItem((BatchGetItemRequest) null, TestObject.class));
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.batchGetItem(BatchGetItemRequest.builder().build(), null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInBatchGetItemFromPrimaryKeys() {
+		assertThrows(NullPointerException.class, () -> mapper.batchGetItemFromPrimaryKeys(null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.batchGetItemFromPrimaryKeys(List.of("key1"), null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInBatchGetItemFromKeyObjects() {
+		assertThrows(NullPointerException.class, () -> mapper.batchGetItemFromKeyObjects(null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.batchGetItemFromKeyObjects(List.of(KEY_OBJECT), null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInBatchGetItemFromConsumer() {
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.batchGetItem((Consumer<BatchGetItemRequest.Builder>) null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.batchGetItem(b -> {}, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInBatchGetItemFromPrimaryKeysWithConsumer() {
+		assertThrows(
+				NullPointerException.class, () -> mapper.batchGetItemFromPrimaryKeys(null, b -> {}, TestObject.class));
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.batchGetItemFromPrimaryKeys(List.of("key1"), null, TestObject.class));
+		assertThrows(
+				NullPointerException.class, () -> mapper.batchGetItemFromPrimaryKeys(List.of("key1"), b -> {}, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInBatchGetItemFromKeyObjectsWithConsumer() {
+		assertThrows(
+				NullPointerException.class, () -> mapper.batchGetItemFromKeyObjects(null, TestObject.class, b -> {}));
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.batchGetItemFromKeyObjects(List.of(KEY_OBJECT), null, b -> {}));
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.batchGetItemFromKeyObjects(List.of(KEY_OBJECT), TestObject.class, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInPutItemFromConsumer() {
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.putItem((Consumer<PutItemRequest.Builder>) null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.putItem(b -> {}, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInPutItemFromKeyObjectWithConsumer() {
+		assertThrows(NullPointerException.class, () -> mapper.putItemFromKeyObject(null, b -> {}));
+		assertThrows(NullPointerException.class, () -> mapper.putItemFromKeyObject(KEY_OBJECT, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInPutItemFromRequest() {
+		assertThrows(NullPointerException.class, () -> mapper.putItem((PutItemRequest) null, TestObject.class));
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.putItem(PutItemRequest.builder().build(), null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInPutItemFromKeyObject() {
+		assertThrows(NullPointerException.class, () -> mapper.putItemFromKeyObject(null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInUpdateItemFromConsumer() {
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.updateItem((Consumer<UpdateItemRequest.Builder>) null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.updateItem(b -> {}, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInUpdateItemFromKeyObjectWithConsumer() {
+		assertThrows(NullPointerException.class, () -> mapper.updateItemFromKeyObject(null, b -> {}));
+		assertThrows(NullPointerException.class, () -> mapper.updateItemFromKeyObject(KEY_OBJECT, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInUpdateItemFromRequest() {
+		assertThrows(NullPointerException.class, () -> mapper.updateItem((UpdateItemRequest) null, TestObject.class));
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.updateItem(UpdateItemRequest.builder().build(), null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInUpdateItemFromKeyObject() {
+		assertThrows(NullPointerException.class, () -> mapper.updateItemFromKeyObject(null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInDeleteItemFromConsumer() {
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.deleteItem((Consumer<DeleteItemRequest.Builder>) null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.deleteItem(b -> {}, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInDeleteItemFromPrimaryKeyWithConsumer() {
+		assertThrows(
+				NullPointerException.class, () -> mapper.deleteItemFromPrimaryKey(null, b -> {}, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.deleteItemFromPrimaryKey("key1", null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.deleteItemFromPrimaryKey("key1", b -> {}, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInDeleteItemFromKeyObjectWithConsumer() {
+		assertThrows(NullPointerException.class, () -> mapper.deleteItemFromKeyObject(null, b -> {}));
+		assertThrows(NullPointerException.class, () -> mapper.deleteItemFromKeyObject(KEY_OBJECT, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInDeleteItemFromRequest() {
+		assertThrows(NullPointerException.class, () -> mapper.deleteItem((DeleteItemRequest) null, TestObject.class));
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.deleteItem(DeleteItemRequest.builder().build(), null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInDeleteItemFromPrimaryKey() {
+		assertThrows(NullPointerException.class, () -> mapper.deleteItemFromPrimaryKey(null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.deleteItemFromPrimaryKey("key1", null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInDeleteItemFromKeyObject() {
+		assertThrows(NullPointerException.class, () -> mapper.deleteItemFromKeyObject(null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInScanFromConsumer() {
+		assertThrows(
+				NullPointerException.class, () -> mapper.scan((Consumer<ScanRequest.Builder>) null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.scan(b -> {}, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInScanFromRequest() {
+		assertThrows(NullPointerException.class, () -> mapper.scan((ScanRequest) null, TestObject.class));
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.scan(ScanRequest.builder().build(), null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInQueryFromConsumer() {
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.query((Consumer<QueryRequest.Builder>) null, TestObject.class));
+		assertThrows(NullPointerException.class, () -> mapper.query(b -> {}, null));
+	}
+
+	@Test
+	void shouldRejectNullArgsInQueryFromRequest() {
+		assertThrows(NullPointerException.class, () -> mapper.query((QueryRequest) null, TestObject.class));
+		assertThrows(
+				NullPointerException.class,
+				() -> mapper.query(QueryRequest.builder().build(), null));
 	}
 }
