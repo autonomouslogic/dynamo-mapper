@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.BatchGetItemResponse;
@@ -217,6 +218,39 @@ public class DynamoDecoderTest {
 		var emptyAttr = AttributeValue.builder().build();
 		assertThrows(
 				IllegalArgumentException.class, () -> decoder.decode(Map.of("string", emptyAttr), TestObject.class));
+	}
+
+	@ParameterizedTest
+	@CsvSource({
+		"0, true",
+		"1, true",
+		"-1, true",
+		"+1, true",
+		"-0, true",
+		"123, true",
+		"9223372036854775807, true",
+		"-9223372036854775808, true",
+		"9223372036854775808, true",
+		"'', false",
+		"-, false",
+		"+, false",
+		"--1, false",
+		"+-1, false",
+		"1-, false",
+		"' 1', false",
+		"'1 ', false",
+		"1.5, false",
+		"1.0, false",
+		"1E3, false",
+		"1e3, false",
+		"0x1, false",
+		"abc, false",
+		"١, false",
+		"１, false",
+		"一, false"
+	})
+	void shouldDetectIntegral(String num, boolean expected) {
+		assertEquals(expected, DynamoDecoder.isIntegral(num));
 	}
 
 	public static List<CodecTests> loadTests() {

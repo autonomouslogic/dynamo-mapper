@@ -172,7 +172,7 @@ public class DynamoDecoder {
 		}
 	}
 
-	private static boolean isIntegral(String num) {
+	protected static boolean isIntegral(String num) {
 		int start = !num.isEmpty() && (num.charAt(0) == '-' || num.charAt(0) == '+') ? 1 : 0;
 		if (num.length() == start) {
 			return false;
