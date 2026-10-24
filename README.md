@@ -162,7 +162,7 @@ so the difference only matters for data written some other way, such as with the
 [![Code Coverage](https://codecov.io/gh/autonomouslogic/dynamo-mapper/graph/badge.svg)](https://codecov.io/gh/autonomouslogic/dynamo-mapper)
 
 Dynamo Mapper tests across multiple Java versions and dependency combinations.
-See the [GitHub Actions workflows](https://github.com/autonomouslogic/dynamo-mapper/actions) for exact versions covered.
+See the [matrix-test.yml](.github/workflows/matrix-test.yml) for exact versions covered.
 
 Besides unit tests, two kinds of tests run against real services:
 
