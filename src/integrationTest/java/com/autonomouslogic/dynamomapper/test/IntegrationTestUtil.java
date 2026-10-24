@@ -1,9 +1,9 @@
 package com.autonomouslogic.dynamomapper.test;
 
+import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSCredentialsProviderChain;
-import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.BasicSessionCredentials;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.autonomouslogic.dynamomapper.model.IntegrationTestObject;
@@ -15,6 +15,7 @@ import lombok.SneakyThrows;
 import org.apache.commons.math3.random.ISAACRandom;
 import org.apache.commons.math3.random.RandomGenerator;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.providers.AwsRegionProvider;
 import software.amazon.awssdk.regions.providers.DefaultAwsRegionProviderChain;
@@ -59,8 +60,26 @@ public class IntegrationTestUtil {
 	}
 
 	public static AWSCredentialsProvider credentialsProviderV1() {
-		return new AWSCredentialsProviderChain(
-				new EnvironmentVariableCredentialsProvider(), new ProfileCredentialsProvider(profileName()));
+		// Bridges the v2 provider so assumed-role profiles (role_arn/source_profile in ~/.aws/config) resolve via
+		// STS. The v1 SDK's own profile/env providers don't support CLI-style assume-role profiles:
+		// https://github.com/aws/aws-sdk-java/issues/803
+		var v2Provider = credentialsProvider();
+		return new AWSCredentialsProvider() {
+			@Override
+			public AWSCredentials getCredentials() {
+				var credentials = v2Provider.resolveCredentials();
+				if (credentials instanceof AwsSessionCredentials sessionCredentials) {
+					return new BasicSessionCredentials(
+							sessionCredentials.accessKeyId(),
+							sessionCredentials.secretAccessKey(),
+							sessionCredentials.sessionToken());
+				}
+				return new BasicAWSCredentials(credentials.accessKeyId(), credentials.secretAccessKey());
+			}
+
+			@Override
+			public void refresh() {}
+		};
 	}
 
 	public static AwsRegionProvider regionProvider() {
