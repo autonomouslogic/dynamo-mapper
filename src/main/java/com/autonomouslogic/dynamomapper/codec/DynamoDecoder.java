@@ -162,22 +162,23 @@ public class DynamoDecoder {
 	}
 
 	private JsonNode decodeNumber(String num) {
-		if (!isIntegral(num)) {
-			return decodeString(num);
+		if (isIntegral(num)) {
+			try {
+				return jsonMapper.getNodeFactory().numberNode(Long.parseLong(num));
+			} catch (NumberFormatException e) {
+				// Noop
+			}
 		}
-		try {
-			return jsonMapper.getNodeFactory().numberNode(Long.parseLong(num));
-		} catch (NumberFormatException e) {
-			return decodeString(num);
-		}
+		return decodeString(num);
 	}
 
 	protected static boolean isIntegral(String num) {
-		int start = !num.isEmpty() && (num.charAt(0) == '-' || num.charAt(0) == '+') ? 1 : 0;
-		if (num.length() == start) {
+		int start = num.startsWith("-") || num.startsWith("+") ? 1 : 0;
+		int len = num.length();
+		if (len == start) {
 			return false;
 		}
-		for (int i = start; i < num.length(); i++) {
+		for (int i = start; i < len; i++) {
 			char c = num.charAt(i);
 			if (c < '0' || c > '9') {
 				return false;
