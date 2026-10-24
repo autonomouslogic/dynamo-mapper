@@ -138,6 +138,26 @@ For instance, it's not possible to have a different schema in the DynamoDB and J
 | Asynchronous API  | Yes           | No                  | Yes                           |
 | Lombok compatible | Yes           | Partial?            | No?                           |
 
+### Booleans stored as numbers
+Dynamo Mapper writes booleans as `BOOL`.
+The official v1 DynamoDBMapper can write them as `N` with `1` for `true` and `0` for `false`,
+so tables written by v1 often hold booleans as numbers.
+
+All three read `BOOL` the same way, but they differ when reading an `N` into a `boolean` or `Boolean`:
+
+| Stored `N`                        | Dynamo Mapper (this library) | DynamoDBMapper (v1) | DynamoDb Enhanced Client (v2)     |
+|-----------------------------------|------------------------------|---------------------|-----------------------------------|
+| `0`                               | `false`                      | `false`             | `false`                           |
+| `1`                               | `true`                       | `true`              | `true`                            |
+| Any other integer, e.g. `2`, `-1` | `true`                       | `false`             | throws `IllegalArgumentException` |
+
+* Dynamo Mapper follows Jackson's integer-to-boolean coercion: `0` is `false` and any other integer is `true`.
+* The v1 DynamoDBMapper only treats `1` as `true`, and silently reads every other number as `false`.
+* The v2 Enhanced Client only accepts `0` and `1`, and throws `Number could not be converted to boolean` for anything else.
+
+The official clients never write a number other than `0` or `1` for a boolean,
+so the difference only matters for data written some other way, such as with the low-level client or by hand.
+
 ## Resources
 * https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_AttributeValue.html
 * https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.NamingRulesDataTypes.html
