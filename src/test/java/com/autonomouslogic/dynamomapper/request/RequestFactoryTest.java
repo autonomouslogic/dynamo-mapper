@@ -192,6 +192,16 @@ public class RequestFactoryTest {
 	}
 
 	@Test
+	void shouldRejectNullPrimaryKeyInDeleteItemRequest() {
+		assertThrows(NullPointerException.class, () -> factory.deleteItemRequestFromPrimaryKey(null, TestObject.class));
+	}
+
+	@Test
+	void shouldRejectNullKeyObjectsListInBatchGetItemRequest() {
+		assertThrows(NullPointerException.class, () -> factory.batchGetItemRequestFromKeyObjects(null));
+	}
+
+	@Test
 	void shouldRejectNullPrimaryKeyListInBatchGetItemRequest() {
 		assertThrows(
 				NullPointerException.class, () -> factory.batchGetItemRequestFromPrimaryKeys(null, TestObject.class));
