@@ -1,7 +1,7 @@
 plugins {
     id "java"
     id "idea"
-    id "io.freefair.lombok" version "9.8.2"
+    id "io.freefair.lombok" version "9.8.3"
 }
 
 group "com.autonomouslogic.dynamomapper"
@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation "software.amazon.awssdk:dynamodb:2.57.3"
+    implementation "software.amazon.awssdk:dynamodb:2.57.8"
     implementation "com.squareup:javapoet:1.13.0"
     implementation "org.apache.commons:commons-lang3:3.21.0"
     implementation "org.projectlombok:lombok:1.18.48"
